@@ -12,6 +12,7 @@ datasource db {
 
 model User {
   id Int @id @default(autoincrement())
+  username String @unique
   createAd DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -20,7 +21,27 @@ model User {
   
   email String
   hash String
+  games Game[] @relation("GameUsers")
+}
 
+// model History {
+//   id Int @id @default(autoincrement())
+//   date DateTime
+//   duration Int 
+//   // player1 User;
+//   // player2 User;
+//   scoreP1 Int
+//   scoreP2 Int
+// }
+
+model Game {
+  id Int @id @default(autoincrement())
+  status GameStatus @default(OUTGOING)
+  players   User[] @relation("GameUsers")
 
 }
 
+enum GameStatus {
+  FINISHED
+  OUTGOING
+}
