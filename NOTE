@@ -5,10 +5,14 @@ env vars :
     DATABASE_URL="postgresql://johndoe:randompassword@localhost:5432/mydb?schema=public"
 
 
-
 for prisma:
     npm add -D prisma
     npm add @prisma/client
     npx prisma init
 
     npx prisma migrate dev
+
+run docker-compose:
+    docker compose up game_db -d 
+
+nestjs uses DTO : data transfer object
