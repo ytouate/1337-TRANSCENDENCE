@@ -38,7 +38,6 @@ model Game {
   id Int @id @default(autoincrement())
   status GameStatus @default(OUTGOING)
   players   User[] @relation("GameUsers")
-
 }
 
 enum GameStatus {
