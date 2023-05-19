@@ -3,6 +3,7 @@ env vars :
     POSTGRES_PASSWORD=...
     POSTGRES_DB=...
     DATABASE_URL="postgresql://johndoe:randompassword@localhost:5432/mydb?schema=public"
+    JWT_SECRET=1vzyQsP2u6s!_ZrGgGf+KM57l$5q9Fv^
 
 
 for prisma:
