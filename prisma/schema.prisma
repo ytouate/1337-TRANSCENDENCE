@@ -19,9 +19,11 @@ model User {
   firstName String?
   lastName String?
   
-  email String
+  email String @unique
   hash String
   games Game[] @relation("GameUsers")
+
+  @@map("users")
 }
 
 // model History {
@@ -38,6 +40,8 @@ model Game {
   id Int @id @default(autoincrement())
   status GameStatus @default(OUTGOING)
   players   User[] @relation("GameUsers")
+
+  @@map("games")
 }
 
 enum GameStatus {
