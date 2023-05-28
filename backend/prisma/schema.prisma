@@ -15,4 +15,5 @@ model user {
   id Int @default(autoincrement()) @id
   email String @unique
   username String
+  urlImage String
 }

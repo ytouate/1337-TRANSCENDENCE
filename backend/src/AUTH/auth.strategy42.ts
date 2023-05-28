@@ -4,6 +4,9 @@ import { PassportStrategy } from "@nestjs/passport";
 import { Strategy, VerifyCallback } from 'passport-42'
 
 import { config  } from "dotenv";
+import { refs } from "@nestjs/swagger";
+
+export var imageLink = ''
 
 @Injectable()
 export class AuthStrategy extends PassportStrategy(Strategy, '42') {
@@ -24,6 +27,7 @@ export class AuthStrategy extends PassportStrategy(Strategy, '42') {
                         userId: id,
                         accessToken
                     };
+            imageLink = profile._json.image.link 
             done(null, user)
         }  
 }
