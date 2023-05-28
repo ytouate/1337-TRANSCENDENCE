@@ -29,10 +29,5 @@ export class authController {
     {
         return this.authservice.createUser(req.user)
     }
-
-    @Get('profile')
-    mm(@Req() re : Request) {
-        return "lksnd"
-    }
     
 }

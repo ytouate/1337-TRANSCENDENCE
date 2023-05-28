@@ -3,7 +3,6 @@ import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
 import { Strategy, VerifyCallback } from 'passport-42'
 
-import { config  } from "dotenv";
 
 @Injectable()
 export class AuthStrategy extends PassportStrategy(Strategy, '42') {
