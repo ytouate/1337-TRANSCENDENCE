@@ -20,6 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@nestjs-modules/mailer": "^1.8.1",
     "@nestjs/axios": "^2.0.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.3.2",
@@ -37,6 +38,7 @@
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.0.3",
     "express-session": "^1.17.3",
+    "handlebars": "^4.7.7",
     "mime-types": "^2.1.35",
     "passport": "^0.6.0",
     "passport-42": "^1.2.6",

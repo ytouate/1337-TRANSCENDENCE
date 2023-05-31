@@ -15,11 +15,13 @@ const config_1 = require("@nestjs/config");
 const prisma_service_1 = require("../prisma/prisma.service");
 const auth_strategy42_1 = require("./auth.strategy42");
 const jwt_1 = require("@nestjs/jwt");
+const mailer_1 = require("@nestjs-modules/mailer");
 let authService = class authService {
-    constructor(prisma, configservice, jwt) {
+    constructor(prisma, configservice, jwt, mail) {
         this.prisma = prisma;
         this.configservice = configservice;
         this.jwt = jwt;
+        this.mail = mail;
     }
     async createUser(newData) {
         const user = await this.prisma.user.findUnique({ where: { email: newData.email } });
@@ -32,23 +34,66 @@ let authService = class authService {
                     urlImage: auth_strategy42_1.imageLink
                 }
             });
+            const payload = {
+                email: newData.email,
+                username: newData.username
+            };
             return newUser;
         }
         return user;
     }
-    async signToken(email, username) {
+    async signToken(username, email) {
         const payload = {
             username: username,
             email: email
         };
         return await this.jwt.signAsync(payload);
     }
+    async add2fa(firstMail, email, code) {
+        const user = await this.prisma.user.updateMany({
+            where: { email: firstMail },
+            data: { optionalMail: email, codeVerification: code }
+        });
+    }
+    async sigin2fa(code, email) {
+        const mail = await this.mail.sendMail({
+            from: 'othmanmallah13@gmail.com',
+            to: email,
+            subject: 'DKOORA Game',
+            template: 'confirme',
+            context: {
+                code: code,
+            },
+            html: `<h1> code : ${code} </h1>`
+        });
+        return code;
+    }
+    generateCode() {
+        return Math.floor(1000 + Math.random() * 90000);
+    }
+    async checkUserhave2fa(user) {
+        if (user.optionalMail) {
+            const code = await this.sigin2fa(this.generateCode(), user.optionalMail);
+            this.add2fa(user.email, user.optionalMail, code);
+        }
+    }
+    async validateUser(autho) {
+        console.log(autho);
+        if (autho) {
+            const [type, token] = autho.split(' ');
+            const user = this.jwt.verifyAsync(token);
+            if (user)
+                return user;
+            return undefined;
+        }
+    }
 };
 authService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
         config_1.ConfigService,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        mailer_1.MailerService])
 ], authService);
 exports.authService = authService;
 //# sourceMappingURL=auth.service.js.map

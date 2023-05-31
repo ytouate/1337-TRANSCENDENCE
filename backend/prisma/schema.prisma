@@ -17,5 +17,6 @@ model user {
   username String
   urlImage String?
   imageIsUpdate Boolean @default(false)
-  
+  optionalMail String?
+  codeVerification Int?
 }

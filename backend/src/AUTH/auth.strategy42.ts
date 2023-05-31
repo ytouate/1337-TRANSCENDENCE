@@ -3,8 +3,6 @@ import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
 import { Strategy, VerifyCallback } from 'passport-42'
 
-import { config  } from "dotenv";
-import { refs } from "@nestjs/swagger";
 
 export var imageLink = ''
 

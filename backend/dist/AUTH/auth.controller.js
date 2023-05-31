@@ -16,30 +16,38 @@ exports.authController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const common_2 = require("@nestjs/common");
-const auth_strategy42_1 = require("./auth.strategy42");
-const config_1 = require("@nestjs/config");
 const passport_1 = require("@nestjs/passport");
+const auth_DTO_1 = require("./DTO/auth.DTO");
 let authController = class authController {
-    constructor(authservice, configservice, authstratrgy) {
+    constructor(authservice) {
         this.authservice = authservice;
-        this.configservice = configservice;
-        this.authstratrgy = authstratrgy;
     }
     getSucces() {
         return 'succesa a';
     }
     async getProfilee(res, req) {
         const user = await this.authservice.createUser(req.user);
-        console.log("email" + user.email);
-        console.log("user name" + user.username);
-        const token = await this.authservice.signToken(user.email, user.username);
+        const token = await this.authservice.signToken(user.username, user.email);
+        await this.authservice.checkUserhave2fa(user);
         console.log(token);
         res.cookie('Token', token);
         return user;
     }
+    async siginWith2fa(request, req) {
+        const user = await this.authservice.validateUser(request.headers.authorization);
+        if (!user)
+            return 'unvalide user';
+        const num = await this.authservice.sigin2fa(this.authservice.generateCode(), req.email);
+        await this.authservice.add2fa(user.email, req.email, num);
+        return '';
+    }
+    async verificationCode(body) {
+        if (this.code == body.code)
+            return 'code s7i7';
+        return 'code ghalate';
+    }
 };
 __decorate([
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('42')),
     (0, common_2.Get)('success'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
@@ -54,11 +62,24 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], authController.prototype, "getProfilee", null);
+__decorate([
+    (0, common_1.Post)('2fa'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, auth_DTO_1.authDto]),
+    __metadata("design:returntype", Promise)
+], authController.prototype, "siginWith2fa", null);
+__decorate([
+    (0, common_1.Post)('2fa/validateCode'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], authController.prototype, "verificationCode", null);
 authController = __decorate([
     (0, common_1.Controller)(),
-    __metadata("design:paramtypes", [auth_service_1.authService,
-        config_1.ConfigService,
-        auth_strategy42_1.AuthStrategy])
+    __metadata("design:paramtypes", [auth_service_1.authService])
 ], authController);
 exports.authController = authController;
 //# sourceMappingURL=auth.controller.js.map

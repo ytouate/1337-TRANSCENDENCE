@@ -13,20 +13,33 @@ const auth_controller_1 = require("./auth.controller");
 const config_1 = require("@nestjs/config");
 const auth_strategy42_1 = require("./auth.strategy42");
 const prisma_module_1 = require("../prisma/prisma.module");
-const prisma_service_1 = require("../prisma/prisma.service");
 const jwt_1 = require("@nestjs/jwt");
+const mailer_1 = require("@nestjs-modules/mailer");
 let authModule = class authModule {
 };
 authModule = __decorate([
     (0, common_1.Module)({
-        imports: [jwt_1.JwtModule.register({
+        imports: [mailer_1.MailerModule.forRoot({
+                transport: {
+                    host: 'smtp.gmail.com',
+                    port: 465,
+                    ignoreTLS: true,
+                    secure: true,
+                    service: 'Gmail',
+                    auth: {
+                        user: 'othmanmallah13@gmail.com',
+                        pass: 'osmxubhgeixhaowp'
+                    }
+                },
+            }), jwt_1.JwtModule.register({
+                global: true,
                 secret: process.env.SECRET,
                 signOptions: {
                     expiresIn: '1w'
                 }
             }), prisma_module_1.PrismaModule, config_1.ConfigModule],
         controllers: [auth_controller_1.authController],
-        providers: [prisma_service_1.PrismaService, auth_strategy42_1.AuthStrategy, config_1.ConfigService, auth_service_1.authService]
+        providers: [auth_strategy42_1.AuthStrategy, auth_service_1.authService]
     })
 ], authModule);
 exports.authModule = authModule;

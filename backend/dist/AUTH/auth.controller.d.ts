@@ -1,11 +1,11 @@
 import { authService } from "./auth.service";
-import { AuthStrategy } from "./auth.strategy42";
-import { ConfigService } from "@nestjs/config";
+import { authDto } from "./DTO/auth.DTO";
 export declare class authController {
     private authservice;
-    private configservice;
-    private authstratrgy;
-    constructor(authservice: authService, configservice: ConfigService, authstratrgy: AuthStrategy);
+    constructor(authservice: authService);
+    private code;
     getSucces(): string;
     getProfilee(res: any, req: any): Promise<import(".prisma/client").user>;
+    siginWith2fa(request: any, req: authDto): Promise<"" | "unvalide user">;
+    verificationCode(body: any): Promise<"code s7i7" | "code ghalate">;
 }
