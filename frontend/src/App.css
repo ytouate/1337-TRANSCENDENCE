@@ -1,0 +1,214 @@
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+
+body {
+    background: linear-gradient(90deg, #d9d9d9 0%, #062c59 100%);
+    font-family: "Montserrat", sans-serif;
+}
+
+.navbar {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    box-shadow: 0 2px 4px -4px lightgray;
+}
+
+.navbar-list {
+    list-style: none;
+    display: flex;
+    color: white;
+    margin-right: 50px;
+}
+
+.navbar-list > li {
+    margin: auto 70px;
+    font-weight: 600;
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 27px;
+    letter-spacing: 2px;
+}
+
+a {
+    color: white;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: none;
+    font-size: 22px;
+    -webkit-transition: font-size 0.5s ease-in-out;
+    -moz-transition: font-size 0.5s ease-in-out;
+    -o-transition: font-size 0.5s ease-in-out;
+    transition: font-size 0.5s ease-in-out;
+}
+
+.profile-img {
+    height: 68px;
+    object-fit: contain;
+    border-radius: 50%;
+    margin-right: 0;
+    box-shadow: 2px 2px 10px black;
+}
+
+.logo {
+    margin: auto 50px;
+    font-weight: bold;
+    line-height: 27px;
+    font-size: 22px;
+    letter-spacing: 2px;
+}
+
+.home {
+    display: flex;
+    align-items: center;
+    height: 90vh;
+}
+
+.left {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.home-text {
+    font-size: 75px;
+    line-height: 90px;
+    color: white;
+    width: 550px;
+    margin: 0 0 50px 0;
+    padding: 0;
+    color: #f5f5f5;
+    text-shadow: 1px 1px 1px #cecece, 1px 2px 1px #cecece, 1px 3px 1px #cecece,
+        1px 4px 1px #cecece, 1px 5px 1px #cecece, 1px 6px 1px #cecece,
+        1px 7px 1px #cecece, 1px 8px 1px #cecece, 1px 9px 1px #cecece,
+        1px 10px 1px #cecece, 1px 18px 6px rgba(16, 16, 16, 0.4),
+        1px 22px 10px rgba(16, 16, 16, 0.2), 1px 25px 35px rgba(16, 16, 16, 0.2),
+        1px 30px 60px rgba(16, 16, 16, 0.4);
+}
+
+.right {
+    width: 50%;
+    display: flex;
+    justify-content: center;
+}
+
+.right > img {
+    width: 600px;
+    margin-right: 140px;
+    box-shadow: 4px 4px 4px;
+    border-radius: 15px;
+}
+
+.play-btn {
+    border: none;
+    outline: none;
+    cursor: pointer;
+    width: 200px;
+    margin-right: 20px;
+    height: 50px;
+    border-radius: 9999px;
+    background-color: #072e5b;
+    color: white;
+    font-size: 18px;
+    box-shadow: 4px 4px 8px gray;
+    cursor: pointer;
+}
+
+.play-btn:hover {
+    transform: scale(1.01);
+    background-color: #284b77;
+    transition: background-color 0.5s ease-in-out;
+}
+
+@media only screen and (max-width: 1700px) {
+    .navbar-list > li {
+        margin: auto 50px;
+        font-size: 16px;
+    }
+    .right > img {
+        width: 450px;
+        margin-right: 100px;
+    }
+    .home-text {
+        font-size: 60px;
+        line-height: 80px;
+        margin: 0 0 40px 0;
+    }
+    .home-buttons {
+        margin-left: -100px;
+        margin-top: 0;
+    }
+}
+
+@media only screen and (max-width: 1300px) {
+    .navbar-list > li {
+        margin: auto 30px;
+        font-size: 16px;
+    }
+    .right > img {
+        width: 350px;
+        margin-right: 50px;
+    }
+    .home-text {
+        font-size: 50px;
+        line-height: 80px;
+        margin: 0 0 30px 100px;
+    }
+    .home-buttons {
+        margin-left: 0;
+        margin-top: 0;
+    }
+}
+@media only screen and (max-width: 1100px) {
+    .navbar-list > li {
+        margin: auto 20px;
+        font-size: 16px;
+    }
+    .right > img {
+        width: 300px;
+        margin-right: 50px;
+        border-radius: 15px;
+    }
+    .home-text {
+        font-size: 50px;
+        line-height: 65px;
+        color: white;
+        margin: 0 0 30px 100px;
+    }
+    .home-buttons {
+        margin-left: 0;
+        margin-top: 0;
+    }
+}
+
+@media only screen and (max-width: 950px) {
+    .profile-img {
+        height: 50px;
+    }
+    .navbar-list > li {
+        margin: auto 10px;
+        font-size: 16px;
+    }
+    .right > img {
+        width: 300px;
+        margin-right: 50px;
+    }
+    .home-text {
+        font-size: 35px;
+        line-height: 50px;
+        margin: 0 0 30px 150px;
+    }
+    .home-buttons {
+        margin-left: -50px;
+        margin-top: 0;
+    }
+    .play-btn {
+        width: 150px;
+        font-size: 14px;
+    }
+}
