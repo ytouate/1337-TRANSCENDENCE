@@ -1,8 +1,8 @@
 
 export const InterfacePfoileServiceProvider = 'InterfacePfoileServiceProvider' 
 export interface IProfileService{
-    getProfile();
-    updatePhotos();
-    deletePhotos();
-    updateName();
+    getProfile(req);
+    updatePhoto(req,  filePath);
+    deletePhoto(req);
+    updateName(newUsername, req);
 }

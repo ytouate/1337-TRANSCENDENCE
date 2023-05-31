@@ -1,13 +1,19 @@
-import { Injectable } from "@nestjs/common";
+import { Global, Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
 import { Strategy , ExtractJwt} from "passport-jwt";
 
+@Global()
 @Injectable()
-export class ProfileGuard extends PassportStrategy (Strategy){
-    constructor(){
+export class JwtStrategy extends PassportStrategy (Strategy, 'jwt'){
+    constructor(private configService: ConfigService){
+        
         super({
-            jwtRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            
+            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+            secretOrKey: configService.get('SECRET'),
         })
+    }
+    async validate(payload: any){
+        return (payload);
     }
 }

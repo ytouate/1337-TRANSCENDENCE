@@ -1,10 +1,11 @@
-import { Controller, Post, Res, Req , UseGuards, Body } from "@nestjs/common";
+import { Controller, Post, Res, Req , UseGuards, Body, RequestMapping } from "@nestjs/common";
 import { authService } from "./auth.service";
 import { Get } from "@nestjs/common";
 import { Query } from "@nestjs/common";
 import { AuthStrategy } from "./auth.strategy42";
 import { ConfigService } from "@nestjs/config";
 import { AuthGuard } from "@nestjs/passport";
+import { use } from "passport";
 
 @Controller()
 export class authController {
@@ -25,9 +26,15 @@ export class authController {
     @Get('sigin')
     @UseGuards(AuthGuard('42'))
     async getProfilee(
+        @Res({passthrough : true}) res,
         @Req() req) 
     {
-        return this.authservice.createUser(req.user)
+        const user = await this.authservice.createUser(req.user)
+        console.log ("email" + user.email)
+        console.log("user name" + user.username)
+        const token = await this.authservice.signToken(user.email, user.username)
+        console.log(token)
+        res.cookie('Token' , token)
+        return user
     }
-    
 }
