@@ -78,7 +78,6 @@ let authService = class authService {
         }
     }
     async validateUser(autho) {
-        console.log(autho);
         if (autho) {
             const [type, token] = autho.split(' ');
             const user = this.jwt.verifyAsync(token);

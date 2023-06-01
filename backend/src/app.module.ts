@@ -6,7 +6,7 @@ import { ProfileModule } from './profile/profile.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
-  imports: [MailerModule , ConfigModule.forRoot({ isGlobal: true }) , authModule, PrismaModule],
+  imports: [MailerModule , ConfigModule.forRoot({ isGlobal: true }) , authModule, ProfileModule , PrismaModule],
   controllers: [],
   providers: [],
 })
