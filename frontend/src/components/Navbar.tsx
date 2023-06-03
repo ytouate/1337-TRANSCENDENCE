@@ -1,15 +1,31 @@
-
-import profileImg from '../assets/ytouate.jpeg'
+import { Link } from "react-router-dom";
+import profileImg from "../assets/ytouate.jpeg";
 function Navbar() {
-    return ( 
+    return (
         <nav className="navbar">
-            <div className='logo'>LOGO</div>
+            <Link to='/' className="logo">LOGO</Link>
             <ul className="navbar-list">
-                <li><a href='#'>Chat</a></li>
-                <li><a href='#'>Live Games</a></li>
-                <li><a href='#'>LeaderBoard</a></li>
-                <li><a href='#'>Play</a></li>
-                <li><img className='profile-img' src={profileImg} alt="" /></li>
+                <li>
+                    <Link to="chat">Chat</Link>
+                </li>
+                <li>
+                    <Link to="leaderboard">Leaderboard</Link>
+                </li>
+                <li>
+                    <Link to="livegames">Live Games</Link>
+                </li>
+                <li>
+                    <Link to="play">Play</Link>
+                </li>
+                <li>
+                    <Link to="/profile">
+                        <img
+                            className="home-profile-img"
+                            src={profileImg}
+                            alt=""
+                        />
+                    </Link>
+                </li>
             </ul>
         </nav>
     );
