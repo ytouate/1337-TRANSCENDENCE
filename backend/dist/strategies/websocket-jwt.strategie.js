@@ -9,15 +9,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.JwtStrategy = void 0;
+exports.webSocketJwtStrategy = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const passport_1 = require("@nestjs/passport");
 const passport_jwt_1 = require("passport-jwt");
-let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy, 'jwt') {
+let webSocketJwtStrategy = class webSocketJwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy, 'websocket-jwt') {
     constructor(configService) {
         super({
-            jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
+            jwtFromRequest: passport_jwt_1.ExtractJwt.fromExtractors([(request) => {
+                    return request.handshake.headers.authorization.slice(7);
+                }]),
             secretOrKey: configService.get('SECRET'),
         });
         this.configService = configService;
@@ -26,10 +28,10 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
         return (payload);
     }
 };
-JwtStrategy = __decorate([
+webSocketJwtStrategy = __decorate([
     (0, common_1.Global)(),
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [config_1.ConfigService])
-], JwtStrategy);
-exports.JwtStrategy = JwtStrategy;
-//# sourceMappingURL=profile.guard.js.map
+], webSocketJwtStrategy);
+exports.webSocketJwtStrategy = webSocketJwtStrategy;
+//# sourceMappingURL=websocket-jwt.strategie.js.map

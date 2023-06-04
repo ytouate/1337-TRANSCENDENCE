@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { Prisma, PrismaPromise } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { throws } from "assert";
 import { PrismaService } from "src/prisma/prisma.service";
 import { imageLink } from "./auth.strategy42";

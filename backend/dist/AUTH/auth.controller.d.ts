@@ -5,7 +5,7 @@ export declare class authController {
     constructor(authservice: authService);
     private code;
     getSucces(): string;
-    getProfilee(res: any, req: any): Promise<import(".prisma/client").user>;
+    getProfilee(res: any, req: any): Promise<import(".prisma/client").User>;
     siginWith2fa(request: any, req: authDto): Promise<"" | "unvalide user">;
     verificationCode(body: any): Promise<"code s7i7" | "code ghalate">;
 }

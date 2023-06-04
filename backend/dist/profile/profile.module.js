@@ -13,8 +13,8 @@ const profile_controller_1 = require("./profile.controller");
 const iprofile_service_1 = require("./iprofile.service");
 const prisma_module_1 = require("../prisma/prisma.module");
 const config_1 = require("@nestjs/config");
-const profile_guard_1 = require("./profile.guard");
 const platform_express_1 = require("@nestjs/platform-express");
+const jwt_strategie_1 = require("../strategies/jwt.strategie");
 let ProfileModule = class ProfileModule {
 };
 ProfileModule = __decorate([
@@ -24,7 +24,7 @@ ProfileModule = __decorate([
             {
                 provide: iprofile_service_1.InterfacePfoileServiceProvider,
                 useClass: profile_service_1.ProfileService,
-            }, profile_guard_1.JwtStrategy
+            }, jwt_strategie_1.JwtStrategy
         ],
         controllers: [profile_controller_1.ProfileController]
     })

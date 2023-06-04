@@ -10,13 +10,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Notification {
+  id Int @id @default(autoincrement())
+  description String
+  sender String
+  title String
+  reicever User @relation(fields: [receiverId], references: [id])
+  receiverId Int
+  time DateTime @default(now())
+}
 
-model user {
+model User {
   id Int @default(autoincrement()) @id
   email String @unique
-  username String
+  username String @unique
   urlImage String?
   imageIsUpdate Boolean @default(false)
   optionalMail String?
   codeVerification Int?
+  notifications Notification[]
 }
