@@ -7,6 +7,11 @@ body {
     font-family: "Montserrat", sans-serif;
     height: 90vh;
 }
+
+/*
+    reseting the css to default values
+*/
+
 html,
 body {
     height: 100%;
@@ -51,10 +56,14 @@ select {
     margin: 0;
     padding: 0;
 }
+
+/*
+    styling the nav bar
+*/
 .navbar {
     display: flex;
     width: 100%;
-    height: 100px;
+    height: 120px;
     justify-content: space-between;
     align-items: center;
     margin: 0;
@@ -100,14 +109,13 @@ a:hover {
 }
 
 .logo {
-    color: black;
-    margin: auto 50px;
-    font-weight: bold;
-    line-height: 27px;
-    font-size: 22px;
-    letter-spacing: 2px;
+    width: 120px;
+    margin: auto 20px;
 }
 
+/*
+    styling the home page
+*/
 .home {
     display: flex;
     align-items: center;
@@ -122,11 +130,10 @@ a:hover {
 }
 
 .home-text {
-    font-size: 75px;
-    line-height: 90px;
+    font-size: 85px;
+    line-height: 100px;
     color: white;
-    width: 550px;
-    margin: 0 0 50px 0;
+    margin: 0 0 60px 0;
     padding: 0;
     color: #f5f5f5;
     text-shadow: 1px 1px 1px #cecece, 1px 2px 1px #cecece, 1px 3px 1px #cecece,
@@ -144,8 +151,7 @@ a:hover {
 }
 
 .right > img {
-    width: 600px;
-    margin-right: 140px;
+    width: 800px;
     box-shadow: 4px 4px 4px;
     border-radius: 15px;
 }
@@ -154,110 +160,36 @@ a:hover {
     border: none;
     outline: none;
     cursor: pointer;
-    width: 200px;
-    margin-right: 20px;
-    height: 50px;
+    width: 300px;
+    margin: 10px;
+    height: 70px;
     border-radius: 9999px;
     background-color: #072e5b;
     color: white;
+    font-weight: bold;
     font-size: 18px;
-    box-shadow: 4px 4px 8px gray;
+    box-shadow: 4px 4px 8px white;
     cursor: pointer;
 }
 
+.home-buttons {
+    margin-left: 60px;
+}
 .play-btn:hover {
     transform: scale(1.01);
     background-color: #284b77;
     transition: background-color 0.5s ease-in-out;
 }
 
-@media only screen and (max-width: 1700px) {
-    .navbar-list > li {
-        margin: auto 50px;
-        font-size: 16px;
-    }
-    .right > img {
-        width: 450px;
-        margin-right: 100px;
-    }
-    .home-text {
-        font-size: 60px;
-        line-height: 80px;
-        margin: 0 0 40px 0;
-    }
-    .home-buttons {
-        margin-left: -100px;
-        margin-top: 0;
-    }
-}
-
-@media only screen and (max-width: 1300px) {
-    .navbar-list > li {
-        margin: auto 30px;
-        font-size: 16px;
-    }
-    .right > img {
-        width: 350px;
-        margin-right: 50px;
-    }
-    .home-text {
-        font-size: 50px;
-        line-height: 80px;
-        margin: 0 0 30px 100px;
-    }
-    .home-buttons {
-        margin-left: 0;
-        margin-top: 0;
-    }
-}
-
-@media only screen and (max-width: 1100px) {
-    .navbar-list > li {
-        margin: auto 20px;
-        font-size: 16px;
-    }
-    .right > img {
-        width: 300px;
-        margin-right: 50px;
-        border-radius: 15px;
-    }
-    .home-text {
-        font-size: 50px;
-        line-height: 65px;
-        color: white;
-        margin: 0 0 30px 100px;
-    }
-    .home-buttons {
-        margin-left: 0;
-        margin-top: 0;
-    }
-}
-
-@media only screen and (max-width: 950px) {
-    .home-profile-img {
-        height: 50px;
-    }
-    .navbar-list > li {
-        margin: auto 10px;
-        font-size: 16px;
-    }
-    .right > img {
-        width: 300px;
-        margin-right: 50px;
-    }
-    .home-text {
-        font-size: 35px;
-        line-height: 50px;
-        margin: 0 0 30px 150px;
-    }
-    .home-buttons {
-        margin-left: -50px;
-        margin-top: 0;
-    }
-    .play-btn {
-        width: 150px;
-        font-size: 14px;
-    }
+/*
+    styling the profile page
+*/
+.profile-page {
+    width: 100%;
+    height: calc(100% - 120px);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
 }
 
 .content {
@@ -267,30 +199,27 @@ a:hover {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: calc(100% - 100px);
     margin-left: 50px;
     font-weight: 600;
 }
 
 .profile-img {
-    margin-top: 50px;
-    width: 80px;
+    width: 180px;
     border-radius: 50%;
-    display: block;
 }
 
 .profile-username {
     color: #062c59;
-    margin-top: 5px;
-    margin-bottom: 50px;
-    font-size: large;
-    font-weight: 600;
+    margin-top: 35px;
+    font-size: 26px;
+    font-weight: bold;
     text-align: center;
 }
 .games-card {
     background-color: #062c59;
-    width: 50%;
-    height: 50px;
+    width: 70%;
+    margin-top: 50px;
+    height: 70px;
     border-radius: 9999px;
     display: flex;
     align-items: center;
@@ -306,6 +235,7 @@ a:hover {
     display: flex;
     justify-content: space-evenly;
 }
+
 .info-card > p {
     font-size: 15px;
     font-weight: 600;
@@ -314,8 +244,9 @@ a:hover {
 
 .info-card {
     background-color: #062c59;
-    width: 30%;
-    height: 50px;
+    width: 40%;
+    margin: 20px 5px 0 5px;
+    height: 60px;
     border-radius: 9999px;
     display: flex;
     align-items: center;
@@ -348,6 +279,7 @@ a:hover {
     margin-left: 10px;
     margin-right: 10px;
 }
+
 .match-card {
     background-color: #062c59;
     width: auto;
@@ -370,16 +302,189 @@ a:hover {
     white-space: nowrap;
 }
 
-.profile-page {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
+.history-cards::-webkit-scrollbar {
+    border-radius: 5px;
 }
+
+.history-cards::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+}
+
 .profile-page-img {
-    width: 600px;
-    margin-right: 140px;
+    width: 800px;
     box-shadow: 4px 4px 4px;
     border-radius: 15px;
+}
+
+/*
+    Dark mode toggler
+*/
+
+.toggle-switch {
+    position: relative;
+    width: 100px;
+    height: 50px;
+    --light: #d8dbe0;
+    --dark: #28292c;
+    --link: rgb(27, 129, 112);
+    --link-hover: rgb(24, 94, 82);
+}
+
+.switch-label {
+    position: absolute;
+    width: 100%;
+    height: 50px;
+    background-color: var(--dark);
+    border-radius: 25px;
+    cursor: pointer;
+    border: 3px solid var(--dark);
+}
+
+.checkbox {
+    position: absolute;
+    display: none;
+}
+
+.slider {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 25px;
+    -webkit-transition: 0.3s;
+    transition: 0.3s;
+}
+
+.checkbox:checked ~ .slider {
+    background-color: var(--light);
+}
+
+.slider::before {
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    -webkit-box-shadow: inset 12px -4px 0px 0px var(--light);
+    box-shadow: inset 12px -4px 0px 0px var(--light);
+    background-color: var(--dark);
+    -webkit-transition: 0.3s;
+    transition: 0.3s;
+}
+
+.checkbox:checked ~ .slider::before {
+    -webkit-transform: translateX(50px);
+    -ms-transform: translateX(50px);
+    transform: translateX(50px);
+    background-color: var(--dark);
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+@media only screen and (max-width: 1700px) {
+    .navbar-list > li {
+        margin: auto 50px;
+        font-size: 16px;
+    }
+    .right > img {
+        width: 450px;
+        margin-right: 100px;
+    }
+    .profile-page-img {
+        width: 450px;
+        margin-right: 50px;
+    }
+    .home-text {
+        font-size: 60px;
+        line-height: 80px;
+        margin: 0 0 40px 0;
+    }
+    .home-buttons {
+        margin-left: -100px;
+        margin-top: 0;
+    }
+}
+
+@media only screen and (max-width: 1300px) {
+    .navbar-list > li {
+        margin: auto 30px;
+        font-size: 16px;
+    }
+    .right > img {
+        width: 350px;
+        margin-right: 50px;
+    }
+    .profile-page-img {
+        width: 350px;
+        margin-right: 50px;
+    }
+    .home-text {
+        font-size: 50px;
+        line-height: 80px;
+        margin: 0 0 30px 100px;
+    }
+    .home-buttons {
+        margin-left: 0;
+        margin-top: 0;
+    }
+}
+
+@media only screen and (max-width: 1100px) {
+    .navbar-list > li {
+        margin: auto 20px;
+        font-size: 16px;
+    }
+    .right > img {
+        width: 300px;
+        margin-right: 50px;
+        border-radius: 15px;
+    }
+    .profile-page-img {
+        width: 300px;
+        margin-right: 50px;
+    }
+    .home-text {
+        font-size: 50px;
+        line-height: 65px;
+        color: white;
+        margin: 0 0 30px 100px;
+    }
+    .home-buttons {
+        margin-left: 0;
+        margin-top: 0;
+    }
+}
+
+@media only screen and (max-width: 950px) {
+    .home-profile-img {
+        height: 50px;
+    }
+    .navbar-list > li {
+        margin: auto 10px;
+        font-size: 16px;
+    }
+    .right > img {
+        width: 300px;
+        margin-right: 50px;
+    }
+
+    .profile-page-img {
+        width: 300px;
+        margin-right: 50px;
+    }
+    .home-text {
+        font-size: 35px;
+        line-height: 50px;
+        margin: 0 0 30px 150px;
+    }
+    .home-buttons {
+        margin-left: -50px;
+        margin-top: 0;
+    }
+    .play-btn {
+        width: 150px;
+        font-size: 14px;
+    }
 }

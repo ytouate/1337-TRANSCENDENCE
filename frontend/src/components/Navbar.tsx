@@ -1,9 +1,13 @@
 import { Link } from "react-router-dom";
 import profileImg from "../assets/ytouate.jpeg";
+import logoImg from "../assets/logo.png";
+
 function Navbar() {
     return (
         <nav className="navbar">
-            <Link to='/' className="logo">LOGO</Link>
+            <Link to="/">
+                <img className="logo" src={logoImg} alt="" />
+            </Link>
             <ul className="navbar-list">
                 <li>
                     <Link to="chat">Chat</Link>
@@ -15,7 +19,12 @@ function Navbar() {
                     <Link to="livegames">Live Games</Link>
                 </li>
                 <li>
-                    <Link to="play">Play</Link>
+                    <div className="toggle-switch">
+                        <label className="switch-label">
+                            <input type="checkbox" className="checkbox" />
+                            <span className="slider"></span>
+                        </label>
+                    </div>
                 </li>
                 <li>
                     <Link to="/profile">
