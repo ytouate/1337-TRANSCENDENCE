@@ -28,7 +28,8 @@ export class NotificationService {
     }
     //send notification to the target
     sendNotification(notification){
-        this.socketByID.get(notification.receiverId).emit('receive_notification', notification);
+        if (this.socketByID.has(notification.receiverId))
+            this.socketByID.get(notification.receiverId).emit('receive_notification', notification);
     }
 
     //push notification to database
