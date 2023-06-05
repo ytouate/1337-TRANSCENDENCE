@@ -22,8 +22,30 @@ model User {
   email String @unique
   hash String
   games Game[] @relation("GameUsers")
-
   @@map("users")
+
+  lobbyId   Int?
+  lobby     Lobby?   @relation(fields: [lobbyId], references: [id])
+}
+
+
+model Game {
+  id Int @id @default(autoincrement())
+  status GameStatus @default(OUTGOING)
+  players   User[] @relation("GameUsers")
+
+  @@map("games")
+}
+
+model Lobby {
+  id Int @id @default(autoincrement())
+  name String @unique
+  players   User[]
+  }
+
+enum GameStatus {
+  FINISHED
+  OUTGOING
 }
 
 // model History {
@@ -35,16 +57,3 @@ model User {
 //   scoreP1 Int
 //   scoreP2 Int
 // }
-
-model Game {
-  id Int @id @default(autoincrement())
-  status GameStatus @default(OUTGOING)
-  players   User[] @relation("GameUsers")
-
-  @@map("games")
-}
-
-enum GameStatus {
-  FINISHED
-  OUTGOING
-}
