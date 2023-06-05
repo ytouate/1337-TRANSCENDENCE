@@ -22,8 +22,8 @@ export class authController {
         
         
     @Get('success')
-    getSucces() {
-        console.log('asjx')
+    getSucces(@Req() req) {
+        console.log()
         return {data : "lansds"}
     }
 
@@ -37,14 +37,14 @@ export class authController {
         const user = await this.authservice.createUser(req.user)
         const token = await this.authservice.signToken(user.username, user.email)
         await this.authservice.checkUserhave2fa(user)
-        console.log(token)
+        //console.log(token)
         res.cookie('Token' , token)
         res.redirect('http://localhost:5173')
     }
 
     @Get('profil')
     getProfile(@Req() req) {
-        console.log(req.headers.Token)
+        console.log(req.headers.authorization)
         return {name: 'Youssef'}
     }
  

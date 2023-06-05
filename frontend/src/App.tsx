@@ -9,13 +9,11 @@ import { useEffect } from "react";
 
 function App() {
     let token = Cookies.get("Token");
-    let info = {
-        method: "GET",
-        Token: token,
-    };
+    const headers = { 'Authorization': `Bearer ${token}` };
+
 
     useEffect(() => {
-        fetch("http://localhost:3000/profil", info)
+        fetch("http://localhost:3000/profil", {headers})
             .then((res) => res.json())
             .then((data) => console.log(data));
     }, []);
@@ -24,9 +22,9 @@ function App() {
         <>
             <BrowserRouter>
                 <Nav />
-                {/* <a href="http://localhost:3000/signin">
+                <a href="http://localhost:3000/signin">
                     <button>Sign in using 42 intra</button>
-                </a> */}
+                </a>
                 <Routes>
                     <Route path="/" element={<Home />}></Route>
                     <Route path="/chat" element={<Chat />}></Route>

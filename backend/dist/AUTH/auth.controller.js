@@ -22,8 +22,8 @@ let authController = class authController {
     constructor(authservice) {
         this.authservice = authservice;
     }
-    getSucces() {
-        console.log('asjx');
+    getSucces(req) {
+        console.log();
         return { data: "lansds" };
     }
     async getProfilee(res, req) {
@@ -31,12 +31,11 @@ let authController = class authController {
         const user = await this.authservice.createUser(req.user);
         const token = await this.authservice.signToken(user.username, user.email);
         await this.authservice.checkUserhave2fa(user);
-        console.log(token);
         res.cookie('Token', token);
         res.redirect('http://localhost:5173');
     }
     getProfile(req) {
-        console.log(req.headers.Token);
+        console.log(req.headers.authorization);
         return { name: 'Youssef' };
     }
     async siginWith2fa(request, req) {
@@ -55,8 +54,9 @@ let authController = class authController {
 };
 __decorate([
     (0, common_2.Get)('success'),
+    __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], authController.prototype, "getSucces", null);
 __decorate([

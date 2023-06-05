@@ -4,7 +4,7 @@ export declare class authController {
     private authservice;
     constructor(authservice: authService);
     private code;
-    getSucces(): {
+    getSucces(req: any): {
         data: string;
     };
     getProfilee(res: any, req: any): Promise<void>;
