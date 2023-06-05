@@ -150,10 +150,6 @@ a:hover {
     justify-content: center;
 }
 
-.wrapper {
-    border-radius: 50px;
-
-}
 .messages-container--header {
     position: fixed;
     background-color: black;
@@ -225,6 +221,7 @@ a:hover {
     font-weight: bold;
     text-align: center;
 }
+
 .games-card {
     background-color: #062c59;
     width: 70%;

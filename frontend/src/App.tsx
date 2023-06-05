@@ -3,22 +3,30 @@ import Nav from "./components/Nav";
 import Home from "./components/Home";
 import { BrowserRouter, Routes, Route, useParams } from "react-router-dom";
 import Profile from "./components/Profile";
-import Cookies from 'js-cookie'
+import Cookies from "js-cookie";
 import Chat from "./components/Chat/Chat";
+import { useEffect } from "react";
 
 function App() {
+    let token = Cookies.get("Token");
     let info = {
-        method: 'GET',
-        Token: Cookies.get('Token')
-    }
-    fetch('http://localhost:3000/profil', info)
-        .then(res => res.json())
-        .then(data => console.log(data))
+        method: "GET",
+        Token: token,
+    };
+
+    useEffect(() => {
+        fetch("http://localhost:3000/profil", info)
+            .then((res) => res.json())
+            .then((data) => console.log(data));
+    }, []);
+
     return (
         <>
             <BrowserRouter>
-                
                 <Nav />
+                {/* <a href="http://localhost:3000/signin">
+                    <button>Sign in using 42 intra</button>
+                </a> */}
                 <Routes>
                     <Route path="/" element={<Home />}></Route>
                     <Route path="/chat" element={<Chat />}></Route>

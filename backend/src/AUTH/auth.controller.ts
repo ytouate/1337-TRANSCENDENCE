@@ -8,6 +8,8 @@ import { AuthGuard } from "@nestjs/passport";
 import { authDto } from "./DTO/auth.DTO";
 import { use } from "passport";
 import { connected } from "process";
+import { json } from "stream/consumers";
+import { log } from "console";
 
 
 @Controller()
@@ -21,23 +23,31 @@ export class authController {
         
     @Get('success')
     getSucces() {
-        return 'succesa a'
+        console.log('asjx')
+        return {data : "lansds"}
     }
-        
-    @Get('sigin')
+
+    @Get('signin')
     @UseGuards(AuthGuard('42'))
     async getProfilee(
         @Res({passthrough : true}) res,
         @Req() req) 
     {
+        console.log('her backend')
         const user = await this.authservice.createUser(req.user)
         const token = await this.authservice.signToken(user.username, user.email)
         await this.authservice.checkUserhave2fa(user)
         console.log(token)
         res.cookie('Token' , token)
-        return user
+        res.redirect('http://localhost:5173')
     }
 
+    @Get('profil')
+    getProfile(@Req() req) {
+        console.log(req.headers.Token)
+        return {name: 'Youssef'}
+    }
+ 
     @Post('2fa')
     async siginWith2fa(@Req() request , @Body() req: authDto) {
         const user = await this.authservice.validateUser(request.headers.authorization)
