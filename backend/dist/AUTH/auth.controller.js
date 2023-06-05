@@ -32,8 +32,7 @@ let authController = class authController {
         res.redirect('http://localhost:5173/');
         console.log(user);
     }
-    getProfile() {
-        return 'profile';
+    getProfile(req) {
     }
     async siginWith2fa(request, req) {
         const user = await this.authservice.validateUser(request.headers.authorization);
@@ -74,8 +73,9 @@ __decorate([
 ], authController.prototype, "getProfilee", null);
 __decorate([
     (0, common_2.Get)('open'),
+    __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], authController.prototype, "getProfile", null);
 __decorate([

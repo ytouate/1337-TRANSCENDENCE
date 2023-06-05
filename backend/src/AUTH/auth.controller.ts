@@ -39,8 +39,8 @@ export class authController {
     }
 
     @Get('open')
-    getProfile() {
-        return 'profile'
+    getProfile(@Req() req) {
+        
     }
 
     @Post('2fa')
