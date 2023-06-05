@@ -99,7 +99,6 @@ export class authService{
 
     // validate User with { Token }
     async validateUser(autho) {
-        console.log(autho)
         if (autho)
         {
             const [type, token] = autho.split(' ')

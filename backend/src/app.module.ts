@@ -4,9 +4,10 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProfileModule } from './profile/profile.module';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { chatModule } from './Chat/chat.gateway.module';
 
 @Module({
-  imports: [MailerModule , ConfigModule.forRoot({ isGlobal: true }) , authModule, PrismaModule],
+  imports: [chatModule ,MailerModule , ConfigModule.forRoot({ isGlobal: true }) , authModule, ProfileModule , PrismaModule],
   controllers: [],
   providers: [],
 })
