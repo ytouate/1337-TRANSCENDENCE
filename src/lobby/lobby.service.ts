@@ -53,6 +53,26 @@ export class LobbyService {
         }
     }
 
+    async deleteLobby(lobbyId: number) {
+        try {
+            const lobby = await this.prisma.lobby.findUnique({
+                where: { id: lobbyId },
+            });
+
+            if (!lobby)
+                throw new HttpException(
+                    'Lobby not found',
+                    HttpStatus.NOT_FOUND,
+                );
+
+            const deletedLobby = await this.prisma.lobby.delete({
+                where: { id: lobbyId },
+                include: { players: true },
+            });
+            return deletedLobby;
+        } catch (error) {}
+    }
+
     async createLobby(dto: LobbyDto) {
         try {
             const lobby = await this.prisma.lobby.findUnique({
@@ -87,6 +107,4 @@ export class LobbyService {
             throw error;
         }
     }
-
-    async removeLobby() {}
 }
