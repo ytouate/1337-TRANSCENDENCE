@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
+import { log } from "console";
 import { Strategy, VerifyCallback } from 'passport-42'
 
 
@@ -8,7 +9,8 @@ export var imageLink = ''
 
 @Injectable()
 export class AuthStrategy extends PassportStrategy(Strategy, '42') {
-    constructor (private readonly configservice:ConfigService) {
+    constructor (private readonly configservice:ConfigService) { 
+        
         super({
             clientID : configservice.get('CLIENT_ID') ,
             clientSecret : configservice.get('CLIENT_SECRET'),

@@ -7,18 +7,13 @@ import Cookies from 'js-cookie'
 import Chat from "./components/Chat/Chat";
 
 function App() {
-    let info = {
-        method: 'GET',
-        Token: Cookies.get('Token')
-    }
-    fetch('http://localhost:3000/profil', info)
-        .then(res => res.json())
-        .then(data => console.log(data))
     return (
         <>
             <BrowserRouter>
-                
                 <Nav />
+                <a href="http://localhost:3000/login">
+                    <button>Sign In</button>
+                </a>
                 <Routes>
                     <Route path="/" element={<Home />}></Route>
                     <Route path="/chat" element={<Chat />}></Route>
