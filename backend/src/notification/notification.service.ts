@@ -1,7 +1,7 @@
 import { Req, UseGuards } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
-import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets';
 import { User } from '@prisma/client';
 import { Server, Socket } from 'socket.io';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -9,16 +9,15 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @WebSocketGateway()
 export class NotificationService {
-    socketByID: Map<number, Socket> ;
+    socketByID: Map<number, Socket[]> ;
     constructor(private jwtService: JwtService, private prismaServie: PrismaService){
-        this.socketByID = new Map<number, Socket>;
+        this.socketByID = new Map<number, Socket[]>();
     }
    
     //get socket for connecting clients
     handleConnection(@ConnectedSocket() client: Socket) {
         this.pushClientInMap(client);
     }
-
     //get the sending message
     @UseGuards(AuthGuard('websocket-jwt'))
     @SubscribeMessage('send_notification')
@@ -28,8 +27,11 @@ export class NotificationService {
     }
     //send notification to the target
     sendNotification(notification){
-        if (this.socketByID.has(notification.receiverId))
-            this.socketByID.get(notification.receiverId).emit('receive_notification', notification);
+        if (this.socketByID.has(notification.receiverId)){
+            for (let i = 0;i < this.socketByID.get(notification.receiverId).length;i++){
+                this.socketByID.get(notification.receiverId)[i].emit('receive_notification', notification);
+            }
+        }
     }
 
     //push notification to database
@@ -53,13 +55,20 @@ export class NotificationService {
     }
     //push the client socket in map
     async pushClientInMap(client: Socket){
-        const userObj: any = this.jwtService.decode(client.handshake.headers.authorization.slice(7));
-        const user: User = await this.prismaServie.user.findFirst({
-            where: {
-                username: userObj.username
-            }
-        })
-        if (!this.socketByID.has(user.id))
-            this.socketByID.set(user.id, client)
+        try{
+            const userObj: any = this.jwtService.verify(client.handshake.headers.authorization.slice(7));
+            const user: User = await this.prismaServie.user.findFirst({
+                where: {
+                    username: userObj.username
+                }
+            })
+            if (!this.socketByID.has(user.id))
+                this.socketByID.set(user.id, [client]);
+            else
+                this.socketByID.get(user.id).push(client);
+        }
+        catch(erro){
+            client.disconnect();
+        }
     }
 }

@@ -4,7 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export declare class NotificationService {
     private jwtService;
     private prismaServie;
-    socketByID: Map<number, Socket>;
+    socketByID: Map<number, Socket[]>;
     constructor(jwtService: JwtService, prismaServie: PrismaService);
     handleConnection(client: Socket): void;
     getNotification(body: any, req: any): Promise<void>;

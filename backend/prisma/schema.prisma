@@ -28,5 +28,7 @@ model User {
   imageIsUpdate Boolean @default(false)
   optionalMail String?
   codeVerification Int?
+  friends User[] @relation("friendship")
+  friendto User[] @relation("friendship")
   notifications Notification[]
 }

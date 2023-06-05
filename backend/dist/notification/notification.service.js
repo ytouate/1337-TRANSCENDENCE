@@ -23,7 +23,7 @@ let NotificationService = class NotificationService {
     constructor(jwtService, prismaServie) {
         this.jwtService = jwtService;
         this.prismaServie = prismaServie;
-        this.socketByID = new Map;
+        this.socketByID = new Map();
     }
     handleConnection(client) {
         this.pushClientInMap(client);
@@ -33,7 +33,11 @@ let NotificationService = class NotificationService {
         this.sendNotification(notifcation);
     }
     sendNotification(notification) {
-        this.socketByID.get(notification.receiverId).emit('receive_notification', notification);
+        if (this.socketByID.has(notification.receiverId)) {
+            for (let i = 0; i < this.socketByID.get(notification.receiverId).length; i++) {
+                this.socketByID.get(notification.receiverId)[i].emit('receive_notification', notification);
+            }
+        }
     }
     async pushNotificationToDb(notificationBody, req) {
         const user = await this.prismaServie.user.findFirst({
@@ -54,14 +58,21 @@ let NotificationService = class NotificationService {
         return notifcation;
     }
     async pushClientInMap(client) {
-        const userObj = this.jwtService.decode(client.handshake.headers.authorization.slice(7));
-        const user = await this.prismaServie.user.findFirst({
-            where: {
-                username: userObj.username
-            }
-        });
-        if (!this.socketByID.has(user.id))
-            this.socketByID.set(user.id, client);
+        try {
+            const userObj = this.jwtService.verify(client.handshake.headers.authorization.slice(7));
+            const user = await this.prismaServie.user.findFirst({
+                where: {
+                    username: userObj.username
+                }
+            });
+            if (!this.socketByID.has(user.id))
+                this.socketByID.set(user.id, [client]);
+            else
+                this.socketByID.get(user.id).push(client);
+        }
+        catch (erro) {
+            client.disconnect();
+        }
     }
 };
 __decorate([
