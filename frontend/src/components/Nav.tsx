@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import profileImg from "../assets/ytouate.jpeg";
 import logoImg from "../assets/logo.png";
 
-function Navbar() {
+function Nav() {
     return (
         <nav className="navbar">
             <Link to="/">
@@ -40,4 +40,4 @@ function Navbar() {
     );
 }
 
-export default Navbar;
+export default Nav;
