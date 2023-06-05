@@ -22,17 +22,18 @@ let authController = class authController {
     constructor(authservice) {
         this.authservice = authservice;
     }
-    gett() {
-        return 'm';
-        console.log('success');
-    }
+    gett() { }
     async getProfilee(res, req) {
         const user = await this.authservice.createUser(req.user);
         const token = await this.authservice.signToken(user.username, user.email);
         await this.authservice.checkUserhave2fa(user);
         console.log(token);
         res.cookie('Token', token);
-        return user;
+        res.redirect('http://localhost:5173/');
+        console.log(user);
+    }
+    getProfile() {
+        return 'profile';
     }
     async siginWith2fa(request, req) {
         const user = await this.authservice.validateUser(request.headers.authorization);
@@ -56,14 +57,14 @@ let authController = class authController {
     }
 };
 __decorate([
-    (0, common_2.Get)('success'),
+    (0, common_2.Get)('login'),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('42')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], authController.prototype, "gett", null);
 __decorate([
-    (0, common_2.Get)('signin'),
+    (0, common_2.Get)('/redirect/signin'),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('42')),
     __param(0, (0, common_1.Res)({ passthrough: true })),
     __param(1, (0, common_1.Req)()),
@@ -71,6 +72,12 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], authController.prototype, "getProfilee", null);
+__decorate([
+    (0, common_2.Get)('open'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], authController.prototype, "getProfile", null);
 __decorate([
     (0, common_1.Post)('2fa'),
     __param(0, (0, common_1.Req)()),

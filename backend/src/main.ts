@@ -13,7 +13,7 @@ async function bootstrap() {
   .build()
 
   app.enableCors({
-    origin : 'http://10.11.6.4:5173',
+    origin : '*',
     credentials : true
   })
 

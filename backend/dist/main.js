@@ -11,7 +11,7 @@ async function bootstrap() {
         .addTag('books')
         .build();
     app.enableCors({
-        origin: 'http://10.11.6.4:5173',
+        origin: '*',
         credentials: true
     });
     const document = swagger_1.SwaggerModule.createDocument(app, config);
