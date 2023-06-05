@@ -6,8 +6,8 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtStrategy } from './profile.guard';
 import { MulterModule } from '@nestjs/platform-express';
+import { JwtStrategy } from 'src/strategies/jwt.strategie';
 
 @Module({
   imports: [PrismaModule, ConfigModule, MulterModule.register({})],
