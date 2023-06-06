@@ -23,7 +23,7 @@ let NotificationService = class NotificationService {
     constructor(jwtService, prismaServie) {
         this.jwtService = jwtService;
         this.prismaServie = prismaServie;
-        this.socketByID = new Map;
+        this.socketByID = new Map();
     }
     handleConnection(client) {
         this.pushClientInMap(client);
@@ -32,37 +32,123 @@ let NotificationService = class NotificationService {
         const notifcation = await this.pushNotificationToDb(body, req);
         this.sendNotification(notifcation);
     }
+<<<<<<< HEAD
     sendNotification(notification) {
         if (this.socketByID.has(notification.receiverId))
             this.socketByID.get(notification.receiverId).emit('receive_notification', notification);
+=======
+    async sendNotification(notification) {
+        var _a;
+        const notif = await this.prismaServie.notification.findUnique({
+            where: {
+                id: notification.id
+            },
+            include: {
+                senderAndReicever: true,
+            }
+        });
+        notification.sender = notif.senderAndReicever[0];
+        if (this.socketByID.has((_a = notif.senderAndReicever[1]) === null || _a === void 0 ? void 0 : _a.id)) {
+            for (let i = 0; i < this.socketByID.get(notif.senderAndReicever[1].id).length; i++) {
+                this.socketByID.get(notif.senderAndReicever[1].id)[i].emit('receive_notification', notification);
+            }
+        }
+>>>>>>> 228b73f014fd6b683a146e96304998c60d065459
     }
     async pushNotificationToDb(notificationBody, req) {
-        const user = await this.prismaServie.user.findFirst({
+        const sender = await this.prismaServie.user.findUnique({
+            where: {
+                username: req.user.username,
+            }
+        });
+        const reicever = await this.prismaServie.user.findUnique({
             where: {
                 username: notificationBody.username
             }
         });
-        const notifcation = await this.prismaServie.notification.create({
+        let userIds = [sender.id, reicever.id];
+        let notification = await this.prismaServie.notification.create({
             data: {
                 description: notificationBody.description,
-                sender: req.user.username,
                 title: notificationBody.title,
-                reicever: {
-                    connect: { id: user.id }
+                senderAndReicever: {
+                    connect: userIds.map((id) => ({ id })),
                 },
             }
         });
-        return notifcation;
+        return notification;
     }
     async pushClientInMap(client) {
-        const userObj = this.jwtService.decode(client.handshake.headers.authorization.slice(7));
-        const user = await this.prismaServie.user.findFirst({
+        try {
+            const userObj = this.jwtService.verify(client.handshake.headers.authorization.slice(7));
+            const user = await this.prismaServie.user.findFirst({
+                where: {
+                    username: userObj.username
+                }
+            });
+            if (!this.socketByID.has(user.id))
+                this.socketByID.set(user.id, [client]);
+            else
+                this.socketByID.get(user.id).push(client);
+        }
+        catch (erro) {
+            client.disconnect();
+        }
+    }
+    async answerToNotification(body, req) {
+        console.log(body);
+        if (body.status == 'accepted') {
+            await this.acceptNotificaion(body);
+            this.deleteNotification(body);
+        }
+        else if (body.status == 'rejected')
+            this.deleteNotification(body);
+    }
+    deleteNotification(messageBody) {
+        this.prismaServie.notification.delete({
             where: {
-                username: userObj.username
+                id: messageBody.id,
             }
         });
-        if (!this.socketByID.has(user.id))
-            this.socketByID.set(user.id, client);
+    }
+    async acceptNotificaion(messageBody) {
+        try {
+            let notification = await this.prismaServie.notification.findUnique({
+                where: {
+                    id: messageBody.id,
+                },
+                include: {
+                    senderAndReicever: true
+                }
+            });
+            await this.prismaServie.user.update({
+                where: {
+                    id: notification.senderAndReicever[0].id
+                },
+                data: {
+                    friends: {
+                        connect: {
+                            id: notification.senderAndReicever[1].id
+                        }
+                    }
+                }
+            });
+            await this.prismaServie.user.update({
+                where: {
+                    id: notification.senderAndReicever[1].id
+                },
+                data: {
+                    friends: {
+                        connect: {
+                            id: notification.senderAndReicever[0].id
+                        }
+                    }
+                }
+            });
+        }
+        catch (error) {
+            throw new common_1.InternalServerErrorException();
+        }
     }
 };
 __decorate([
@@ -80,8 +166,17 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], NotificationService.prototype, "getNotification", null);
+__decorate([
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('websocket-jwt')),
+    (0, websockets_1.SubscribeMessage)('answer_notification'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], NotificationService.prototype, "answerToNotification", null);
 NotificationService = __decorate([
-    (0, websockets_1.WebSocketGateway)(),
+    (0, websockets_1.WebSocketGateway)({ namespace: 'notification', cors: true }),
     __metadata("design:paramtypes", [jwt_1.JwtService, prisma_service_1.PrismaService])
 ], NotificationService);
 exports.NotificationService = NotificationService;

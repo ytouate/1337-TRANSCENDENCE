@@ -13,10 +13,8 @@ datasource db {
 model Notification {
   id Int @id @default(autoincrement())
   description String
-  sender String
   title String
-  reicever User @relation(fields: [receiverId], references: [id])
-  receiverId Int
+  senderAndReicever User[] @relation("userNotificaiton")
   time DateTime @default(now())
 }
 
@@ -28,5 +26,7 @@ model User {
   imageIsUpdate Boolean @default(false)
   optionalMail String?
   codeVerification Int?
-  notifications Notification[]
+  friends   User[]   @relation("UserFriends")
+  friendOf  User[]   @relation("UserFriends")
+  notifications Notification[] @relation("userNotificaiton")
 }
