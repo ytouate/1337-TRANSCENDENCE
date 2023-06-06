@@ -64,6 +64,14 @@ export class authService{
         )
     }
 
+    //validate user
+    async validateUser(data) : Promise<any>{
+        const user = this.prisma.user.findUnique({where : {email : data.email} })
+        if (user)
+            return user
+        return undefined
+    }
+
     // send code verification { email } 
     async sigin2fa(code, email)
     {
@@ -98,14 +106,4 @@ export class authService{
     }
 
     // validate User with { Token }
-    async validateUser(autho) {
-        if (autho)
-        {
-            const [type, token] = autho.split(' ')
-            const user = this.jwt.verifyAsync(token)
-            if (user)
-                return user
-            return undefined
-        }
-    }
 }

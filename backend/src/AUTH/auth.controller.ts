@@ -32,20 +32,23 @@ export class authController {
         const user = await this.authservice.createUser(req.user)
         const token = await this.authservice.signToken(user.username, user.email)
         await this.authservice.checkUserhave2fa(user)
-        console.log(token)
-        res.cookie('Token' , token)
+        res.cookie('Token' , token, { httpOnly: false })
         res.redirect('http://localhost:5173/')
-        console.log(user)
     }
 
-    @Get('open')
-    getProfile(@Req() req) {
-        
+    @Get('user')
+    @UseGuards(AuthGuard('jwt'))
+    async getp(@Req() req) {
+        const user = await this.authservice.validateUser(req.user)
+        if (user)
+            return user
+        return 'user not found'
     }
 
     @Post('2fa')
+    @UseGuards(AuthGuard('jwt'))
     async siginWith2fa(@Req() request , @Body() req: authDto) {
-        const user = await this.authservice.validateUser(request.headers.authorization)
+        const user = await this.authservice.validateUser(request.user)
         if (!user)
             return 'unvalide user'
         const num = await this.authservice.sigin2fa(this.authservice.generateCode(), req.email)
@@ -56,8 +59,6 @@ export class authController {
 
     @Post('2fa/validateCode')
     async verificationCode(@Body() body) {
-        console.log(this.code)
-        console.log(body.code)
         if (this.code == body.code)
             return 'code s7i7'
         return 'code ghalate'

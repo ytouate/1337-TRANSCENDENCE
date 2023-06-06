@@ -6,10 +6,13 @@ import { ProfileModule } from './profile/profile.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { UserModule } from './user/user.module';
 import { NotificationModule } from './notification/notification.module';
+import { chatModule } from './Chat/chat.gateway.module';
+import { chatGateway } from './Chat/chat.gateway';
+import { appController } from './app.controller';
 
 @Module({
-  imports: [ProfileModule, MailerModule , ConfigModule.forRoot({ isGlobal: true }) , authModule, PrismaModule, UserModule, NotificationModule],
-  controllers: [],
-  providers: [],
+  imports: [chatModule ,NotificationModule,  ProfileModule, MailerModule , ConfigModule.forRoot({ isGlobal: true }) , authModule, PrismaModule, UserModule, NotificationModule],
+  controllers: [appController],
+  providers: [appController, chatGateway],
 })
 export class AppModule {}

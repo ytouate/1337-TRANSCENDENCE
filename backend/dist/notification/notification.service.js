@@ -33,7 +33,8 @@ let NotificationService = class NotificationService {
         this.sendNotification(notifcation);
     }
     sendNotification(notification) {
-        this.socketByID.get(notification.receiverId).emit('receive_notification', notification);
+        if (this.socketByID.has(notification.receiverId))
+            this.socketByID.get(notification.receiverId).emit('receive_notification', notification);
     }
     async pushNotificationToDb(notificationBody, req) {
         const user = await this.prismaServie.user.findFirst({

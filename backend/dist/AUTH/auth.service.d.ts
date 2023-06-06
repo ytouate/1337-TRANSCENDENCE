@@ -11,8 +11,8 @@ export declare class authService {
     createUser(newData: any): Promise<import(".prisma/client").User>;
     signToken(username: any, email: any): Promise<string>;
     add2fa(firstMail: any, email: any, code: any): Promise<void>;
+    validateUser(data: any): Promise<any>;
     sigin2fa(code: any, email: any): Promise<any>;
     generateCode(): number;
     checkUserhave2fa(user: any): Promise<void>;
-    validateUser(autho: any): Promise<any>;
 }

@@ -55,6 +55,12 @@ let authService = class authService {
             data: { optionalMail: email, codeVerification: code }
         });
     }
+    async validateUser(data) {
+        const user = this.prisma.user.findUnique({ where: { email: data.email } });
+        if (user)
+            return user;
+        return undefined;
+    }
     async sigin2fa(code, email) {
         const mail = await this.mail.sendMail({
             from: 'othmanmallah13@gmail.com',
@@ -75,15 +81,6 @@ let authService = class authService {
         if (user.optionalMail) {
             const code = await this.sigin2fa(this.generateCode(), user.optionalMail);
             this.add2fa(user.email, user.optionalMail, code);
-        }
-    }
-    async validateUser(autho) {
-        if (autho) {
-            const [type, token] = autho.split(' ');
-            const user = this.jwt.verifyAsync(token);
-            if (user)
-                return user;
-            return undefined;
         }
     }
 };

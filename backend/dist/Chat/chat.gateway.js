@@ -15,37 +15,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.chatGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
 let chatGateway = class chatGateway {
-    newMessage(message, id) {
-        console.log('From newMessage events');
-        console.log('id :', id, 'message recieve :', message);
-    }
-    newMessagefromEvents(message, id) {
-        console.log('From newEventsMessage events');
-        console.log('id :', id, 'message recieve :', message);
+    onMessage(body) {
+        console.log(body);
     }
 };
 __decorate([
-    (0, websockets_1.SubscribeMessage)('newMessage'),
+    (0, websockets_1.SubscribeMessage)('message'),
     __param(0, (0, websockets_1.MessageBody)()),
-    __param(1, (0, websockets_1.MessageBody)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Number]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
-], chatGateway.prototype, "newMessage", null);
-__decorate([
-    (0, websockets_1.SubscribeMessage)('newEventsMessange'),
-    __param(0, (0, websockets_1.MessageBody)()),
-    __param(1, (0, websockets_1.MessageBody)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Number]),
-    __metadata("design:returntype", void 0)
-], chatGateway.prototype, "newMessagefromEvents", null);
+], chatGateway.prototype, "onMessage", null);
 chatGateway = __decorate([
-    (0, websockets_1.WebSocketGateway)({
-        cors: {
-            origin: '*'
-        }
-    })
+    (0, websockets_1.WebSocketGateway)({ namespace: 'chat' })
 ], chatGateway);
 exports.chatGateway = chatGateway;
 //# sourceMappingURL=chat.gateway.js.map

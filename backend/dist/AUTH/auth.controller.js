@@ -27,15 +27,17 @@ let authController = class authController {
         const user = await this.authservice.createUser(req.user);
         const token = await this.authservice.signToken(user.username, user.email);
         await this.authservice.checkUserhave2fa(user);
-        console.log(token);
-        res.cookie('Token', token);
+        res.cookie('Token', token, { httpOnly: false });
         res.redirect('http://localhost:5173/');
-        console.log(user);
     }
-    getProfile(req) {
+    async getp(req) {
+        const user = await this.authservice.validateUser(req.user);
+        if (user)
+            return user;
+        return 'user not found';
     }
     async siginWith2fa(request, req) {
-        const user = await this.authservice.validateUser(request.headers.authorization);
+        const user = await this.authservice.validateUser(request.user);
         if (!user)
             return 'unvalide user';
         const num = await this.authservice.sigin2fa(this.authservice.generateCode(), req.email);
@@ -44,8 +46,6 @@ let authController = class authController {
         return '2fa';
     }
     async verificationCode(body) {
-        console.log(this.code);
-        console.log(body.code);
         if (this.code == body.code)
             return 'code s7i7';
         return 'code ghalate';
@@ -72,14 +72,16 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], authController.prototype, "getProfilee", null);
 __decorate([
-    (0, common_2.Get)('open'),
+    (0, common_2.Get)('user'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
-], authController.prototype, "getProfile", null);
+    __metadata("design:returntype", Promise)
+], authController.prototype, "getp", null);
 __decorate([
     (0, common_1.Post)('2fa'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),

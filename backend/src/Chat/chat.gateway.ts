@@ -1,23 +1,28 @@
-import { MessageBody, SubscribeMessage, WebSocketGateway } from "@nestjs/websockets";
+import { Logger, OnModuleInit } from "@nestjs/common";
+import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import { Socket ,Server } from "socket.io";
 
 
 
-@WebSocketGateway({
-    cors : {
-        origin : '*'
+@WebSocketGateway({ namespace : 'chat'})
+export class chatGateway  {
+
+    // @WebSocketServer()
+    // server : Server;
+
+    @SubscribeMessage('message')
+    onMessage(@MessageBody() body: any) {
+        console.log(body)
+        //this.server.emit('onMessage' , body)
     }
-})
-export class chatGateway{
 
-    @SubscribeMessage('newMessage')
-    newMessage(@MessageBody() message , @MessageBody('id') id: number) {
-        console.log('From newMessage events')
-        console.log('id :' , id , 'message recieve :', message)
-    }
+    // onModuleInit() {
+    //     this.server.on('coonection', (socket) => {
+    //         console.log(socket.id)
+    //         console.log('connected')
+    //     })
+    // }
 
-    @SubscribeMessage('newEventsMessange')
-    newMessagefromEvents(@MessageBody() message , @MessageBody('id') id: number) {
-        console.log('From newEventsMessage events')
-        console.log('id :' , id , 'message recieve :', message)
-    }
+
+
 }
