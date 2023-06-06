@@ -1,13 +1,14 @@
-import { Req, UseGuards } from '@nestjs/common';
+import { InternalServerErrorException, Req, UseGuards } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets';
-import { User } from '@prisma/client';
+import { Notification, User } from '@prisma/client';
+import { log } from 'console';
 import { Server, Socket } from 'socket.io';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 
-@WebSocketGateway()
+@WebSocketGateway({namespace: 'notification', cors: true})
 export class NotificationService {
     socketByID: Map<number, Socket[]> ;
     constructor(private jwtService: JwtService, private prismaServie: PrismaService){
@@ -26,32 +27,47 @@ export class NotificationService {
         this.sendNotification(notifcation)
     }
     //send notification to the target
-    sendNotification(notification){
-        if (this.socketByID.has(notification.receiverId)){
-            for (let i = 0;i < this.socketByID.get(notification.receiverId).length;i++){
-                this.socketByID.get(notification.receiverId)[i].emit('receive_notification', notification);
+    async sendNotification(notification){
+        const notif = await this.prismaServie.notification.findUnique({
+            where: {
+                id : notification.id
+            },
+            include:{
+                senderAndReicever: true,
+            }
+        })
+        notification.sender = notif.senderAndReicever[0];
+        if (this.socketByID.has(notif.senderAndReicever[1]?.id)){
+            for (let i = 0;i < this.socketByID.get(notif.senderAndReicever[1].id).length;i++){
+                this.socketByID.get(notif.senderAndReicever[1].id)[i].emit('receive_notification', notification);
             }
         }
     }
 
     //push notification to database
     async pushNotificationToDb(notificationBody, req){
-        const user = await this.prismaServie.user.findFirst({
+        const sender = await this.prismaServie.user.findUnique({
+            where: {
+                username: req.user.username,
+            }
+        })
+        const reicever = await this.prismaServie.user.findUnique({
             where: {
                 username: notificationBody.username
             }
         })
-        const notifcation = await this.prismaServie.notification.create({
+        let userIds = [sender.id, reicever.id]
+        let notification: Notification = await this.prismaServie.notification.create({
             data: {
                 description: notificationBody.description,
-                sender: req.user.username,
                 title: notificationBody.title,
-                reicever: {
-                    connect: {id: user.id}
+                senderAndReicever: {
+                    connect: userIds.map((id) => ({id})),
                 },
             }
-        })
-        return notifcation;
+        });
+        
+        return notification;
     }
     //push the client socket in map
     async pushClientInMap(client: Socket){
@@ -69,6 +85,65 @@ export class NotificationService {
         }
         catch(erro){
             client.disconnect();
+        }
+    }
+    //accept or reject friend request
+    @UseGuards(AuthGuard('websocket-jwt'))
+    @SubscribeMessage('answer_notification')
+    async answerToNotification(@MessageBody() body: any, @Req() req){
+        console.log(body);
+        if (body.status == 'accepted'){
+            await this.acceptNotificaion(body);
+            this.deleteNotification(body);
+        }
+        else if (body.status == 'rejected') this.deleteNotification(body);
+    }
+    // delete notifiation from database
+    deleteNotification(messageBody){
+        this.prismaServie.notification.delete({
+            where : {
+                id: messageBody.id,
+            }
+        })
+    }
+    //accept notification
+    async acceptNotificaion(messageBody){
+        try{
+            let notification = await this.prismaServie.notification.findUnique({
+                where:{
+                    id: messageBody.id,
+                },
+                include: {
+                    senderAndReicever: true
+                }
+            })
+            await this.prismaServie.user.update({
+                where: {
+                    id: notification.senderAndReicever[0].id
+                },
+                data: {
+                    friends:{
+                        connect: {
+                            id: notification.senderAndReicever[1].id
+                        }
+                    }
+                }
+            })
+            await this.prismaServie.user.update({
+                where: {
+                    id: notification.senderAndReicever[1].id
+                },
+                data: {
+                    friends:{
+                        connect: {
+                            id: notification.senderAndReicever[0].id
+                        }
+                    }
+                }
+            })
+        }
+        catch(error){
+            throw new InternalServerErrorException();
         }
     }
 }
