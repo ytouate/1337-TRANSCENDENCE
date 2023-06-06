@@ -1,6 +1,6 @@
 import img from "../assets/ytouate.jpeg";
 
-function RightMessageCard() {
+function RightMessageCard(props) {
     return (
         <div className="right-message-card">
             <div className="right-message-card--container">
@@ -12,10 +12,7 @@ function RightMessageCard() {
             </div>
 
             <p className="right-message-card--message">
-                Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-                Repudiandae odio ratione eveniet eum praesentium nemo tempore,
-                laborum voluptatum qui voluptates beatae sunt ullam, aspernatur
-                obcaecati deserunt. Animi aspernatur mollitia eligendi!
+                {props.message}
             </p>
         </div>
     );

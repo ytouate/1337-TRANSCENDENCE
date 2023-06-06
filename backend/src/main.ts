@@ -6,10 +6,12 @@ import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 
+const req = require('cors')
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule , {cors : true});
   const config = new DocumentBuilder().setTitle('Demp application')
+  
   .setDescription('Demo application')
   .setVersion('V1')
   .addTag('books')

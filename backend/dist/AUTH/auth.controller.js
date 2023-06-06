@@ -24,6 +24,7 @@ let authController = class authController {
     }
     gett() { }
     async getProfilee(res, req) {
+        console.log('her backend');
         const user = await this.authservice.createUser(req.user);
         const token = await this.authservice.signToken(user.username, user.email);
         await this.authservice.checkUserhave2fa(user);
@@ -35,6 +36,10 @@ let authController = class authController {
         if (user)
             return user;
         return 'user not found';
+    }
+    getProfile(req) {
+        console.log(req.headers.authorization);
+        return { name: 'Youssef' };
     }
     async siginWith2fa(request, req) {
         const user = await this.authservice.validateUser(request.user);
@@ -79,6 +84,13 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], authController.prototype, "getp", null);
+__decorate([
+    (0, common_2.Get)('profil'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], authController.prototype, "getProfile", null);
 __decorate([
     (0, common_1.Post)('2fa'),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),

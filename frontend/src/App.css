@@ -3,9 +3,17 @@
 @tailwind utilities; */
 
 body {
-    background: linear-gradient(90deg, #d9d9d9 0%, #062c59 100%);
+    /* background: linear-gradient(90deg, #d9d9d9 0%, #062c59 100%); */
     font-family: "Montserrat", sans-serif;
+    background-color: #fffbf3;
+    background-color: #dedede;
+    color: black;
     height: 90vh;
+}
+
+.page {
+    max-width: 1900px;
+    margin: auto;
 }
 
 /*
@@ -52,11 +60,49 @@ select {
 *::after {
     box-sizing: border-box;
 }
+
 * {
     margin: 0;
     padding: 0;
 }
 
+
+.signin-page {
+    width: 60%;
+    max-width: 30%;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: gray;
+    margin: auto auto;
+    border-radius: 15px;
+    box-shadow: 4px 4px black;
+    flex-wrap: wrap;
+}
+.signin-page > h2  {
+    max-width: fit-content;
+    width: 90%;
+    font-size: 26px;
+    margin-bottom: 50px;
+}
+.signin-page > a {
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    
+}
+.signin-page > a > button {
+    width: 80%;
+    height: 80px;
+    border-radius: 15px;
+}
 /*
     styling the nav bar
 */
@@ -67,19 +113,18 @@ select {
     justify-content: space-between;
     align-items: center;
     margin: 0;
-    box-shadow: 0 2px 4px -4px lightgray;
+    box-shadow: 0 2px 4px -4px black;
 }
 
 .navbar-list {
     list-style: none;
     display: flex;
-    color: white;
     margin-right: 50px;
 }
 
 .navbar-list > li {
     margin: auto 70px;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 20px;
     cursor: pointer;
     line-height: 27px;
@@ -87,7 +132,7 @@ select {
 }
 
 a {
-    color: white;
+    color: black;
     text-decoration: none;
 }
 
@@ -130,52 +175,40 @@ a:hover {
 }
 
 .home-text {
-    font-size: 85px;
-    line-height: 100px;
-    color: white;
-    margin: 0 0 60px 0;
-    padding: 0;
-    color: #f5f5f5;
-    text-shadow: 1px 1px 1px #cecece, 1px 2px 1px #cecece, 1px 3px 1px #cecece,
-        1px 4px 1px #cecece, 1px 5px 1px #cecece, 1px 6px 1px #cecece,
-        1px 7px 1px #cecece, 1px 8px 1px #cecece, 1px 9px 1px #cecece,
-        1px 10px 1px #cecece, 1px 18px 6px rgba(16, 16, 16, 0.4),
-        1px 22px 10px rgba(16, 16, 16, 0.2), 1px 25px 35px rgba(16, 16, 16, 0.2),
-        1px 30px 60px rgba(16, 16, 16, 0.4);
+    font-family: "Montserrat";
+    font-style: normal;
+    font-weight: 700;
+    font-size: 75px;
+    line-height: 91px;
+    margin-bottom: 20px;
+    color: black;
+    text-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
 }
 
 .right {
     width: 50%;
-    display: flex;
-    justify-content: center;
 }
 
-.wrapper {
-    border-radius: 50px;
-
-}
 .messages-container--header {
     position: fixed;
-    background-color: black;
-
     height: 83px;
 }
 
 .right > img {
-    width: 800px;
-    box-shadow: 4px 4px 4px #062c59;
+    width: 60%;
+    box-shadow: 4px 4px 4px lightgray;
     border-radius: 15px;
+    margin: auto;
 }
 
 .play-btn {
     border: none;
     outline: none;
-    cursor: pointer;
-    width: 300px;
-    margin: 10px;
+    width: 270px;
     height: 70px;
-    border-radius: 9999px;
-    background-color: #072e5b;
+    margin: 10px;
+    border-radius: 38px;
+    background-color: #062c59;
     color: white;
     font-weight: bold;
     font-size: 18px;
@@ -185,9 +218,11 @@ a:hover {
 .home-buttons {
     margin-left: 60px;
 }
+
 .play-btn:hover {
     transform: scale(1.01);
     background-color: #284b77;
+    color: white;
     transition: background-color 0.5s ease-in-out;
 }
 
@@ -196,14 +231,12 @@ a:hover {
 */
 .profile-page {
     width: 100%;
-    height: calc(100% - 120px);
+    height: 90vh;
     display: flex;
     align-items: center;
-    justify-content: space-around;
 }
 
-.content {
-    max-width: fit-content;
+.profile-page--left {
     width: 50%;
     display: flex;
     flex-direction: column;
@@ -211,51 +244,54 @@ a:hover {
     justify-content: center;
     margin-left: 50px;
     font-weight: 600;
+    margin: auto;
 }
 
 .profile-img {
-    width: 180px;
+    width: 120px;
     border-radius: 50%;
 }
 
 .profile-username {
     color: #062c59;
-    margin-top: 35px;
-    font-size: 26px;
+    margin-top: 25px;
+    font-size: 24px;
     font-weight: bold;
     text-align: center;
 }
+
 .games-card {
     background-color: #062c59;
-    width: 70%;
+    color: white;
+    width: 50%;
     margin-top: 50px;
     height: 70px;
     border-radius: 9999px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
     font-size: 18px;
     font-weight: 600;
-    margin-bottom: 50px;
 }
 
 .history {
     width: 100%;
     display: flex;
-    justify-content: space-evenly;
+    color: white;
+    justify-content: center;
 }
 
 .info-card > p {
     font-size: 15px;
-    font-weight: 600;
-    color: white;
+    font-weight: 700;
 }
 
 .info-card {
     background-color: #062c59;
-    width: 40%;
-    margin: 20px 5px 0 5px;
+    color: white;
+    width: 25%;
+    margin-top: 25px;
+    margin-right: 5px;
     height: 60px;
     border-radius: 9999px;
     display: flex;
@@ -269,7 +305,6 @@ a:hover {
 }
 
 .match-card--player {
-    color: white;
     font-size: 14px;
     margin: 0;
     margin-top: 5px;
@@ -284,7 +319,6 @@ a:hover {
 }
 
 .match-card--status {
-    color: white;
     margin-bottom: 25px;
     margin-left: 10px;
     margin-right: 10px;
@@ -298,16 +332,16 @@ a:hover {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-right: 10px;
+    margin-right: 20px;
+    color: white;
+    box-shadow: 4px 4px 4px lightgray;
 }
 
 .history-cards {
     margin-top: 50px;
     margin-bottom: 50px;
-    width: 100%;
     display: flex;
-    justify-content: space-between;
-    max-width: 620px;
+    max-width: 90%;
     overflow: auto;
     white-space: nowrap;
 }
@@ -321,10 +355,14 @@ a:hover {
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
 }
 
+.profile-page--right {
+    width: 50%;
+}
 .profile-page-img {
-    width: 800px;
+    width: 60%;
     box-shadow: 4px 4px 4px;
     border-radius: 15px;
+    margin: auto;
 }
 
 /*
@@ -397,29 +435,36 @@ a:hover {
     styling the chat page
 */
 .wrapper {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-left {
     background-color: white;
+    border-radius: 15px;
+    box-shadow: 4px 4px 4px gray;
+    width: fit-content;
+    max-width: 70%;
 }
 
 .chat-nav {
+    width: 100%;
     display: grid;
     grid-template-columns: 1fr 2fr 1fr;
-    /* display: none; */
 }
 
 .chat-page {
     display: grid;
     grid-template-columns: 1fr 2fr 1fr;
-    width: 1500px;
-    height: 1200px;
+    height: 900px;
     border-radius: 15px;
 }
+
 .messages-container {
     height: 100%;
-    overflow: auto;
     border-right: 1px solid lightgray;
 }
 
@@ -430,6 +475,7 @@ a:hover {
 .messages-nav {
     border-right: 1px solid lightgray;
 }
+
 .chat-navbar {
     border-right: 1px solid lightgray;
 }
@@ -442,16 +488,18 @@ a:hover {
     align-items: center;
     font-weight: bold;
     font-size: 22px;
-    color: #062c59;
+    color: black;
 }
 
 .chat-container {
     height: 100%;
     overflow: auto;
     border-right: 1px solid lightgray;
+    display: flex;
+    flex-direction: column;
 }
 
-.chat-container::-webkit-scrollbar {
+.messages::-webkit-scrollbar {
     display: none;
 }
 
@@ -462,7 +510,7 @@ a:hover {
 .user-message-card {
     background-color: #e4e4e4;
     box-shadow: 4px 4px 4px lightgray;
-    color: #062c59;
+    color: black ;
     font-weight: 500;
     width: 80%;
     height: 70px;
@@ -485,7 +533,7 @@ a:hover {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    margin-left: 100px;
+    margin-left: 80px;
     background-color: black;
 }
 
@@ -496,6 +544,7 @@ a:hover {
 .user-message-card--data {
     margin-left: 15px;
 }
+
 .user-message-card--profile {
     width: 60px;
     margin-left: 10px;
@@ -511,12 +560,13 @@ a:hover {
 .message-card {
     height: auto;
     width: fit-content;
-    max-width: 50%;
-    color: #062c59;
-
+    max-width: 60%;
+    color: black;
     margin-left: 10px;
     margin-top: 10px;
 }
+
+
 
 .message-card--sender-img {
     width: 65px;
@@ -532,7 +582,7 @@ a:hover {
 }
 
 .message-card--message-time {
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .message-card--sender-img {
@@ -553,38 +603,40 @@ a:hover {
 .right-message-card {
     height: auto;
     width: fit-content;
-    max-width: 50%;
-    color: #062c59;
+    max-width: 60%;
+    color: black;
     margin-left: auto;
     display: flex;
     flex-direction: column;
     margin-right: 20px;
 }
 
-.right-message-card--sender-img {
-    width: 65px;
-    border-radius: 50%;
-    margin-bottom: 0;
-}
 
 .right-message-card--container {
     display: flex;
     align-items: center;
-    font-size: 20px;
     font-weight: bold;
     margin-left: auto;
     margin-right: 0;
 }
-
-.right-message-card--message-time {
+.right-message-card--sender-name {
     font-size: 16px;
 }
+.right-message-card--message-time{
+    font-size: 12px;
+    text-align: right;
+}
+
 
 .right-message-card--sender-img {
     margin-top: 10px;
     margin-left: 10px;
     margin-right: 10px;
+    width: 50px;
+    border-radius: 50%;
+    margin-bottom: 0;
 }
+
 .right-message-card > p {
     font-weight: 600;
     font-size: 20px;
@@ -594,10 +646,12 @@ a:hover {
     border-radius: 15px 0 15px 15px;
     background-color: #d9d9d9;
 }
+
 .friends-container {
     height: 100%;
     overflow: auto;
 }
+
 .friends-container::-webkit-scrollbar {
     display: none;
 }
@@ -610,15 +664,17 @@ a:hover {
     align-items: center;
     font-weight: bold;
     font-size: 22px;
-    color: #062c59;
+    color: black;
 }
+
 .friend-card--lastmessage {
     font-size: 14px;
 }
+
 .friend-card {
     background-color: #e4e4e4;
     box-shadow: 4px 4px 4px lightgray;
-    color: #062c59;
+    color: black;
     font-weight: 500;
     width: 80%;
     height: 70px;
@@ -627,123 +683,63 @@ a:hover {
     border-radius: 15px;
     margin: 20px auto;
 }
+.messages {
+    height: 90%;
+    overflow: auto;
+}
+.message-sender {
+    height: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
+.message-sender > input {
+    width: 400px;
+    height: 55px;
+    border: none;
+    background-color: lightgray;
+    border-radius: 38px;
+    outline: none;
+    box-shadow: 4px 4px 4px gray;
+    padding-left: 20px;
+    padding-right: 50px;
+    font-weight: 600;
+}
+
+.send-button > img {
+    width: 20px;
+    cursor: pointer;
+}
+.send-button {
+    position: relative;
+    right: 40px;
+}
 .friend-card--username {
     font-weight: bold;
+    
 }
 
 .friend-card--data {
     margin-left: 15px;
     margin-right: 120px;
 }
+
 .friend-card--profile {
     width: 60px;
     margin-left: 10px;
     border-radius: 50%;
 }
 
+
 @media only screen and (max-width: 1700px) {
-    .navbar-list > li {
-        margin: auto 50px;
-        font-size: 16px;
-    }
-    .right > img {
-        width: 450px;
-        margin-right: 100px;
-    }
-    .profile-page-img {
-        width: 450px;
-        margin-right: 50px;
-    }
-    .home-text {
-        font-size: 60px;
-        line-height: 80px;
-        margin: 0 0 40px 0;
-    }
-    .home-buttons {
-        margin-left: -100px;
-        margin-top: 0;
-    }
 }
 
 @media only screen and (max-width: 1300px) {
-    .navbar-list > li {
-        margin: auto 30px;
-        font-size: 16px;
-    }
-    .right > img {
-        width: 350px;
-        margin-right: 50px;
-    }
-    .profile-page-img {
-        width: 350px;
-        margin-right: 50px;
-    }
-    .home-text {
-        font-size: 50px;
-        line-height: 80px;
-        margin: 0 0 30px 100px;
-    }
-    vertical-line-break .home-buttons {
-        margin-left: 0;
-        margin-top: 0;
-    }
 }
 
 @media only screen and (max-width: 1100px) {
-    .navbar-list > li {
-        margin: auto 20px;
-        font-size: 16px;
-    }
-    .right > img {
-        width: 300px;
-        margin-right: 50px;
-        border-radius: 15px;
-    }
-    .profile-page-img {
-        width: 300px;
-        margin-right: 50px;
-    }
-    .home-text {
-        font-size: 50px;
-        line-height: 65px;
-        color: white;
-        margin: 0 0 30px 100px;
-    }
-    .home-buttons {
-        margin-left: 0;
-        margin-top: 0;
-    }
 }
 
 @media only screen and (max-width: 950px) {
-    .home-profile-img {
-        height: 50px;
-    }
-    .navbar-list > li {
-        margin: auto 10px;
-        font-size: 16px;
-    }
-    .right > img {
-        width: 300px;
-        margin-right: 50px;
-    }
-
-    .profile-page-img {
-        width: 300px;
-        margin-right: 50px;
-    }
-    .home-text {
-        font-size: 35px;
-        line-height: 50px;
-        margin: 0 0 30px 150px;
-    }
-    .home-buttons {
-        margin-left: -50px;
-        margin-top: 0;
-    }
-    .play-btn {
-        width: 150px;
-        font-size: 14px;
-    }
 }
