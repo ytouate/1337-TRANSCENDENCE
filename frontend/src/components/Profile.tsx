@@ -1,10 +1,10 @@
 import profileImg from "../assets/ytouate.jpeg";
 import MatchCard from "./MatchCard";
-import img from '../assets/background_2.jpeg'
+import img from '../assets/background_3.jpg'
 function Profile() {
     return (
         <section className="profile-page">
-            <div className="content">
+            <div className="profile-page--left">
                 <div className="profile-info-container">
                     <img src={profileImg} alt="" className="profile-img" />
                     <p className="profile-username">ytouate</p>
@@ -36,7 +36,9 @@ function Profile() {
                     <p>Account settings</p>
                 </div>
             </div>
-            <img  className="profile-page-img" src={img} alt="" />
+            <div className="profile-page--right">
+                <img  className="profile-page-img" src={img} alt="" />
+            </div>
         </section>
     );
 }
