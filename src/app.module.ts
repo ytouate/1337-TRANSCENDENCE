@@ -6,7 +6,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { LobbyService } from './lobby/lobby.service';
 import { LobbyController } from './lobby/lobby.controller';
 import { LobbyModule } from './lobby/lobby.module';
-import { GateWayModule } from './gateway/gamegateway.module';
+import { GateWayModule } from './gateway/game.module';
 
 @Module({
     imports: [
