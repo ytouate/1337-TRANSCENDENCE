@@ -23,9 +23,6 @@ model User {
   hash String
   games Game[] @relation("GameUsers")
   @@map("users")
-
-  lobbyId   Int?
-  lobby     Lobby?   @relation(fields: [lobbyId], references: [id])
 }
 
 
@@ -39,11 +36,6 @@ model Game {
   @@map("games")
 }
 
-model Lobby {
-  id Int @id @default(autoincrement())
-  name String @unique
-  players   User[]
-  }
 
 enum GameStatus {
   FINISHED
