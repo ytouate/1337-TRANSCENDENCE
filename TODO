@@ -1,1 +1,3 @@
-finish lobby 
+clean the auth and login logic, not needed anymore
+clean the game gateway, for more readibility and flexibility
+add customization to game (database logic)
