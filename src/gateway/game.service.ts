@@ -10,18 +10,37 @@ import {
 import { Server, Socket } from 'socket.io';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GameService } from 'src/game/game.service';
-import {
-    WIN_CONDITION,
-    BOARD_HEIGHT,
-    BOARD_WIDTH,
-    BALL_SIZE,
-    BALL_SPEED_X,
-    BALL_SPEED_Y,
-    PADDLE_WIDTH,
-    PADDLE_HEIGHT,
-    PADDLE_MARGIN,
-} from './constants';
-import { UserData, PlayerPosition, GamePosition } from './interfaces';
+
+interface UserData {
+    socket: Socket;
+    username: string;
+    id: number;
+}
+
+export const WIN_CONDITION = 3;
+
+const BOARD_HEIGHT = 600;
+const BOARD_WIDTH = 900;
+
+const BALL_SIZE = 15;
+const BALL_SPEED_X = 8; // 10 originlly
+const BALL_SPEED_Y = 4;
+
+const PADDLE_WIDTH = 10;
+const PADDLE_HEIGHT = 100;
+const PADDLE_MARGIN = 10;
+
+interface PlayerPosition {
+    id: number;
+    username: string;
+    y: number;
+    score: number;
+}
+
+interface GamePosition {
+    player1: PlayerPosition;
+    player2: PlayerPosition;
+}
 
 @WebSocketGateway({ cors: true })
 export class GameGateWay
