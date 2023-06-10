@@ -32,6 +32,7 @@ model Game {
   players   User[] @relation("GameUsers")
   score1 Int @default(0)
   score2 Int @default(0)
+  winnerId Int @default(-1)
 
   @@map("games")
 }
