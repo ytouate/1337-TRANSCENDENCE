@@ -1,4 +1,4 @@
-import { OnModuleInit, Req } from '@nestjs/common';
+import { OnModuleInit } from '@nestjs/common';
 import {
     ConnectedSocket,
     MessageBody,
@@ -9,38 +9,9 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { GameService } from 'src/game/game.service';
-
-interface UserData {
-    socket: Socket;
-    username: string;
-    id: number;
-}
-
-export const WIN_CONDITION = 3;
-
-const BOARD_HEIGHT = 600;
-const BOARD_WIDTH = 900;
-
-const BALL_SIZE = 15;
-const BALL_SPEED_X = 8; // 10 originlly
-const BALL_SPEED_Y = 4;
-
-const PADDLE_WIDTH = 10;
-const PADDLE_HEIGHT = 100;
-const PADDLE_MARGIN = 10;
-
-interface PlayerPosition {
-    id: number;
-    username: string;
-    y: number;
-    score: number;
-}
-
-interface GamePosition {
-    player1: PlayerPosition;
-    player2: PlayerPosition;
-}
+import { BOARD_HEIGHT, PADDLE_HEIGHT } from './constants';
+import { UserData, GamePosition } from './interfaces';
+import { Game } from './gamelogic/Game';
 
 @WebSocketGateway({ cors: true })
 export class GameGateWay
@@ -53,10 +24,7 @@ export class GameGateWay
     @WebSocketServer()
     server: Server;
 
-    constructor(
-        private prisma: PrismaService,
-        private gameService: GameService,
-    ) {
+    constructor(private prisma: PrismaService) {
         this.userSockets = new Map<number, UserData>();
         this.queue = [];
         this.gamePlayerPosition = new Map();
@@ -128,9 +96,15 @@ export class GameGateWay
         const userData1 = this.userSockets.get(player1);
         const userData2 = this.userSockets.get(player2);
 
-        const game = await this.gameService.createGame({
-            player1: player1,
-            player2: player2,
+        const game = await this.prisma.game.create({
+            data: {
+                players: {
+                    connect: [{ id: player1 }, { id: player2 }],
+                },
+            },
+            include: {
+                players: true,
+            },
         });
 
         if (!game) throw new Error('Failed to create the game');
@@ -175,136 +149,16 @@ export class GameGateWay
         // this.userSockets.delete(player1); // still dont know what to do with this
         // this.userSockets.delete(player2);
 
-        this.startGameLoop(
+        const gamePosition = this.gamePlayerPosition.get(game.id);
+
+        const gameInstance = new Game(
             game.id,
             userData1.socket,
             userData2.socket,
+            gamePosition,
         );
+        gameInstance.startGameLoop(this.server, this.prisma);
     }
-
-    startGameLoop(roomId: number, socket1: Socket, socket2: Socket) {
-        var ball = {
-            x: BOARD_WIDTH / 2,
-            y: BOARD_HEIGHT / 2,
-            speedX: BALL_SPEED_X,
-            speedY: BALL_SPEED_Y,
-        };
-
-        const interval = setInterval(() => {
-            const gamePosition = this.gamePlayerPosition.get(roomId);
-
-            ball.x += ball.speedX;
-            ball.y += ball.speedY;
-
-            var reset = false;
-            var gameOver = false;
-
-            if (ball.x < PADDLE_MARGIN + BALL_SIZE + PADDLE_WIDTH) {
-                if (
-                    ball.y > gamePosition.player1.y &&
-                    ball.y < gamePosition.player1.y + PADDLE_HEIGHT
-                ) {
-                    ball.speedX *= -1;
-                    var deltaY =
-                        ball.y -
-                        (gamePosition.player1.y + PADDLE_HEIGHT / 2);
-                    ball.speedY = deltaY * 0.35;
-                } else if (ball.x < 0) {
-                    gamePosition.player2.score++;
-                    reset = true;
-                }
-            } else if (
-                ball.x >
-                BOARD_WIDTH - BALL_SIZE - PADDLE_WIDTH - PADDLE_MARGIN
-            ) {
-                if (
-                    ball.y > gamePosition.player2.y &&
-                    ball.y < gamePosition.player2.y + PADDLE_HEIGHT
-                ) {
-                    ball.speedX *= -1;
-                    var deltaY =
-                        ball.y -
-                        (gamePosition.player2.y + PADDLE_HEIGHT / 2);
-                    ball.speedY = deltaY * 0.35;
-                } else if (ball.x > BOARD_WIDTH) {
-                    gamePosition.player1.score++;
-                    reset = true;
-                }
-            }
-
-            if (ball.y < 0) {
-                ball.speedY *= -1;
-            }
-            if (ball.y > BOARD_HEIGHT) {
-                ball.speedY *= -1;
-            }
-
-            if (reset) {
-                var data: PlayerPosition;
-                if (gamePosition.player1.score >= WIN_CONDITION) {
-                    gameOver = true;
-                    data = gamePosition.player1;
-                }
-                if (gamePosition.player2.score >= WIN_CONDITION) {
-                    gameOver = true;
-                    data = gamePosition.player2;
-                }
-                if (gameOver) {
-                    this.server.to(String(roomId)).emit('game_over', {
-                        data,
-                    });
-                    this.updateGameEnd(roomId, gamePosition);
-                    socket1.leave(String(roomId));
-                    socket2.leave(String(roomId));
-                    clearInterval(interval); // Stop the interval
-
-                    return;
-                }
-                ball.x = BOARD_WIDTH / 2;
-                ball.y = BOARD_HEIGHT / 2;
-                ball.speedX *= -1; // flip direction
-            }
-
-            this.server.to(String(roomId)).emit('game_update', {
-                ball: { x: ball.x, y: ball.y },
-                gamePosition,
-            });
-        }, 1000 / 60);
-    }
-
-    updateGameEnd(gameId: number, gamePosition: GamePosition) {
-        try {
-            this.prisma.game.update({
-                where: {
-                    id: gameId,
-                },
-                data: {
-                    status: 'FINISHED',
-                    score1: gamePosition.player1.score,
-                    score2: gamePosition.player2.score,
-                },
-            });
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    //will use later
-    // updateGameScores(gameId: number, gamePosition: GamePosition) {
-    //     try {
-    //         this.prisma.game.update({
-    //             where: {
-    //                 id: gameId,
-    //             },
-    //             data: {
-    //                 score1: gamePosition.player1.score,
-    //                 score2: gamePosition.player2.score,
-    //             },
-    //         });
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // }
 
     @SubscribeMessage('mouseMove')
     mouseMove(
