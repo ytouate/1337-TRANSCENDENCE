@@ -39,6 +39,9 @@ export class GameService {
                         },
                     },
                 },
+                include: {
+                    players: true,
+                },
             });
             return games;
         } catch (error) {

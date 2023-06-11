@@ -27,7 +27,7 @@ export class GameController {
 
     @Get('user/:userId')
     getUserGames(@Param('userId') userId: number) {
-        return this.gameService.getUserGames(userId);
+        return this.gameService.getUserGames(Number(userId));
     }
 
     @Post('create')
