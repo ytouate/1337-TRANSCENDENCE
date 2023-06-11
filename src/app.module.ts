@@ -3,10 +3,9 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { LobbyService } from './lobby/lobby.service';
-import { LobbyController } from './lobby/lobby.controller';
-import { LobbyModule } from './lobby/lobby.module';
+
 import { GateWayModule } from './gateway/game.module';
+import { GameModule } from './game/game.module';
 
 @Module({
     imports: [
@@ -17,9 +16,9 @@ import { GateWayModule } from './gateway/game.module';
         UserModule,
         PrismaModule,
         GateWayModule,
-        LobbyModule,
+        GameModule,
     ],
-    providers: [LobbyService],
-    controllers: [LobbyController],
+    providers: [],
+    controllers: [],
 })
 export class AppModule {}
