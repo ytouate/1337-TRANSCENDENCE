@@ -9,33 +9,29 @@ import {
     PADDLE_WIDTH,
     PADDLE_HEIGHT,
     PADDLE_MARGIN,
-} from '../constants';
-import { PlayerPosition, GamePosition, Ball } from '../interfaces';
+} from './constants';
+import { PlayerPosition, GamePosition, Ball } from './interfaces';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 export class Game {
     private roomId: number;
     private socket1: Socket;
     private socket2: Socket;
-    private ball: Ball;
     private gamePosition: GamePosition;
+    private timeStart: Date;
 
     constructor(
         roomId: number,
         socket1: Socket,
         socket2: Socket,
         gamePosition: GamePosition,
+        timeStart: Date,
     ) {
         this.roomId = roomId;
         this.socket1 = socket1;
         this.socket2 = socket2;
-        this.ball = {
-            x: BOARD_WIDTH / 2,
-            y: BOARD_HEIGHT / 2,
-            speedX: BALL_SPEED_X,
-            speedY: BALL_SPEED_Y,
-        };
         this.gamePosition = gamePosition;
+        this.timeStart = timeStart;
     }
 
     public startGameLoop(server: Server, prisma: PrismaService) {
@@ -147,6 +143,11 @@ export class Game {
     }
 
     private async updateGameEnd(prisma: PrismaService, id: number) {
+        const durationInSeconds = Math.floor(
+            (new Date().getTime() -
+                new Date(this.timeStart).getTime()) /
+                1000,
+        );
         try {
             await prisma.game.update({
                 where: {
@@ -157,6 +158,7 @@ export class Game {
                     score1: this.gamePosition.player1.score,
                     score2: this.gamePosition.player2.score,
                     winnerId: id,
+                    duration: durationInSeconds,
                 },
             });
         } catch (error) {

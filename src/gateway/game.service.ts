@@ -9,8 +9,8 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { BOARD_HEIGHT, PADDLE_HEIGHT } from './constants';
-import { UserData, GamePosition } from './interfaces';
+import { BOARD_HEIGHT, PADDLE_HEIGHT } from './gamelogic/constants';
+import { UserData, GamePosition } from './gamelogic/interfaces';
 import { Game } from './gamelogic/Game';
 
 @WebSocketGateway({ cors: true })
@@ -96,11 +96,16 @@ export class GameGateWay
         const userData1 = this.userSockets.get(player1);
         const userData2 = this.userSockets.get(player2);
 
+        if (!userData1 || !userData2) return;
+
+        if (!userData1.socket || !userData2.socket) return;
+
         const game = await this.prisma.game.create({
             data: {
                 players: {
                     connect: [{ id: player1 }, { id: player2 }],
                 },
+                playerOrder: player1,
             },
             include: {
                 players: true,
@@ -112,12 +117,8 @@ export class GameGateWay
         const roomId = String(game.id);
         console.log('Joining Room:', roomId);
 
-        if (userData1) userData1.socket.join(roomId);
-        if (userData2) userData2.socket.join(roomId);
-
-        if (!userData1 || !userData2) return;
-
-        if (!userData1.socket || !userData2.socket) return;
+        userData1.socket.join(roomId);
+        userData2.socket.join(roomId);
 
         userData1.socket.emit('match_found', {
             gameId: game.id,
@@ -156,6 +157,7 @@ export class GameGateWay
             userData1.socket,
             userData2.socket,
             gamePosition,
+            game.createdAt,
         );
         gameInstance.startGameLoop(this.server, this.prisma);
     }
