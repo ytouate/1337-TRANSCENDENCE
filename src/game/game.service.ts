@@ -21,6 +21,12 @@ export class GameService {
                 where: {
                     status: 'OUTGOING',
                 },
+                include: {
+                    players: true,
+                },
+                orderBy: {
+                    createdAt: 'desc',
+                },
             });
             return games;
         } catch (error) {
@@ -42,6 +48,9 @@ export class GameService {
                 include: {
                     players: true,
                 },
+                orderBy: {
+                    createdAt: 'desc',
+                },
             });
             return games;
         } catch (error) {
@@ -59,6 +68,7 @@ export class GameService {
                             { id: dto.player2 },
                         ],
                     },
+                    playerOrder: dto.player1,
                 },
                 include: {
                     players: true,
