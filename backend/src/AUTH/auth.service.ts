@@ -2,13 +2,15 @@ import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Prisma } from "@prisma/client";
 import { throws } from "assert";
-import { PrismaService } from "src/prisma/prisma.service";
+import { PrismaService } from "src/Prisma/prisma.service";
 import { imageLink } from "./auth.strategy42";
 import { JwtService } from "@nestjs/jwt";
 import { MailerService } from "@nestjs-modules/mailer";
 import { Console } from "console";
 import { use } from "passport";
 import { concatAll } from "rxjs";
+import { Socket } from "dgram";
+import { Server } from "http";
 
 @Injectable()
 export class authService{
@@ -30,7 +32,7 @@ export class authService{
                 data : {
                     email : newData.email,
                     username : newData.username,
-                    urlImage : imageLink
+                    urlImage : imageLink,
                 } 
             })
             const payload = {
@@ -66,10 +68,7 @@ export class authService{
 
     //validate user
     async validateUser(data) : Promise<any>{
-        const user = this.prisma.user.findUnique({where : {email : data.email} })
-        if (user)
-            return user
-        return undefined
+        return await this.prisma.user.findUnique({where : {email : data.email} })
     }
 
     // send code verification { email } 

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { NotificationService } from './notification.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/Prisma/prisma.service';
 import { webSocketJwtStrategy } from 'src/strategies/websocket-jwt.strategie';
 
 @Module({

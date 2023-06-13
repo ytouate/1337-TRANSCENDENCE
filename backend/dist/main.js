@@ -18,7 +18,10 @@ async function bootstrap() {
     });
     const document = swagger_1.SwaggerModule.createDocument(app, config);
     swagger_1.SwaggerModule.setup('api', app, document);
-    app.useStaticAssets((0, path_1.join)(__dirname, '..', 'static'));
+    console.log(__dirname);
+    app.useStaticAssets((0, path_1.join)(__dirname, 'Chat', 'static'));
+    app.setBaseViewsDir((0, path_1.join)(__dirname, 'Chat', 'views'));
+    app.setViewEngine('ejs');
     await app.listen(3000);
 }
 bootstrap();

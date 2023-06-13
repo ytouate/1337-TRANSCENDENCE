@@ -9,23 +9,26 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 const req = require('cors')
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule , {cors : true});
-  const config = new DocumentBuilder().setTitle('Demp application')
-  
-  .setDescription('Demo application')
-  .setVersion('V1')
-  .addTag('books')
-  .build()
+    const app = await NestFactory.create<NestExpressApplication>(AppModule , {cors : true});
+    const config = new DocumentBuilder().setTitle('Demp application')
 
-  app.enableCors({
-    origin : '*',
-    credentials : true
-  })
+    .setDescription('Demo application')
+    .setVersion('V1')
+    .addTag('books')
+    .build()
 
-  const document = SwaggerModule.createDocument(app, config)
-  SwaggerModule.setup('api', app, document)
-  
-  app.useStaticAssets(join(__dirname, '..', 'static'));
-  await app.listen(3000);
+    app.enableCors({
+      origin : '*',
+      credentials : true
+    })
+
+    const document = SwaggerModule.createDocument(app, config)
+    SwaggerModule.setup('api', app, document)
+
+    console.log(__dirname)
+    app.useStaticAssets(join(__dirname, 'Chat', 'static'));
+    app.setBaseViewsDir(join(__dirname, 'Chat', 'views'));
+    app.setViewEngine('ejs');
+    await app.listen(3000);
 }
 bootstrap();

@@ -22,7 +22,7 @@ var __rest = (this && this.__rest) || function (s, e) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProfileService = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("../prisma/prisma.service");
+const prisma_service_1 = require("../Prisma/prisma.service");
 const fs_1 = require("fs");
 const mime_types_1 = require("mime-types");
 let ProfileService = class ProfileService {

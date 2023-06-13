@@ -33,7 +33,7 @@ export class authController {
         const user = await this.authservice.createUser(req.user)
         const token = await this.authservice.signToken(user.username, user.email)
         await this.authservice.checkUserhave2fa(user)
-        res.cookie('Token' , token, { httpOnly: false })
+        res.cookie('Token' , token, { httpOnly: true })
         res.redirect('http://localhost:5173/')
     }
 
@@ -44,12 +44,6 @@ export class authController {
         if (user)
             return user
         return 'user not found'
-    }
-
-    @Get('profil')
-    getProfile(@Req() req) {
-        console.log(req.headers.authorization)
-        return {name: 'Youssef'}
     }
  
     @Post('2fa')
@@ -65,9 +59,10 @@ export class authController {
     }
 
     @Post('2fa/validateCode')
-    async verificationCode(@Body() body) {
+    @UseGuards(AuthGuard('jwt'))
+    async verificationCode(@Body() body, @Req() req) {
         if (this.code == body.code)
-            return 'code s7i7'
+            return await this.authservice.validateUser(req.user)
         return 'code ghalate'
     }
 

@@ -18,7 +18,7 @@ const jwt_1 = require("@nestjs/jwt");
 const passport_1 = require("@nestjs/passport");
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
-const prisma_service_1 = require("../prisma/prisma.service");
+const prisma_service_1 = require("../Prisma/prisma.service");
 let NotificationService = class NotificationService {
     constructor(jwtService, prismaServie) {
         this.jwtService = jwtService;
@@ -32,11 +32,6 @@ let NotificationService = class NotificationService {
         const notifcation = await this.pushNotificationToDb(body, req);
         this.sendNotification(notifcation);
     }
-<<<<<<< HEAD
-    sendNotification(notification) {
-        if (this.socketByID.has(notification.receiverId))
-            this.socketByID.get(notification.receiverId).emit('receive_notification', notification);
-=======
     async sendNotification(notification) {
         var _a;
         const notif = await this.prismaServie.notification.findUnique({
@@ -53,7 +48,6 @@ let NotificationService = class NotificationService {
                 this.socketByID.get(notif.senderAndReicever[1].id)[i].emit('receive_notification', notification);
             }
         }
->>>>>>> 228b73f014fd6b683a146e96304998c60d065459
     }
     async pushNotificationToDb(notificationBody, req) {
         const sender = await this.prismaServie.user.findUnique({
