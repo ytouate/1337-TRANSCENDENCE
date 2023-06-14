@@ -19,6 +19,7 @@ export class Game {
     private socket2: Socket;
     private gamePosition: GamePosition;
     private timeStart: Date;
+    private ballHit: boolean;
 
     constructor(
         roomId: number,
@@ -32,9 +33,14 @@ export class Game {
         this.socket2 = socket2;
         this.gamePosition = gamePosition;
         this.timeStart = timeStart;
+        this.ballHit = false;
     }
 
-    public startGameLoop(server: Server, prisma: PrismaService) {
+    public startGameLoop(
+        server: Server,
+        prisma: PrismaService,
+        gamePlayerPosition: Map<number, GamePosition>,
+    ) {
         var ball: Ball = {
             x: BOARD_WIDTH / 2,
             y: BOARD_HEIGHT / 2,
@@ -42,16 +48,34 @@ export class Game {
             speedY: BALL_SPEED_Y,
         };
 
+        server.to(String(this.roomId)).emit('game_update', {
+            ball: { x: ball.x, y: ball.y },
+            gamePosition: this.gamePosition,
+        });
+
         const interval = setInterval(() => {
             // const gamePosition = this.gamePlayerPosition.get(roomId);
 
             ball.x += ball.speedX;
             ball.y += ball.speedY;
 
-            var { reset } = this.gameLogic(ball, this.gamePosition);
+            var { reset, collision } = this.gameLogic(
+                ball,
+                this.gamePosition,
+            );
+
+            // if (collision) {
+            //     server.to(String(this.roomId)).emit('game_update', {
+            //         ball: { x: ball.x, y: ball.y },
+            //         gamePosition: this.gamePosition,
+            //     });
+            // }
 
             if (reset) {
-                ball.speedY = BALL_SPEED_Y;
+                // server.to(String(this.roomId)).emit('game_update', {
+                //     ball: { x: ball.x, y: ball.y },
+                //     gamePosition: this.gamePosition,
+                // });
                 var { data, gameOver } = this.checkScore(
                     ball,
                     this.gamePosition,
@@ -63,15 +87,20 @@ export class Game {
                     this.updateGameEnd(prisma, data.id);
                     this.socket1.leave(String(this.roomId));
                     this.socket2.leave(String(this.roomId));
-                    clearInterval(interval); // Stop the interval
+                    gamePlayerPosition.delete(this.roomId);
 
+                    clearInterval(interval); // Stop the interval
                     return;
                 }
                 this.resetBall(ball);
             }
-
             server.to(String(this.roomId)).emit('game_update', {
-                ball: { x: ball.x, y: ball.y },
+                ball: {
+                    x: ball.x,
+                    y: ball.y,
+                    speedX: ball.speedX,
+                    speedY: ball.speedY,
+                },
                 gamePosition: this.gamePosition,
             });
         }, 1000 / 60);
@@ -79,16 +108,23 @@ export class Game {
 
     private gameLogic(ball: Ball, gamePosition: GamePosition) {
         var reset = false;
+        var collision = false;
+
         if (ball.x < PADDLE_MARGIN + BALL_SIZE + PADDLE_WIDTH) {
             if (
                 ball.y > gamePosition.player1.y &&
                 ball.y < gamePosition.player1.y + PADDLE_HEIGHT
             ) {
+                if (!this.ballHit) {
+                    ball.speedX *= 2;
+                }
                 ball.speedX *= -1;
                 var deltaY =
                     ball.y -
                     (gamePosition.player1.y + PADDLE_HEIGHT / 2);
                 ball.speedY = deltaY * 0.35;
+                collision = true;
+                this.ballHit = true;
             } else if (ball.x < 0) {
                 gamePosition.player2.score++;
                 reset = true;
@@ -102,33 +138,40 @@ export class Game {
                 ball.y < gamePosition.player2.y + PADDLE_HEIGHT
             ) {
                 ball.speedX *= -1;
+                if (!this.ballHit) {
+                    ball.speedX *= 2;
+                }
                 var deltaY =
                     ball.y -
                     (gamePosition.player2.y + PADDLE_HEIGHT / 2);
                 ball.speedY = deltaY * 0.35;
+                collision = true;
+                this.ballHit = true;
             } else if (ball.x > BOARD_WIDTH) {
                 gamePosition.player1.score++;
                 reset = true;
             }
         }
-
         if (ball.y < 0) {
             ball.speedY *= -1;
         }
         if (ball.y > BOARD_HEIGHT) {
             ball.speedY *= -1;
         }
-        return { reset };
+        return { reset, collision };
     }
 
     private resetBall(ball: Ball) {
         ball.x = BOARD_WIDTH / 2;
         ball.y = BOARD_HEIGHT / 2;
         ball.speedX *= -1; // flip direction
+        // if (ball.speedX < 0) ball.speedX = BALL_SPEED_X;
+        // else ball.speedX = -BALL_SPEED_X;
+        ball.speedY = BALL_SPEED_Y;
+        // this.ballHit = false;
     }
 
     private checkScore(ball: Ball, gamePosition: GamePosition) {
-        ball.speedY = BALL_SPEED_Y;
         var data: PlayerPosition;
         var gameOver;
         if (gamePosition.player1.score >= WIN_CONDITION) {

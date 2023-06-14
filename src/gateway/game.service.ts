@@ -120,11 +120,14 @@ export class GameGateWay
         userData1.socket.join(roomId);
         userData2.socket.join(roomId);
 
+        console.log('emitting to user 1:');
+
         userData1.socket.emit('match_found', {
             gameId: game.id,
             opponent: userData2.username,
             pos: 'left',
         });
+        console.log('emitting to user 2:');
 
         userData2.socket.emit('match_found', {
             gameId: game.id,
@@ -159,7 +162,11 @@ export class GameGateWay
             gamePosition,
             game.createdAt,
         );
-        gameInstance.startGameLoop(this.server, this.prisma);
+        gameInstance.startGameLoop(
+            this.server,
+            this.prisma,
+            this.gamePlayerPosition,
+        );
     }
 
     @SubscribeMessage('mouseMove')
@@ -184,7 +191,7 @@ export class GameGateWay
     async queueUp(@MessageBody() body: any) {
         const userId = body.userId;
 
-        // console.log({ userId });
+        console.log('queueUp emitted from ' + userId);
 
         // if (!this.userSockets.has(userId)) return;
 
@@ -196,4 +203,7 @@ export class GameGateWay
             this.matchPlayers(player1, player2);
         }
     }
+
+    @SubscribeMessage('invite')
+    async invite() {}
 }
