@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
-import { log } from "console";
 import { Strategy, VerifyCallback } from 'passport-42'
 
 

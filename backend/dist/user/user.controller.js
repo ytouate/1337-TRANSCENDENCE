@@ -26,7 +26,15 @@ let UserController = class UserController {
         const user = await this.user.validateUser(req.user);
         if (!user)
             return 'u can\'t\ create a room';
-        return await this.userService.creatRoom(Param.roomName, user);
+        return await this.userService.creatRoom(Param, user);
+    }
+    async setAdmin(Param) {
+        await this.userService.setAdmin(Param);
+        return `the user ${Param.username} has moved from member to admin`;
+    }
+    async changePassword(Param) {
+        await this.userService.changePasswordOfProtectedRoom(Param);
+        return 'the password has changed';
     }
     async getRoomByName(Param) {
         return await this.userService.getRoomByName(Param.roomName);
@@ -44,6 +52,22 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "createRoom", null);
+__decorate([
+    (0, common_1.Post)('addAdmin'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
+    __param(0, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "setAdmin", null);
+__decorate([
+    (0, common_1.Post)('changePassword'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
+    __param(0, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "changePassword", null);
 __decorate([
     (0, common_1.Get)('getRoom'),
     __param(0, (0, common_1.Query)()),

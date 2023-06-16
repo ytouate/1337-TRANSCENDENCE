@@ -1,4 +1,4 @@
-import { OnModuleInit, UseGuards } from "@nestjs/common";
+import { OnModuleInit, Param, Query, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import {  ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Socket ,Server } from "socket.io";
@@ -16,6 +16,8 @@ export class chatGateway  implements OnModuleInit , OnGatewayConnection , OnGate
 
     @WebSocketServer()
     server : Server;
+
+    private socketId : Map<string , string> = new Map()
 
     // send message to current room
     @SubscribeMessage('sendMessage')
@@ -35,12 +37,17 @@ export class chatGateway  implements OnModuleInit , OnGatewayConnection , OnGate
     @UseGuards(AuthGuard('websocket-jwt'))
     async handle(@ConnectedSocket() client : Socket , @Req() req) {
         console.log(`client  ${client.id} connected and joining the room ${client.handshake.query.roomName}`)
-        const user = await this.updateUser(req.user, client)
+        const user = await this.validateUserByEmail(req.user.email)
         if (user)
         {
-            this.server.in(user.socketId).socketsJoin(client.handshake.query.roomName)
+            const result = await this.user.joiningTheRoom(client.handshake.query, user);
+            if (result == undefined)
+                return 'incorect password'
+            this.socketId.set(user.email, client.id)
+            this.server.in(client.id).socketsJoin(client.handshake.query.roomName)
             this.user.addUserToRoom(user, client.handshake.query.roomName)      
         }
+        return `${user.username} has joined in ${client.handshake.query.roomName}`
     }
 
 
@@ -48,21 +55,15 @@ export class chatGateway  implements OnModuleInit , OnGatewayConnection , OnGate
     @SubscribeMessage('leaveRoom')
     @UseGuards(AuthGuard('websocket-jwt'))
     async leaveRoomHandler(@ConnectedSocket() client: Socket, @Req() req) {
-        console.log(`client  ${client.id}  leave room ${client.handshake.query.roomName}`)
-        const user = await this.validateUser(req.user)
+        const user = await this.validateUserByUsername(client.handshake.query.username)
         if (user)
         {
-            this.server.in(client.id).socketsLeave(client.handshake.query.roomName)
+            const Id = this.socketId.get(user.email)
+            console.log("id = " ,Id)
+            console.log(`client  ${Id} leave room ${client.handshake.query.roomName}`)
+            this.server.in(Id).socketsLeave(client.handshake.query.roomName)
             this.user.deleteUserFromRoom(user , client.handshake.query.roomName)
         }
-    }
-
-    // add socket id of the user in database
-    async updateUser(user , client)  {
-        return  await this.prisma.user.update({
-            where : {email : user.email} , 
-            data : {socketId : client.id}
-        })
     }
 
     // if the user connect to the event
@@ -75,11 +76,13 @@ export class chatGateway  implements OnModuleInit , OnGatewayConnection , OnGate
         console.log(`client ${client.id} has disconnect`)    
     }
 
-    //check the user if exist { by socketId }
-    async validateUser(req) {
-        return await this.prisma.user.findUnique(
-            {where : {email : req.email}}
-        )
+    //check the user if exist 
+    async validateUserByUsername(username) {
+        return await this.prisma.user.findFirst({where : {username : username}})
     }
 
+    //check the user if exist 
+    async validateUserByEmail(email) {
+        return await this.prisma.user.findUnique({where : {email : email}})
+    }
 }

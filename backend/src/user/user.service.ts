@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { connect } from 'http2';
-import { use } from 'passport';
 import { PrismaService } from 'src/Prisma/prisma.service';
 
 @Injectable()
@@ -9,8 +7,11 @@ export class UserService {
 
     
     // create room {2 users => n users}
-    async creatRoom(name , user) {
-        const room = await this.getRoomByName(name)
+    async creatRoom(Param , user) {
+        let {roomName , status , password} = Param
+        if (!password)
+            password = ''
+        const room = await this.getRoomByName(roomName)
         if (!room)
         {
             try {
@@ -18,11 +19,13 @@ export class UserService {
                 const room = await this.prismaService.chatRoom.create(
                     {
                         data : {
-                            roomName : name,
+                            roomName : roomName,
                             timeCreate : new Date(Date.now()),
                             users : {
                                 connect : { id : user.id}
                             },
+                            status : status,
+                            password : password
                         }
                     }
                 )
@@ -33,7 +36,7 @@ export class UserService {
             }
             finally { this.prismaService.$disconnect() }
         }
-        return `room ${name} already exist`
+        return `room ${roomName} already exist`
     }
 
     // add user to specific room
@@ -42,7 +45,6 @@ export class UserService {
         await this.addStatusOfUser(user , 'member')
         if (!await this.avoidDuplicate(user, name))
         {
-            console.log('******')
             await this.prismaService.chatRoom.update({
                 where : { id : room.id},
                 data :
@@ -157,5 +159,69 @@ export class UserService {
                 }
             }
         })
+    }
+
+
+    //check user  if have order to join the rrom
+    async   joiningTheRoom(param, user)
+    {
+        const {roomName , password} = param
+        const room = await this.getRoomByName(roomName)
+        console.log(room.status)
+        if (room.status === 'protected')
+        {
+            if (password != room.password)
+                return undefined       
+        }
+        return 'public' 
+    }  
+
+
+    //get user with username
+    async getUserWithUsername(name) {
+        return await this.prismaService.user.findFirst({where : {username :  name}})
+    }
+
+
+    // set admin to other users in my room
+    async   setAdmin(param) {
+        const member = await this.prismaService.user.findFirst({where : {username : param.username}})
+        const room = await this.prismaService.chatRoom.findFirst({ where : {roomName : param.roomName} })
+        console.log(member)
+        console.log(room)
+        if (room)
+        {
+            await this.prismaService.chatRoom.update(
+            {
+                where : {id : room.id} , 
+                data : {
+                    users : {
+                        update : {
+                            where : {
+                                email : member.email
+                            },
+                            data : {
+                                status : param.status
+                            }
+                        }
+                    }
+                }
+            }    
+            )
+        }
+    }
+
+
+    //change password of protected room
+    async   changePasswordOfProtectedRoom(param) {
+        const {roomName, password} = param
+        const room = await this.prismaService.chatRoom.findFirst({where : {roomName : roomName}})
+        if (room){
+            await this.prismaService.chatRoom.update({where : {
+                id : room.id
+            },
+            data : { password : password }
+        })
+        }
     }
 }

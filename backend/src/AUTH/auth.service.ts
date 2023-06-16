@@ -1,16 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { Prisma } from "@prisma/client";
-import { throws } from "assert";
 import { PrismaService } from "src/Prisma/prisma.service";
 import { imageLink } from "./auth.strategy42";
 import { JwtService } from "@nestjs/jwt";
 import { MailerService } from "@nestjs-modules/mailer";
-import { Console } from "console";
-import { use } from "passport";
-import { concatAll } from "rxjs";
-import { Socket } from "dgram";
-import { Server } from "http";
 
 @Injectable()
 export class authService{

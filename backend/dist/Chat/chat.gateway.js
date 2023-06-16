@@ -24,6 +24,7 @@ let chatGateway = class chatGateway {
     constructor(prisma, user) {
         this.prisma = prisma;
         this.user = user;
+        this.socketId = new Map();
     }
     onMessage(client, data, req) {
         this.server.in(client.handshake.query.roomName).emit('onMessage', data);
@@ -33,25 +34,26 @@ let chatGateway = class chatGateway {
     }
     async handle(client, req) {
         console.log(`client  ${client.id} connected and joining the room ${client.handshake.query.roomName}`);
-        const user = await this.updateUser(req.user, client);
+        const user = await this.validateUserByEmail(req.user.email);
         if (user) {
-            this.server.in(user.socketId).socketsJoin(client.handshake.query.roomName);
+            const result = await this.user.joiningTheRoom(client.handshake.query, user);
+            if (result == undefined)
+                return 'incorect password';
+            this.socketId.set(user.email, client.id);
+            this.server.in(client.id).socketsJoin(client.handshake.query.roomName);
             this.user.addUserToRoom(user, client.handshake.query.roomName);
         }
+        return `${user.username} has joined in ${client.handshake.query.roomName}`;
     }
     async leaveRoomHandler(client, req) {
-        console.log(`client  ${client.id}  leave room ${client.handshake.query.roomName}`);
-        const user = await this.validateUser(req.user);
+        const user = await this.validateUserByUsername(client.handshake.query.username);
         if (user) {
-            this.server.in(client.id).socketsLeave(client.handshake.query.roomName);
+            const Id = this.socketId.get(user.email);
+            console.log("id = ", Id);
+            console.log(`client  ${Id} leave room ${client.handshake.query.roomName}`);
+            this.server.in(Id).socketsLeave(client.handshake.query.roomName);
             this.user.deleteUserFromRoom(user, client.handshake.query.roomName);
         }
-    }
-    async updateUser(user, client) {
-        return await this.prisma.user.update({
-            where: { email: user.email },
-            data: { socketId: client.id }
-        });
     }
     async handleConnection(client, ...args) {
         console.log(`client ${client.id} has connected`);
@@ -59,8 +61,11 @@ let chatGateway = class chatGateway {
     async handleDisconnect(client) {
         console.log(`client ${client.id} has disconnect`);
     }
-    async validateUser(req) {
-        return await this.prisma.user.findUnique({ where: { email: req.email } });
+    async validateUserByUsername(username) {
+        return await this.prisma.user.findFirst({ where: { username: username } });
+    }
+    async validateUserByEmail(email) {
+        return await this.prisma.user.findUnique({ where: { email: email } });
     }
 };
 __decorate([

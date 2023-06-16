@@ -16,18 +16,23 @@ let UserService = class UserService {
     constructor(prismaService) {
         this.prismaService = prismaService;
     }
-    async creatRoom(name, user) {
-        const room = await this.getRoomByName(name);
+    async creatRoom(Param, user) {
+        let { roomName, status, password } = Param;
+        if (!password)
+            password = '';
+        const room = await this.getRoomByName(roomName);
         if (!room) {
             try {
                 await this.addStatusOfUser(user, 'Admin');
                 const room = await this.prismaService.chatRoom.create({
                     data: {
-                        roomName: name,
+                        roomName: roomName,
                         timeCreate: new Date(Date.now()),
                         users: {
                             connect: { id: user.id }
                         },
+                        status: status,
+                        password: password
                     }
                 });
                 return room;
@@ -39,13 +44,12 @@ let UserService = class UserService {
                 this.prismaService.$disconnect();
             }
         }
-        return `room ${name} already exist`;
+        return `room ${roomName} already exist`;
     }
     async addUserToRoom(user, name) {
         let room = await this.prismaService.chatRoom.findFirst({ where: { roomName: name } });
         await this.addStatusOfUser(user, 'member');
         if (!await this.avoidDuplicate(user, name)) {
-            console.log('******');
             await this.prismaService.chatRoom.update({
                 where: { id: room.id },
                 data: {
@@ -130,6 +134,53 @@ let UserService = class UserService {
                 }
             }
         });
+    }
+    async joiningTheRoom(param, user) {
+        const { roomName, password } = param;
+        const room = await this.getRoomByName(roomName);
+        console.log(room.status);
+        if (room.status === 'protected') {
+            if (password != room.password)
+                return undefined;
+        }
+        return 'public';
+    }
+    async getUserWithUsername(name) {
+        return await this.prismaService.user.findFirst({ where: { username: name } });
+    }
+    async setAdmin(param) {
+        const member = await this.prismaService.user.findFirst({ where: { username: param.username } });
+        const room = await this.prismaService.chatRoom.findFirst({ where: { roomName: param.roomName } });
+        console.log(member);
+        console.log(room);
+        if (room) {
+            await this.prismaService.chatRoom.update({
+                where: { id: room.id },
+                data: {
+                    users: {
+                        update: {
+                            where: {
+                                email: member.email
+                            },
+                            data: {
+                                status: param.status
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+    async changePasswordOfProtectedRoom(param) {
+        const { roomName, password } = param;
+        const room = await this.prismaService.chatRoom.findFirst({ where: { roomName: roomName } });
+        if (room) {
+            await this.prismaService.chatRoom.update({ where: {
+                    id: room.id
+                },
+                data: { password: password }
+            });
+        }
     }
 };
 UserService = __decorate([

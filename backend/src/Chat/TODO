@@ -10,16 +10,6 @@
                * second { join_rom place to joun client in a specifi room }
 
 
-- create room
-- join room
-- delete room
-- add user to specifi room
-- reamove user from all rooms
-- get room
-- get all rooms
-
-
-
 -/*/*/**/*/*
 
 - how ConnectedSocket work 
@@ -31,5 +21,9 @@
 
 */
 
-- save messages in database
-- add status in chatroom
+- when create Room add friend in creation
+- the admin want to add user in room or delete user room
+
+
+- mute {can't send message for limited time}
+- when i change status of user he change in all rooms

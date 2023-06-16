@@ -1,14 +1,8 @@
 import { Controller, Post, Res, Req , UseGuards, Body, RequestMapping, HttpStatus } from "@nestjs/common";
 import { authService } from "./auth.service";
 import { Get } from "@nestjs/common";
-import { Query } from "@nestjs/common";
-import { AuthStrategy } from "./auth.strategy42";
-import { ConfigService } from "@nestjs/config";
 import { AuthGuard } from "@nestjs/passport";
 import { authDto } from "./DTO/auth.DTO";
-import { use } from "passport";
-import { connected } from "process";
-import { get } from "http";
 
 
 @Controller()
@@ -22,6 +16,7 @@ export class authController {
     @Get('login')
     @UseGuards(AuthGuard('42'))
     gett() {}
+
 
     @Get('/redirect/signin')
     @UseGuards(AuthGuard('42'))
@@ -37,6 +32,7 @@ export class authController {
         res.redirect('http://localhost:5173/')
     }
 
+
     @Get('user')
     @UseGuards(AuthGuard('jwt'))
     async getp(@Req() req) {
@@ -46,6 +42,7 @@ export class authController {
         return 'user not found'
     }
  
+
     @Post('2fa')
     @UseGuards(AuthGuard('jwt'))
     async siginWith2fa(@Req() request , @Body() req: authDto) {
@@ -58,6 +55,7 @@ export class authController {
         return '2fa'
     }
 
+
     @Post('2fa/validateCode')
     @UseGuards(AuthGuard('jwt'))
     async verificationCode(@Body() body, @Req() req) {
@@ -65,6 +63,7 @@ export class authController {
             return await this.authservice.validateUser(req.user)
         return 'code ghalate'
     }
+
 
     @Post('logout')
     async logout(@Req() req) {
