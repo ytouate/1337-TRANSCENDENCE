@@ -7,7 +7,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { GateWayModule } from './gateway/game.module';
 import { GameModule } from './game/game.module';
 import { PrefModule } from './pref/pref.module';
-import { ScheduleModule } from '@nestjs/schedule';
+
 
 @Module({
     imports: [
@@ -20,7 +20,6 @@ import { ScheduleModule } from '@nestjs/schedule';
         GateWayModule,
         GameModule,
         PrefModule,
-        ScheduleModule.forRoot(),
     ],
     providers: [],
     controllers: [],
