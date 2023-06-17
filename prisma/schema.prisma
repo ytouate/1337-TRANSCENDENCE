@@ -29,25 +29,24 @@ model User {
 }
 
 model Preference {
-  id        Int      @id @default(autoincrement())
-  ballColor String @default("black")
+  id          Int    @id @default(autoincrement())
+  ballColor   String @default("black")
   paddleColor String @default("black")
-  mapTheme    String @default("default")
+  mapTheme    String @default("galaxy_pink")
 
-  user User @relation(fields: [userId], references: [id])
-  userId Int @unique
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @unique
 }
 
 model Game {
-  id       Int        @id @default(autoincrement())
-  status   GameStatus @default(OUTGOING)
-  players  User[]     @relation("GameUsers")
-  score1   Int        @default(0)
-  score2   Int        @default(0)
-  winnerId Int        @default(-1)
-  createdAt DateTime @default(now())
-  duration Int        @default(0)
-
+  id          Int        @id @default(autoincrement())
+  status      GameStatus @default(OUTGOING)
+  players     User[]     @relation("GameUsers")
+  score1      Int        @default(0)
+  score2      Int        @default(0)
+  winnerId    Int        @default(-1)
+  createdAt   DateTime   @default(now())
+  duration    Int        @default(0)
   playerOrder Int
 
   @@map("games")
