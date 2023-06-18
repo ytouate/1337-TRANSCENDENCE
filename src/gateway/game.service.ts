@@ -8,7 +8,6 @@ import {
     WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { BOARD_HEIGHT, PADDLE_HEIGHT } from './gamelogic/constants';
 import { UserData, GamePosition } from './gamelogic/interfaces';
 import { Game } from './gamelogic/Game';
