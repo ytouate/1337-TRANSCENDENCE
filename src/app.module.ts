@@ -8,7 +8,6 @@ import { GateWayModule } from './gateway/game.module';
 import { GameModule } from './game/game.module';
 import { PrefModule } from './pref/pref.module';
 
-
 @Module({
     imports: [
         ConfigModule.forRoot({
