@@ -1,13 +1,18 @@
 import { AuthGuard } from '@nestjs/passport';
-import { Controller, Get, Param, Req, UseGuards } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Param,
+    Req,
+    UseGuards,
+} from '@nestjs/common';
 import { Request } from 'express';
 import { JwtGuard } from 'src/auth/guard';
 import { GetUser } from 'src/auth/decorator';
 import { User } from '@prisma/client';
 import { UserService } from './user.service';
 
-
-@UseGuards(JwtGuard)
+// @UseGuards(JwtGuard)
 @Controller('users')
 export class UserController {
     constructor(private userService: UserService) {}
@@ -23,6 +28,8 @@ export class UserController {
         return this.userService.getUserByUsername(username);
     }
 
-    
-
+    @Get(':userId')
+    getUserById(@Param('userId') userId: number) {
+        return this.userService.getUserById(Number(userId));
+    }
 }

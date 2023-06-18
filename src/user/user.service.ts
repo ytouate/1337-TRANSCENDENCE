@@ -20,17 +20,35 @@ export class UserService {
     }
 
     async getUserById(userId: number) {
+        // console.log('m here');
         const user = await this.prisma.user.findUnique({
             where: {
                 id: userId,
             },
+            include: {
+                preference: true,
+            },
         });
+
+        const gamesPlayed = await this.prisma.game.count({
+            where: {
+                players: {
+                    some: {
+                        id: user.id,
+                    },
+                },
+            },
+        });
+
         if (!user)
             // check if user exists
             throw new ForbiddenException('user not found');
 
         delete user.hash;
-        return user;
+        return {
+            ...user,
+            gamesPlayed,
+        };
     }
 
     async updateUserWin(userId: number) {
@@ -55,7 +73,7 @@ export class UserService {
                     id: userId,
                 },
                 data: {
-                    win: { decrement: 1 },
+                    loss: { increment: 1 },
                 },
             });
         } catch (error) {
