@@ -20,6 +20,7 @@ export class Game {
     private gamePosition: GamePosition;
     private timeStart: Date;
     private ballHit: boolean;
+    private round: number;
 
     constructor(
         roomId: number,
@@ -34,6 +35,7 @@ export class Game {
         this.gamePosition = gamePosition;
         this.timeStart = timeStart;
         this.ballHit = false;
+        this.round = 0;
     }
 
     public startGameLoop(
@@ -48,38 +50,28 @@ export class Game {
             speedY: BALL_SPEED_Y,
         };
 
-        server.to(String(this.roomId)).emit('game_update', {
-            ball: { x: ball.x, y: ball.y },
-            gamePosition: this.gamePosition,
-        });
-
         const interval = setInterval(() => {
-            // const gamePosition = this.gamePlayerPosition.get(roomId);
+            server.to(String(this.roomId)).emit('game_update', {
+                ball: {
+                    x: ball.x,
+                    y: ball.y,
+                    speedX: ball.speedX,
+                    speedY: ball.speedY,
+                },
+                gamePosition: this.gamePosition,
+            });
 
             ball.x += ball.speedX;
             ball.y += ball.speedY;
 
-            var { reset, collision } = this.gameLogic(
-                ball,
-                this.gamePosition,
-            );
-
-            // if (collision) {
-            //     server.to(String(this.roomId)).emit('game_update', {
-            //         ball: { x: ball.x, y: ball.y },
-            //         gamePosition: this.gamePosition,
-            //     });
-            // }
+            var { reset } = this.gameLogic(ball, this.gamePosition);
 
             if (reset) {
-                // server.to(String(this.roomId)).emit('game_update', {
-                //     ball: { x: ball.x, y: ball.y },
-                //     gamePosition: this.gamePosition,
-                // });
                 var { data, gameOver } = this.checkScore(
                     ball,
                     this.gamePosition,
                 );
+
                 if (gameOver) {
                     server.to(String(this.roomId)).emit('game_over', {
                         data,
@@ -92,23 +84,14 @@ export class Game {
                     clearInterval(interval); // Stop the interval
                     return;
                 }
+                // await sleep(5000);
                 this.resetBall(ball);
             }
-            server.to(String(this.roomId)).emit('game_update', {
-                ball: {
-                    x: ball.x,
-                    y: ball.y,
-                    speedX: ball.speedX,
-                    speedY: ball.speedY,
-                },
-                gamePosition: this.gamePosition,
-            });
         }, 1000 / 60);
     }
 
     private gameLogic(ball: Ball, gamePosition: GamePosition) {
         var reset = false;
-        var collision = false;
 
         if (ball.x < PADDLE_MARGIN + BALL_SIZE + PADDLE_WIDTH) {
             if (
@@ -123,7 +106,6 @@ export class Game {
                     ball.y -
                     (gamePosition.player1.y + PADDLE_HEIGHT / 2);
                 ball.speedY = deltaY * 0.35;
-                collision = true;
                 this.ballHit = true;
             } else if (ball.x < 0) {
                 gamePosition.player2.score++;
@@ -145,7 +127,6 @@ export class Game {
                     ball.y -
                     (gamePosition.player2.y + PADDLE_HEIGHT / 2);
                 ball.speedY = deltaY * 0.35;
-                collision = true;
                 this.ballHit = true;
             } else if (ball.x > BOARD_WIDTH) {
                 gamePosition.player1.score++;
@@ -155,20 +136,22 @@ export class Game {
         if (ball.y < 0) {
             ball.speedY *= -1;
         }
-        if (ball.y > BOARD_HEIGHT) {
+        else if (ball.y > BOARD_HEIGHT) {
             ball.speedY *= -1;
         }
-        return { reset, collision };
+        return { reset };
     }
 
     private resetBall(ball: Ball) {
         ball.x = BOARD_WIDTH / 2;
         ball.y = BOARD_HEIGHT / 2;
-        ball.speedX *= -1; // flip direction
-        // if (ball.speedX < 0) ball.speedX = BALL_SPEED_X;
-        // else ball.speedX = -BALL_SPEED_X;
-        ball.speedY = BALL_SPEED_Y;
-        // this.ballHit = false;
+        // ball.speedX *= -1; // flip direction
+        if (this.round % 2 === 0) {
+            ball.speedX = -ball.speedX;
+        }
+        ball.speedY = (Math.random() < 0.5 ? -1 : 1) * BALL_SPEED_Y;
+        this.ballHit = false;
+        this.round++;
     }
 
     private checkScore(ball: Ball, gamePosition: GamePosition) {
@@ -184,6 +167,15 @@ export class Game {
         }
         return { gameOver, data };
     }
+
+    // private async updateGameScore(
+    //     prisma: PrismaService,
+    //     id: number,
+    //     score1: number,
+    //     score2: number,
+    // ) {
+
+    // }
 
     private async updateGameEnd(prisma: PrismaService, id: number) {
         const durationInSeconds = Math.floor(

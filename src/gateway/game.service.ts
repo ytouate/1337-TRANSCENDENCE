@@ -19,6 +19,7 @@ export class GameGateWay
 {
     userSockets: Map<number, UserData>;
     queue: number[];
+
     gamePlayerPosition: Map<number, GamePosition>;
 
     @WebSocketServer()
@@ -37,6 +38,7 @@ export class GameGateWay
     }
 
     async handleConnection(@ConnectedSocket() client: Socket) {
+        // console.log('handleConnection');
         this.addClient(client);
     }
 
@@ -77,21 +79,41 @@ export class GameGateWay
             },
         });
 
+        if (!user) return;
+
         const userData: UserData = {
             socket: client,
             username: user.username,
             id: user.id,
         };
 
-        //means player exists and belongs to the lobby
-        if (!this.userSockets.has(user.id)) {
-            console.log(`Client with userId ${userId} connected`);
+        //means player exists
+        console.log(`Client with userId ${userId} connected`);
 
-            this.userSockets.set(user.id, userData);
+        this.userSockets.set(user.id, userData);
+    }
+
+    async getPlayerPrefs(userId: number) {
+        try {
+            const prefs = await this.prisma.preference.findUnique({
+                where: {
+                    userId: userId,
+                },
+                include: {
+                    user: true,
+                },
+            });
+            return prefs;
+        } catch (error) {
+            throw error;
         }
     }
 
-    async matchPlayers(player1: number, player2: number) {
+    async matchPlayers(
+        player1: number,
+        player2: number,
+        gameInvite: boolean,
+    ) {
         // Get the sockets for the matched players
         const userData1 = this.userSockets.get(player1);
         const userData2 = this.userSockets.get(player2);
@@ -122,17 +144,29 @@ export class GameGateWay
 
         console.log('emitting to user 1:');
 
-        userData1.socket.emit('match_found', {
+        console.log('emitting to user 2:');
+
+        const event_name = gameInvite
+            ? 'game_invite_start'
+            : 'match_found';
+
+        const pref1 = await this.getPlayerPrefs(userData1.id);
+        const pref2 = await this.getPlayerPrefs(userData2.id);
+
+        userData1.socket.emit(event_name, {
             gameId: game.id,
             opponent: userData2.username,
             pos: 'left',
+            pref: pref1,
+            pref2: pref2,
         });
-        console.log('emitting to user 2:');
 
-        userData2.socket.emit('match_found', {
+        userData2.socket.emit(event_name, {
             gameId: game.id,
             opponent: userData1.username,
             pos: 'right',
+            pref: pref2,
+            pref2: pref1,
         });
 
         this.gamePlayerPosition.set(game.id, {
@@ -149,9 +183,6 @@ export class GameGateWay
                 score: 0,
             },
         });
-
-        // this.userSockets.delete(player1); // still dont know what to do with this
-        // this.userSockets.delete(player2);
 
         const gamePosition = this.gamePlayerPosition.get(game.id);
 
@@ -187,23 +218,98 @@ export class GameGateWay
         }
     }
 
+    // @SubscribeMessage('mouseMove')
+    // mouseMove(
+    //     @MessageBody() body: any,
+    //     @ConnectedSocket() client: Socket,
+    // ) {
+    //     const { x, y, gameId } = body;
+    //     const roomId = String(gameId);
+
+    //     client.to(roomId).emit('opponent_mousemove', { x, y });
+    // }
+
     @SubscribeMessage('queueUp')
     async queueUp(@MessageBody() body: any) {
         const userId = body.userId;
 
-        console.log('queueUp emitted from ' + userId);
-
-        // if (!this.userSockets.has(userId)) return;
-
+        if (this.queue.includes(userId)) {
+            console.log('User already in the queue');
+            return;
+        }
         this.queue.push(userId);
-        // console.log({ id: userId, len: this.queue.length });
         if (this.queue.length >= 2) {
             const player1 = this.queue.shift();
             const player2 = this.queue.shift();
-            this.matchPlayers(player1, player2);
+            this.matchPlayers(player1, player2, false);
         }
     }
 
-    @SubscribeMessage('invite')
-    async invite() {}
+    @SubscribeMessage('gameInvite')
+    async gameInvite(@MessageBody() body: any) {
+        const userId: number = body.userId;
+        const opponentUsername: string = body.opponentUsername;
+
+        const opponent = await this.prisma.user.findUnique({
+            where: {
+                username: opponentUsername,
+            },
+        });
+        if (!opponent) {
+            console.log('opponent not found');
+            return;
+        }
+
+        const opponentData = this.userSockets.get(opponent.id);
+        const myData = this.userSockets.get(userId);
+        if (opponentData.id === myData.id) {
+            console.log('inviting userself retard ?');
+            return;
+        }
+
+        const senderInfo = await this.prisma.user.findUnique({
+            where: {
+                id: myData.id,
+            },
+        });
+
+        if (!senderInfo) {
+            console.log('huh u dont exist');
+            return;
+        }
+
+        myData.socket.to(opponentData.socket.id).emit('invite', {
+            senderInfo: senderInfo,
+        });
+    }
+
+    @SubscribeMessage('inviteResponse')
+    async inviteResponse(@MessageBody() body: any) {
+        const userId: number = body.userId;
+        const opponentId: number = body.opponentId;
+        const status: string = body.status;
+
+        if (status === 'accepted') {
+            // this.matchPlayers(opponent.id, userId);
+            console.log('players matched');
+            await new Promise(() => {
+                setTimeout(() => {
+                    this.matchPlayers(opponentId, userId, true);
+                }, 1000); // Delay of 5 seconds (5000 milliseconds)
+            });
+        } else if (status === 'declined') {
+            console.log('player declined');
+            const myData = this.userSockets.get(userId);
+            const opponentData = this.userSockets.get(opponentId);
+            if (myData) {
+                myData.socket
+                    .to(opponentData.socket.id)
+                    .emit('invite_response', {
+                        userId: userId,
+                        username: myData.username,
+                        status: 'declined',
+                    });
+            }
+        }
+    }
 }
