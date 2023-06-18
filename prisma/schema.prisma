@@ -23,6 +23,9 @@ model User {
   hash  String
   games Game[] @relation("GameUsers")
 
+  win Int @default(0)
+  loss Int @default(0)
+
   preference Preference?
 
   @@map("users")
