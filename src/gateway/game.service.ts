@@ -12,6 +12,9 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { BOARD_HEIGHT, PADDLE_HEIGHT } from './gamelogic/constants';
 import { UserData, GamePosition } from './gamelogic/interfaces';
 import { Game } from './gamelogic/Game';
+import { UserService } from 'src/user/user.service';
+import { GameService } from 'src/game/game.service';
+import { PrefService } from 'src/pref/pref.service';
 
 @WebSocketGateway({ cors: true })
 export class GameGateWay
@@ -19,13 +22,16 @@ export class GameGateWay
 {
     userSockets: Map<number, UserData>;
     queue: number[];
-
     gamePlayerPosition: Map<number, GamePosition>;
 
     @WebSocketServer()
     server: Server;
 
-    constructor(private prisma: PrismaService) {
+    constructor(
+        private userService: UserService,
+        private gameService: GameService,
+        private prefService: PrefService,
+    ) {
         this.userSockets = new Map<number, UserData>();
         this.queue = [];
         this.gamePlayerPosition = new Map();
@@ -73,11 +79,15 @@ export class GameGateWay
     async addClient(client: Socket) {
         const { userId } = client.handshake.query;
 
-        const user = await this.prisma.user.findUnique({
-            where: {
-                id: Number(userId),
-            },
-        });
+        // const user = await this.prisma.user.findUnique({
+        //     where: {
+        //         id: Number(userId),
+        //     },
+        // });
+
+        const user = await this.userService.getUserById(
+            Number(userId),
+        );
 
         if (!user) return;
 
@@ -93,22 +103,6 @@ export class GameGateWay
         this.userSockets.set(user.id, userData);
     }
 
-    async getPlayerPrefs(userId: number) {
-        try {
-            const prefs = await this.prisma.preference.findUnique({
-                where: {
-                    userId: userId,
-                },
-                include: {
-                    user: true,
-                },
-            });
-            return prefs;
-        } catch (error) {
-            throw error;
-        }
-    }
-
     async matchPlayers(
         player1: number,
         player2: number,
@@ -122,16 +116,21 @@ export class GameGateWay
 
         if (!userData1.socket || !userData2.socket) return;
 
-        const game = await this.prisma.game.create({
-            data: {
-                players: {
-                    connect: [{ id: player1 }, { id: player2 }],
-                },
-                playerOrder: player1,
-            },
-            include: {
-                players: true,
-            },
+        // const game = await this.prisma.game.create({
+        //     data: {
+        //         players: {
+        //             connect: [{ id: player1 }, { id: player2 }],
+        //         },
+        //         playerOrder: player1,
+        //     },
+        //     include: {
+        //         players: true,
+        //     },
+        // });
+
+        const game = await this.gameService.createGame({
+            player1,
+            player2,
         });
 
         if (!game) throw new Error('Failed to create the game');
@@ -150,8 +149,12 @@ export class GameGateWay
             ? 'game_invite_start'
             : 'match_found';
 
-        const pref1 = await this.getPlayerPrefs(userData1.id);
-        const pref2 = await this.getPlayerPrefs(userData2.id);
+        const pref1 = await this.prefService.getUserPref(
+            userData1.id,
+        );
+        const pref2 = await this.prefService.getUserPref(
+            userData2.id,
+        );
 
         userData1.socket.emit(event_name, {
             gameId: game.id,
@@ -192,10 +195,11 @@ export class GameGateWay
             userData2.socket,
             gamePosition,
             game.createdAt,
+            this.gameService,
+            this.userService,
         );
         gameInstance.startGameLoop(
             this.server,
-            this.prisma,
             this.gamePlayerPosition,
         );
     }
@@ -250,11 +254,15 @@ export class GameGateWay
         const userId: number = body.userId;
         const opponentUsername: string = body.opponentUsername;
 
-        const opponent = await this.prisma.user.findUnique({
-            where: {
-                username: opponentUsername,
-            },
-        });
+        // const opponent = await this.prisma.user.findUnique({
+        //     where: {
+        //         username: opponentUsername,
+        //     },
+        // });
+
+        const opponent = await this.userService.getUserByUsername(
+            opponentUsername,
+        );
         if (!opponent) {
             console.log('opponent not found');
             return;
@@ -267,11 +275,13 @@ export class GameGateWay
             return;
         }
 
-        const senderInfo = await this.prisma.user.findUnique({
-            where: {
-                id: myData.id,
-            },
-        });
+        // const senderInfo = await this.prisma.user.findUnique({
+        //     where: {
+        //         id: myData.id,
+        //     },
+        // });
+
+        const senderInfo = await this.userService.getUserById(userId);
 
         if (!senderInfo) {
             console.log('huh u dont exist');

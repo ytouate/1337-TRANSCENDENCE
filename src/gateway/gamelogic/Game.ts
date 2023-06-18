@@ -12,6 +12,9 @@ import {
 } from './constants';
 import { PlayerPosition, GamePosition, Ball } from './interfaces';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Injectable } from '@nestjs/common';
+import { GameService } from 'src/game/game.service';
+import { UserService } from 'src/user/user.service';
 
 export class Game {
     private roomId: number;
@@ -21,6 +24,8 @@ export class Game {
     private timeStart: Date;
     private ballHit: boolean;
     private round: number;
+    private gameService: GameService;
+    private userService: UserService;
 
     constructor(
         roomId: number,
@@ -28,6 +33,8 @@ export class Game {
         socket2: Socket,
         gamePosition: GamePosition,
         timeStart: Date,
+        gameService: GameService,
+        userService: UserService,
     ) {
         this.roomId = roomId;
         this.socket1 = socket1;
@@ -36,11 +43,12 @@ export class Game {
         this.timeStart = timeStart;
         this.ballHit = false;
         this.round = 0;
+        this.gameService = gameService;
+        this.userService = userService;
     }
 
     public startGameLoop(
         server: Server,
-        prisma: PrismaService,
         gamePlayerPosition: Map<number, GamePosition>,
     ) {
         var ball: Ball = {
@@ -50,14 +58,11 @@ export class Game {
             speedY: BALL_SPEED_Y,
         };
 
+        const room = String(this.roomId);
+
         const interval = setInterval(() => {
-            server.to(String(this.roomId)).emit('game_update', {
-                ball: {
-                    x: ball.x,
-                    y: ball.y,
-                    speedX: ball.speedX,
-                    speedY: ball.speedY,
-                },
+            server.to(room).emit('game_update', {
+                ball,
                 gamePosition: this.gamePosition,
             });
 
@@ -67,16 +72,14 @@ export class Game {
             var { reset } = this.gameLogic(ball, this.gamePosition);
 
             if (reset) {
-                var { data, gameOver } = this.checkScore(
-                    ball,
-                    this.gamePosition,
-                );
+                var { winnerData, loserData, gameOver } =
+                    this.checkScore(ball, this.gamePosition);
 
                 if (gameOver) {
-                    server.to(String(this.roomId)).emit('game_over', {
-                        data,
+                    server.to(room).emit('game_over', {
+                        winnerData,
                     });
-                    this.updateGameEnd(prisma, data.id);
+                    this.updateGameEnd(winnerData.id, loserData.id);
                     this.socket1.leave(String(this.roomId));
                     this.socket2.leave(String(this.roomId));
                     gamePlayerPosition.delete(this.roomId);
@@ -84,7 +87,6 @@ export class Game {
                     clearInterval(interval); // Stop the interval
                     return;
                 }
-                // await sleep(5000);
                 this.resetBall(ball);
             }
         }, 1000 / 60);
@@ -133,39 +135,40 @@ export class Game {
                 reset = true;
             }
         }
-        if (ball.y < 0) {
-            ball.speedY *= -1;
-        }
-        else if (ball.y > BOARD_HEIGHT) {
+        if (ball.y < 0 || ball.y > BOARD_HEIGHT) {
             ball.speedY *= -1;
         }
         return { reset };
     }
 
     private resetBall(ball: Ball) {
+        this.round++;
         ball.x = BOARD_WIDTH / 2;
         ball.y = BOARD_HEIGHT / 2;
-        // ball.speedX *= -1; // flip direction
         if (this.round % 2 === 0) {
-            ball.speedX = -ball.speedX;
+            ball.speedX = BALL_SPEED_X;
+        } else {
+            ball.speedX = -BALL_SPEED_X;
         }
         ball.speedY = (Math.random() < 0.5 ? -1 : 1) * BALL_SPEED_Y;
         this.ballHit = false;
-        this.round++;
     }
 
     private checkScore(ball: Ball, gamePosition: GamePosition) {
-        var data: PlayerPosition;
+        var winnerData: PlayerPosition;
+        var loserData: PlayerPosition;
         var gameOver;
         if (gamePosition.player1.score >= WIN_CONDITION) {
             gameOver = true;
-            data = gamePosition.player1;
+            winnerData = gamePosition.player1;
+            loserData = gamePosition.player2;
         }
         if (gamePosition.player2.score >= WIN_CONDITION) {
             gameOver = true;
-            data = gamePosition.player2;
+            winnerData = gamePosition.player2;
+            loserData = gamePosition.player1;
         }
-        return { gameOver, data };
+        return { gameOver, winnerData, loserData };
     }
 
     // private async updateGameScore(
@@ -177,25 +180,23 @@ export class Game {
 
     // }
 
-    private async updateGameEnd(prisma: PrismaService, id: number) {
+    private async updateGameEnd(winnerId: number, loserId: number) {
         const durationInSeconds = Math.floor(
             (new Date().getTime() -
                 new Date(this.timeStart).getTime()) /
                 1000,
         );
         try {
-            await prisma.game.update({
-                where: {
-                    id: this.roomId,
-                },
-                data: {
-                    status: 'FINISHED',
-                    score1: this.gamePosition.player1.score,
-                    score2: this.gamePosition.player2.score,
-                    winnerId: id,
-                    duration: durationInSeconds,
-                },
-            });
+            await this.gameService.updateGameEnd(
+                this.roomId,
+                this.gamePosition.player1.score,
+                this.gamePosition.player2.score,
+                winnerId,
+                durationInSeconds,
+            );
+
+            await this.userService.updateUserWin(winnerId);
+            await this.userService.updateUserLoss(loserId);
         } catch (error) {
             throw error;
         }

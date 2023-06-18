@@ -84,4 +84,29 @@ export class GameService {
             throw error;
         }
     }
+
+    async updateGameEnd(
+        gameId: number,
+        score1: number,
+        score2: number,
+        winnerId: number,
+        duration: number,
+    ) {
+        try {
+            await this.prisma.game.update({
+                where: {
+                    id: gameId,
+                },
+                data: {
+                    status: 'FINISHED',
+                    score1: score1,
+                    score2: score2,
+                    winnerId: winnerId,
+                    duration: duration,
+                },
+            });
+        } catch (error) {
+            throw error;
+        }
+    }
 }
