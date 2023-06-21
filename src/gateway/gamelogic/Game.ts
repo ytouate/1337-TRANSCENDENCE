@@ -11,8 +11,6 @@ import {
     PADDLE_MARGIN,
 } from './constants';
 import { PlayerPosition, GamePosition, Ball } from './interfaces';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { Injectable } from '@nestjs/common';
 import { GameService } from 'src/game/game.service';
 import { UserService } from 'src/user/user.service';
 
@@ -94,11 +92,12 @@ export class Game {
 
     private gameLogic(ball: Ball, gamePosition: GamePosition) {
         var reset = false;
+        const { player1, player2 } = gamePosition;
 
         if (ball.x < PADDLE_MARGIN + BALL_SIZE + PADDLE_WIDTH) {
             if (
-                ball.y > gamePosition.player1.y &&
-                ball.y < gamePosition.player1.y + PADDLE_HEIGHT
+                ball.y > player1.y &&
+                ball.y < player1.y + PADDLE_HEIGHT
             ) {
                 if (!this.ballHit) {
                     ball.speedX *= 2;
@@ -106,11 +105,11 @@ export class Game {
                 ball.speedX *= -1;
                 var deltaY =
                     ball.y -
-                    (gamePosition.player1.y + PADDLE_HEIGHT / 2);
+                    (player1.y + PADDLE_HEIGHT / 2);
                 ball.speedY = deltaY * 0.35;
                 this.ballHit = true;
             } else if (ball.x < 0) {
-                gamePosition.player2.score++;
+                player2.score++;
                 reset = true;
             }
         } else if (
@@ -118,8 +117,8 @@ export class Game {
             BOARD_WIDTH - BALL_SIZE - PADDLE_WIDTH - PADDLE_MARGIN
         ) {
             if (
-                ball.y > gamePosition.player2.y &&
-                ball.y < gamePosition.player2.y + PADDLE_HEIGHT
+                ball.y > player2.y &&
+                ball.y < player2.y + PADDLE_HEIGHT
             ) {
                 ball.speedX *= -1;
                 if (!this.ballHit) {
@@ -127,11 +126,11 @@ export class Game {
                 }
                 var deltaY =
                     ball.y -
-                    (gamePosition.player2.y + PADDLE_HEIGHT / 2);
+                    (player2.y + PADDLE_HEIGHT / 2);
                 ball.speedY = deltaY * 0.35;
                 this.ballHit = true;
             } else if (ball.x > BOARD_WIDTH) {
-                gamePosition.player1.score++;
+                player1.score++;
                 reset = true;
             }
         }

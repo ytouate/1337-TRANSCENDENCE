@@ -78,12 +78,6 @@ export class GameGateWay
     async addClient(client: Socket) {
         const { userId } = client.handshake.query;
 
-        // const user = await this.prisma.user.findUnique({
-        //     where: {
-        //         id: Number(userId),
-        //     },
-        // });
-
         const user = await this.userService.getUserById(
             Number(userId),
         );
@@ -94,6 +88,7 @@ export class GameGateWay
             socket: client,
             username: user.username,
             id: user.id,
+            // pref: user.preference,
         };
 
         //means player exists
@@ -114,18 +109,6 @@ export class GameGateWay
         if (!userData1 || !userData2) return;
 
         if (!userData1.socket || !userData2.socket) return;
-
-        // const game = await this.prisma.game.create({
-        //     data: {
-        //         players: {
-        //             connect: [{ id: player1 }, { id: player2 }],
-        //         },
-        //         playerOrder: player1,
-        //     },
-        //     include: {
-        //         players: true,
-        //     },
-        // });
 
         const game = await this.gameService.createGame({
             player1,
@@ -209,7 +192,6 @@ export class GameGateWay
         @ConnectedSocket() client: Socket,
     ) {
         const { y, gameId, userId } = body;
-        // const userId = this.getUserIdBySocket(client);
 
         const gamePositions = this.gamePlayerPosition.get(gameId);
         if (gamePositions) {
@@ -218,19 +200,10 @@ export class GameGateWay
             } else if (userId == gamePositions.player2.id) {
                 gamePositions.player2.y = y;
             }
+            // const roomId = String(gameId);
+            // client.broadcast.to(roomId).emit('opponent_mousemove', { y });
         }
     }
-
-    // @SubscribeMessage('mouseMove')
-    // mouseMove(
-    //     @MessageBody() body: any,
-    //     @ConnectedSocket() client: Socket,
-    // ) {
-    //     const { x, y, gameId } = body;
-    //     const roomId = String(gameId);
-
-    //     client.to(roomId).emit('opponent_mousemove', { x, y });
-    // }
 
     @SubscribeMessage('queueUp')
     async queueUp(@MessageBody() body: any) {
@@ -268,6 +241,7 @@ export class GameGateWay
         }
 
         const opponentData = this.userSockets.get(opponent.id);
+        if (!opponentData) return;
         const myData = this.userSockets.get(userId);
         if (opponentData.id === myData.id) {
             console.log('inviting userself retard ?');
@@ -304,7 +278,7 @@ export class GameGateWay
             await new Promise(() => {
                 setTimeout(() => {
                     this.matchPlayers(opponentId, userId, true);
-                }, 1000); // Delay of 5 seconds (5000 milliseconds)
+                }, 1000);
             });
         } else if (status === 'declined') {
             console.log('player declined');
