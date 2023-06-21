@@ -10,4 +10,4 @@ export const BALL_SPEED_Y = 4;
 
 export const PADDLE_WIDTH = 10;
 export const PADDLE_HEIGHT = 100;
-export const PADDLE_MARGIN = 10;
+export const PADDLE_MARGIN = 5;
