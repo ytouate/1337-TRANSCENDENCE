@@ -5,7 +5,7 @@ import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSo
 import { Notification, User } from '@prisma/client';
 import { log } from 'console';
 import { Server, Socket } from 'socket.io';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/Prisma/prisma.service';
 
 
 @WebSocketGateway({namespace: 'notification', cors: true})

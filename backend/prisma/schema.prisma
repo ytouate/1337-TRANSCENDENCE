@@ -11,22 +11,48 @@ datasource db {
 }
 
 model Notification {
-  id Int @id @default(autoincrement())
-  description String
-  title String
-  senderAndReicever User[] @relation("userNotificaiton")
-  time DateTime @default(now())
+  id                Int      @id @default(autoincrement())
+  description       String
+  title             String
+  senderAndReicever User[]   @relation("userNotificaiton")
+  time              DateTime @default(now())
 }
 
 model User {
-  id Int @default(autoincrement()) @id
-  email String @unique
-  username String @unique
-  urlImage String?
-  imageIsUpdate Boolean @default(false)
-  optionalMail String?
+  id               Int            @id @default(autoincrement())
+  email            String         @unique
+  socketId         String?
+  username         String         @unique
+  urlImage         String?
+  imageIsUpdate    Boolean        @default(false)
+  optionalMail     String?
   codeVerification Int?
-  friends   User[]   @relation("UserFriends")
-  friendOf  User[]   @relation("UserFriends")
-  notifications Notification[] @relation("userNotificaiton")
+  status           String?
+  friends          User[]         @relation("UserFriends")
+  friendOf         User[]         @relation("UserFriends")
+  notifications    Notification[] @relation("userNotificaiton")
+  roomChat         chatRoom[]     @relation("userInChatRoom")
+  message          Message[]
+}
+
+model chatRoom {
+  id         Int       @id @default(autoincrement())
+  roomName   String
+  timeCreate DateTime  @default(now())
+  users      User[]    @relation("userInChatRoom")
+  messages   Message[]
+  mutes     User[]      @realation("mutesUserInChatRoom")
+  status    String     @default("public")
+  password  String?
+  // add password { protected chat }
+}
+
+model Message {
+  id       Int      @id @default(autoincrement())
+  data     String
+  time     DateTime @default(now())
+  roomId   Int
+  userId   Int      
+  user     User     @relation(fields: [userId], references: [id])
+  roomData chatRoom @relation(fields: [roomId], references: [id])
 }

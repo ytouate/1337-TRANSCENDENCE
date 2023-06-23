@@ -7,10 +7,7 @@ export declare class authController {
     gett(): void;
     getProfilee(res: any, req: any): Promise<void>;
     getp(req: any): Promise<any>;
-    getProfile(req: any): {
-        name: string;
-    };
     siginWith2fa(request: any, req: authDto): Promise<"2fa" | "unvalide user">;
-    verificationCode(body: any): Promise<"code s7i7" | "code ghalate">;
+    verificationCode(body: any, req: any): Promise<any>;
     logout(req: any): Promise<string>;
 }

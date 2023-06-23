@@ -1,5 +1,5 @@
 import { ConfigService } from "@nestjs/config";
-import { PrismaService } from "src/prisma/prisma.service";
+import { PrismaService } from "src/Prisma/prisma.service";
 import { JwtService } from "@nestjs/jwt";
 import { MailerService } from "@nestjs-modules/mailer";
 export declare class authService {

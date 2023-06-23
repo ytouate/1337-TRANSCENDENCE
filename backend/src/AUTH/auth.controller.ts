@@ -1,14 +1,8 @@
 import { Controller, Post, Res, Req , UseGuards, Body, RequestMapping, HttpStatus } from "@nestjs/common";
 import { authService } from "./auth.service";
 import { Get } from "@nestjs/common";
-import { Query } from "@nestjs/common";
-import { AuthStrategy } from "./auth.strategy42";
-import { ConfigService } from "@nestjs/config";
 import { AuthGuard } from "@nestjs/passport";
 import { authDto } from "./DTO/auth.DTO";
-import { use } from "passport";
-import { connected } from "process";
-import { get } from "http";
 
 
 @Controller()
@@ -23,6 +17,7 @@ export class authController {
     @UseGuards(AuthGuard('42'))
     gett() {}
 
+
     @Get('/redirect/signin')
     @UseGuards(AuthGuard('42'))
     async getProfilee(
@@ -33,9 +28,10 @@ export class authController {
         const user = await this.authservice.createUser(req.user)
         const token = await this.authservice.signToken(user.username, user.email)
         await this.authservice.checkUserhave2fa(user)
-        res.cookie('Token' , token, { httpOnly: false })
+        res.cookie('Token' , token, { httpOnly: true })
         res.redirect('http://localhost:5173/')
     }
+
 
     @Get('user')
     @UseGuards(AuthGuard('jwt'))
@@ -45,13 +41,8 @@ export class authController {
             return user
         return 'user not found'
     }
-
-    @Get('profil')
-    getProfile(@Req() req) {
-        console.log(req.headers.authorization)
-        return {name: 'Youssef'}
-    }
  
+
     @Post('2fa')
     @UseGuards(AuthGuard('jwt'))
     async siginWith2fa(@Req() request , @Body() req: authDto) {
@@ -64,12 +55,15 @@ export class authController {
         return '2fa'
     }
 
+
     @Post('2fa/validateCode')
-    async verificationCode(@Body() body) {
+    @UseGuards(AuthGuard('jwt'))
+    async verificationCode(@Body() body, @Req() req) {
         if (this.code == body.code)
-            return 'code s7i7'
+            return await this.authservice.validateUser(req.user)
         return 'code ghalate'
     }
+
 
     @Post('logout')
     async logout(@Req() req) {

@@ -1,4 +1,4 @@
-import { Controller } from "@nestjs/common";
+import { Controller, Render } from "@nestjs/common";
 import { Get } from "@nestjs/common";
 import { join } from "path";
 import { createReadStream } from "fs";
@@ -6,10 +6,14 @@ import { createReadStream } from "fs";
 @Controller()
 export class appController{
 
-    @Get('index')
+    @Get('name')
+    Home(name) {
+        return { message : `Heelo world ${name}`}
+    }
+
+
+    @Get('api/chat')
     getindex() {
-        const file = createReadStream(join(process.cwd(), '/src/static/index.html'));
-        console.log(file);
-        return ''
+        return 'message'
     }
 }

@@ -12,17 +12,22 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.appController = void 0;
 const common_1 = require("@nestjs/common");
 const common_2 = require("@nestjs/common");
-const path_1 = require("path");
-const fs_1 = require("fs");
 let appController = class appController {
+    Home(name) {
+        return { message: `Heelo world ${name}` };
+    }
     getindex() {
-        const file = (0, fs_1.createReadStream)((0, path_1.join)(process.cwd(), '/src/static/index.html'));
-        console.log(file);
-        return '';
+        return 'message';
     }
 };
 __decorate([
-    (0, common_2.Get)('index'),
+    (0, common_2.Get)('name'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], appController.prototype, "Home", null);
+__decorate([
+    (0, common_2.Get)('api/chat'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)

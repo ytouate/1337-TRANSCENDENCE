@@ -9,11 +9,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.chatModule = void 0;
 const common_1 = require("@nestjs/common");
 const chat_gateway_1 = require("./chat.gateway");
+const prisma_module_1 = require("../Prisma/prisma.module");
+const prisma_service_1 = require("../Prisma/prisma.service");
+const user_module_1 = require("../user/user.module");
+const user_service_1 = require("../user/user.service");
 let chatModule = class chatModule {
 };
 chatModule = __decorate([
     (0, common_1.Module)({
-        providers: [chat_gateway_1.chatGateway]
+        imports: [user_module_1.UserModule, prisma_module_1.PrismaModule],
+        providers: [user_service_1.UserService, prisma_service_1.PrismaService, chat_gateway_1.chatGateway]
     })
 ], chatModule);
 exports.chatModule = chatModule;

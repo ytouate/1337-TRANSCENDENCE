@@ -1,15 +1,11 @@
 import { Module } from "@nestjs/common";
 import { authService } from "./auth.service";
 import { authController } from "./auth.controller";
-import { ConfigModule, ConfigService } from "@nestjs/config";
+import { ConfigModule } from "@nestjs/config";
 import { AuthStrategy } from "./auth.strategy42";
-import { PrismaClient } from "@prisma/client";
-import { PrismaModule } from "src/prisma/prisma.module";
-import { PrismaService } from "src/prisma/prisma.service";
+import { PrismaModule } from "src/Prisma/prisma.module";
 import { JwtModule } from "@nestjs/jwt";
-import { MailerModule, MailerService } from "@nestjs-modules/mailer";
-import Handlebars from "handlebars";
-import { join } from "path";
+import { MailerModule } from "@nestjs-modules/mailer";
 
 
 @Module({

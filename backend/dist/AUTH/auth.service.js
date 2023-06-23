@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.authService = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
-const prisma_service_1 = require("../prisma/prisma.service");
+const prisma_service_1 = require("../Prisma/prisma.service");
 const auth_strategy42_1 = require("./auth.strategy42");
 const jwt_1 = require("@nestjs/jwt");
 const mailer_1 = require("@nestjs-modules/mailer");
@@ -31,7 +31,7 @@ let authService = class authService {
                 data: {
                     email: newData.email,
                     username: newData.username,
-                    urlImage: auth_strategy42_1.imageLink
+                    urlImage: auth_strategy42_1.imageLink,
                 }
             });
             const payload = {
@@ -56,10 +56,7 @@ let authService = class authService {
         });
     }
     async validateUser(data) {
-        const user = this.prisma.user.findUnique({ where: { email: data.email } });
-        if (user)
-            return user;
-        return undefined;
+        return await this.prisma.user.findUnique({ where: { email: data.email } });
     }
     async sigin2fa(code, email) {
         const mail = await this.mail.sendMail({

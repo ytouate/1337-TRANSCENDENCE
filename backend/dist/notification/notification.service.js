@@ -18,7 +18,7 @@ const jwt_1 = require("@nestjs/jwt");
 const passport_1 = require("@nestjs/passport");
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
-const prisma_service_1 = require("../prisma/prisma.service");
+const prisma_service_1 = require("../Prisma/prisma.service");
 let NotificationService = class NotificationService {
     constructor(jwtService, prismaServie) {
         this.jwtService = jwtService;

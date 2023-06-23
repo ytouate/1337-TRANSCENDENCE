@@ -1,6 +1,6 @@
 import { Injectable, StreamableFile } from '@nestjs/common';
 import { IProfileService } from './iprofile.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/Prisma/prisma.service';
 import {User} from 'prisma'
 import { createReadStream } from 'fs';
 import { Response } from 'express';

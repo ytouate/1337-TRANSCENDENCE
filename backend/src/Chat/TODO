@@ -1,0 +1,29 @@
+-  chatroom have host (admin who create a room) and table of users 
+-  message have name of room fin ghay brodcasta l message
+
+
+
+- how the user enter in specifi room in websocket
+- how thw socket join work
+- two events : * first { chat place to brodcats message to all client in the events }
+
+               * second { join_rom place to joun client in a specifi room }
+
+
+-/*/*/**/*/*
+
+- how ConnectedSocket work 
+- why whene i send token in event i foiund it inside handsahek
+- what diff client : socket and @ConnectedSocket() client : socket
+
+- check if the user has already joined in the group
+
+
+*/
+
+- when create Room add friend in creation
+- the admin want to add user in room or delete user room
+
+
+- mute {can't send message for limited time}
+- when i change status of user he change in all rooms
