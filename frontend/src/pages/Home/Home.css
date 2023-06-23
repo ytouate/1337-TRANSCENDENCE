@@ -1,0 +1,30 @@
+.game-options
+{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 50px;
+    justify-content: space-between;
+}
+
+.stats-cards {
+    display: flex;
+    gap: 50px;
+}
+
+.home-img {
+    width: 500px;
+}
+
+.home-left {
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+}
+
+.home {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}

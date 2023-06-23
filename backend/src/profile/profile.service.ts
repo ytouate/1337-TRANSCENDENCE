@@ -35,6 +35,7 @@ export class ProfileService implements IProfileService{
         return this.userReturn(updateUser, req)
       }
     }
+
     async deletePhoto(req) {
         const updateUser = await this.prismaService.user.update({
             where: {

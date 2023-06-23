@@ -1,50 +1,49 @@
 import "./App.css";
+import './index.css'
+
 import Nav from "./components/Nav";
-import Home from "./components/Home";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Profile from "./components/Profile";
+// import Home from "./components/Home";
+import Home from './pages/Home/Home'
+import NotFound from "./components/NotFound";
 import Cookies from "js-cookie";
+import { useEffect, useState } from "react";
+
+import {
+    createBrowserRouter,
+    Route,
+    createRoutesFromElements,
+    RouterProvider,
+} from "react-router-dom";
+
+import Profile from "./components/ProfileData";
 import Chat from "./components/Chat";
-import { useEffect } from "react";
 import SignIn from "./components/SignIn";
+import img from "./assets/ytouate.jpeg";
+import Leaderboard from "./components/Leaderboard";
+import AccountSettings from "./components/AccountSettings";
+
+const router = createBrowserRouter(
+    createRoutesFromElements(
+        <Route path="/" element={<Nav profileImg={img} />}>
+            <Route index element={<Home />}></Route>
+            {/* <Route path="signin" element={<SignIn />} />
+            <Route index element={<Home />} />
+            <Route path="chat" element={<Chat />} />
+            <Route path="leaderboard" element={<Leaderboard />} />
+            <Route
+                path="livegames"
+                element={<h1>here goes the live games</h1>}
+            />
+            <Route path="profile" element={<Profile />} />
+            <Route path="settings" element={<AccountSettings />} />
+            <Route path="*" element={<NotFound />}></Route> */}
+        </Route>
+    )
+);
 
 function App() {
-    let token = Cookies.get("Token");
-    const headers = { Authorization: `Bearer ${token}` };
 
-    useEffect(() => {
-        fetch("http://localhost:3000/profil", { headers })
-            .then((res) => res.json())
-            .then((data) => console.log(data));
-    }, []);
-
-    return (
-        <>
-            <BrowserRouter>
-                <Nav />
-                {/* <a href="http://localhost:3000/signin">
-                    <button>Sign in using 42 intra</button>
-                </a> */}
-                <div className="page">
-                    <Routes>
-                        <Route path="/signin" element={<SignIn />}></Route>
-                        <Route path="/" element={<Home />}></Route>
-                        <Route path="/chat" element={<Chat />}></Route>
-                        <Route
-                            path="/leaderboard"
-                            element={<h1>here goes the leaderboard</h1>}
-                        ></Route>
-                        <Route
-                            path="/live-games"
-                            element={<h1>here goes the live games</h1>}
-                        ></Route>
-                        <Route path="/profile" element={<Profile />}></Route>
-                    </Routes>
-                </div>
-            </BrowserRouter>
-        </>
-    );
+    return <RouterProvider router={router} />;
 }
 
 export default App;
-

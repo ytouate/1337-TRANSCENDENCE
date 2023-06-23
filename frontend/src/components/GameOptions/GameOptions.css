@@ -1,0 +1,85 @@
+.card {
+    width: 290px;
+    height: 345px;
+    transition: all 0.2s;
+    position: relative;
+    cursor: pointer;
+}
+
+.card-inner {
+    width: inherit;
+    height: inherit;
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-inner > img {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.card:hover {
+    transform: scale(1.04) rotate(1deg);
+}
+
+.circle {
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(#28235c, #3d3964);
+    border-radius: 50%;
+    position: absolute;
+    animation: move-up6 2s ease-in infinite alternate-reverse;
+}
+
+.circle:nth-child(1) {
+    top: -25px;
+    left: -25px;
+}
+
+.circle:nth-child(2) {
+    bottom: -25px;
+    right: -25px;
+    animation-name: move-down1;
+}
+
+@keyframes move-up6 {
+    to {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes move-down1 {
+    to {
+        transform: translateY(10px);
+    }
+}
+/*
+    reseting the css to default values
+*/
+.button {
+    border-radius: 8px;
+    border: 1px solid transparent;
+    padding: 0.6em 1.2em;
+    font-size: 0.9em;
+    font-weight: 500;
+    font-family: inherit;
+    background-color: var(--cards-color);
+    cursor: pointer;
+    color: white;
+    transition: border-color 0.25s;
+    max-width: fit-content;
+    margin: auto;
+}
+
+.button:hover {
+    border-color: #646cff;
+}
+
+.button:focus,
+.button:focus-visible {
+    outline: 4px auto -webkit-focus-ring-color;
+}

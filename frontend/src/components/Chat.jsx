@@ -6,18 +6,23 @@ import Navbar from "./ChatNav";
 import sendButton from "../assets/send-line.svg";
 import { useState } from "react";
 function Chat() {
-    let [message, setMessage] = useState('');
+    let [message, setMessage] = useState("");
     let [messages, setMessages] = useState([]);
     function handleMessageChange(event) {
         setMessage(event.target.value);
     }
-    function sendMessage() {
+    function sendMessage(e) {
+        e.preventDefault();
+        var targetElm = document.querySelector(".chat-container");
+        targetElm.scrollIntoView();
+
         let trimmedMessage = message.trim();
-        if (trimmedMessage.length == 0)
-            return ;
+        if (trimmedMessage.length == 0) return;
         let newMessages = [...messages];
-        newMessages.push(<RightMessageCard key={newMessages.length} message={message} />);
-        setMessage('');
+        newMessages.push(
+            <RightMessageCard key={newMessages.length} message={message} />
+        );
+        setMessage("");
         setMessages(newMessages);
     }
     return (
@@ -30,15 +35,10 @@ function Chat() {
                         <UserMessageCard />
                     </div>
                     <div className="chat-container">
-                        <div className="messages">
-                            {messages}
-                            {/* <LeftMessageCard />
-                            <RightMessageCard />
-                            <LeftMessageCard />
-                            <RightMessageCard /> */}
-                        </div>
-                        <div className="message-sender">
+                        <div className="messages">{messages}</div>
+                        <form className="message-sender" onSubmit={sendMessage}>
                             <input
+                                className="input"
                                 value={message}
                                 onChange={handleMessageChange}
                                 type="text"
@@ -50,7 +50,7 @@ function Chat() {
                                     alt=""
                                 />
                             </i>
-                        </div>
+                        </form>
                     </div>
                     <div className="friends-container">
                         <FriendCard />
