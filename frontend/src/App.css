@@ -70,12 +70,12 @@ body {
     background-color: #f6f3eb;
     display: flex;
     width: 100%;
-    height: 120px;
+    height: 100px;
     justify-content: space-between;
     align-items: center;
-    margin: 0;
     font-family: "Michroma", sans-serif;
     padding-right: 40px;
+    padding-left: 40px;
 }
 
 .not-found {
@@ -97,7 +97,7 @@ body {
 }
 
 .navbar-list {
-    gap: 60px;
+    gap: 20px;
     list-style: none;
     display: flex;
 }
@@ -105,10 +105,10 @@ body {
 .navbar-list > li {
     margin: auto;
     font-weight: 700;
-    font-size: 18px;
+    font-size: 14px;
     cursor: pointer;
-    line-height: 27px;
-    letter-spacing: 2px;
+    line-height: 25px;
+    letter-spacing: 1px;
 }
 
 a {
@@ -116,14 +116,6 @@ a {
     text-decoration: none;
 }
 
-.navbar-list > li > a:hover {
-    text-decoration: none;
-    font-size: 21px;
-    /* -webkit-transition: font-size 0.5s ease-in-out;
-    -moz-transition: font-size 0.5s ease-in-out;
-    -o-transition: font-size 0.5s ease-in-out; */
-    transition: font-size 0.2s ease-in-out;
-}
 
 .home-profile-img {
     height: 68px;
@@ -135,7 +127,6 @@ a {
 
 .logo {
     width: 90px;
-    margin: auto 20px;
 }
 
 /* .home {
@@ -838,23 +829,7 @@ input[type="file"]::file-selector-button:hover {
     font-size: 22px;
 }
 
-.friend-card--lastmessage {
-    font-size: 14px;
-}
 
-.friend-card,
-.rank-card {
-    background-color: var(--cards-color);
-    box-shadow: 4px 4px 4px var(--box-shadow-color);
-    color: white;
-    font-weight: 500;
-    width: 80%;
-    height: 70px;
-    display: flex;
-    align-items: center;
-    border-radius: 15px;
-    margin: 20px auto;
-}
 
 .messages {
     margin-top: 20px;
@@ -895,110 +870,8 @@ input[type="file"]::file-selector-button:hover {
     right: 40px;
 }
 
-.friend-card--username,
-.rank-card--username {
-    font-weight: bold;
-}
 
-.friend-card--data,
-.rank-card--data {
-    margin-left: 15px;
-    margin-right: 120px;
-}
 
-.friend-card--profile,
-.rank-card--profile {
-    width: 60px;
-    margin-left: 10px;
-    border-radius: 50%;
-}
-
-/* .leaderboard {
-    width: 100%;
-    height: 90vh;
-    display: flex;
-    align-items: center;
-} */
-.leaderboard-right {
-    width: 50%;
-}
-
-.leaderboard-right > img {
-    width: 70%;
-    box-shadow: 4px 4px 4px;
-    border-radius: 15px;
-    margin: auto;
-}
-
-.leaderboard-left {
-    box-shadow: gray 0px 20px 30px -10px;
-    background-color: #f6f3eb;
-    width: 60%;
-    height: 900px;
-    border-radius: 38px;
-    display: flex;
-    margin-left: 50px;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.leaderboard-types {
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
-}
-
-.leaderboard-type-card {
-    display: flex;
-    background-color: var(--cards-color);
-    color: white;
-    cursor: pointer;
-    height: 50px;
-    border-radius: 9999px;
-    width: 25%;
-    justify-content: center;
-    align-items: center;
-    font-weight: 600;
-    font-size: 20px;
-}
-
-.leaderboard-type-card:hover {
-    transform: scale(1.01);
-    background-color: #3d3964;
-    color: white;
-    transition: background-color 0.5s ease-in-out;
-}
-.first-three {
-    margin-top: 50px;
-    display: flex;
-    justify-content: center;
-    text-align: center;
-    margin-top: 100px;
-}
-
-.first > img,
-.second > img,
-.third > img {
-    width: 80px;
-    border-radius: 50%;
-    margin-left: 20px;
-    margin-right: 20px;
-}
-
-.second,
-.third {
-    margin-top: 50px;
-}
-
-.other-ranks {
-    height: 400px;
-    width: 70%;
-    margin: 50px auto 0 auto;
-    overflow: scroll;
-}
-.other-ranks::-webkit-scrollbar {
-    display: none;
-}
 @media only screen and (max-width: 1700px) {
     .home-text {
         font-size: 65px;
@@ -1029,7 +902,8 @@ input[type="file"]::file-selector-button:hover {
     position: relative;
     max-width: 390px;
     border-radius: 5px;
-    box-shadow: 4px 4px 8px #dedede;
+    border: 1px solid gray;
+    box-shadow: 4px 4px 8px gray;
 }
 
 .input {

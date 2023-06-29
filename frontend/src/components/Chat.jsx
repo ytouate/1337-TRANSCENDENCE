@@ -1,7 +1,7 @@
 import UserMessageCard from "./UserMessageCard";
 import LeftMessageCard from "./LeftMessageCard";
 import RightMessageCard from "./RightMessageCard";
-import FriendCard from "./FriendCard";
+import FriendCard from "./FriendCard/FriendCard";
 import Navbar from "./ChatNav";
 import sendButton from "../assets/send-line.svg";
 import { useState } from "react";

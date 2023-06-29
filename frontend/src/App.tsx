@@ -26,15 +26,15 @@ const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/" element={<Nav profileImg={img} />}>
             <Route index element={<Home />}></Route>
-            {/* <Route path="signin" element={<SignIn />} />
-            <Route index element={<Home />} />
             <Route path="chat" element={<Chat />} />
+            <Route path="profile" element={<Profile />} />
+            {/* <Route index element={<Home />} />
             <Route path="leaderboard" element={<Leaderboard />} />
+            <Route path="signin" element={<SignIn />} />
             <Route
                 path="livegames"
                 element={<h1>here goes the live games</h1>}
             />
-            <Route path="profile" element={<Profile />} />
             <Route path="settings" element={<AccountSettings />} />
             <Route path="*" element={<NotFound />}></Route> */}
         </Route>

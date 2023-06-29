@@ -1,6 +1,6 @@
 .card {
-    width: 290px;
-    height: 345px;
+    height: 200px;
+    width: 150px;
     transition: all 0.2s;
     position: relative;
     cursor: pointer;
@@ -27,8 +27,8 @@
 }
 
 .circle {
-    width: 100px;
-    height: 100px;
+    width: 60px;
+    height: 60px;
     background: radial-gradient(#28235c, #3d3964);
     border-radius: 50%;
     position: absolute;
@@ -61,6 +61,11 @@
     reseting the css to default values
 */
 .button {
+    width: 90%;
+    display: flex;
+    justify-content: center;
+    white-space: nowrap;
+    text-align: center;
     border-radius: 8px;
     border: 1px solid transparent;
     padding: 0.6em 1.2em;
@@ -71,7 +76,6 @@
     cursor: pointer;
     color: white;
     transition: border-color 0.25s;
-    max-width: fit-content;
     margin: auto;
 }
 
