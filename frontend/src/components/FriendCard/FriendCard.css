@@ -21,19 +21,20 @@
 }
 
 a {
-    display: block;
-    color: black;
-    padding: 8px 10px;
-    font-size: 13px;
-    text-decoration: none;
+  display: block;
+  color: black;
+  padding: 8px 10px;
+  font-size: 13px;
+  text-decoration: none;
 }
 
 a:hover {
-    background-color:  #e5e3dd;
+  background-color: #e5e3dd;
 }
 
 .friend-card--manage:hover .dropdown-content {
   display: block;
+  transition: display 0.5s ease;
 }
 
 .dropdown-content {
@@ -42,13 +43,15 @@ a:hover {
   background-color: #f6f3eb;
   min-width: 120px;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-  /* padding: 12px 16px; */
   z-index: 1;
   right: 0;
+  transition: 0.5s ease;
 }
+
 .friend-card--manage > img {
   width: 13px;
 }
+
 .friend-card--left {
   display: flex;
   align-items: center;
@@ -59,12 +62,8 @@ a:hover {
   font-size: 12px;
 }
 
-.friend-card--username,
-.rank-card--username {
+.friend-card--username {
   font-weight: bold;
-}
-
-.friend-card--data{
 }
 
 .friend-card--profile {

@@ -1,4 +1,4 @@
-import './GameOptions.css';
+import './GameOption.css';
 
 function GameOptions(props) {
     return (

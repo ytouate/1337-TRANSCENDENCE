@@ -1,31 +1,22 @@
 .game-options
 {
-    display: flex;
-    gap: 30px;
-    justify-content: space-between;
     width: 100%;
-    padding: 100px;
-}
-
-.home-left {
     display: flex;
     flex-direction: column;
     gap: 50px;
 }
 
-.stats-cards {
+.options {
     display: flex;
     gap: 50px;
 }
 
-.home-img {
-    width: 100%;
-}
-
 .home {
+    padding: 40px;
     width: 100%;
     height: 100%;
-    display: flex;
-    justify-content: space-around;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 50px;
     align-items: center;
 }

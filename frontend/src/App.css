@@ -129,12 +129,6 @@ a {
     width: 90px;
 }
 
-/* .home {
-    display: flex;
-    align-items: center;
-    height: 90vh;
-} */
-
 .left > p {
     width: 100%;
     margin-bottom: 20px;
@@ -154,9 +148,8 @@ a {
     font-family: "Montserrat";
     font-style: normal;
     font-weight: 700;
-    font-size: 75px;
-    line-height: 81px;
-    margin-bottom: 50px;
+    font-size: 40px;
+    line-height: 40px;
     color: #28235c;
     text-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
     animation: move-up6 1.5s ease-in infinite alternate-reverse;
@@ -596,8 +589,8 @@ input[type="file"]::file-selector-button:hover {
     styling the chat page
 */
 .wrapper {
+    padding: 50px;
     width: 100%;
-    height: 90vh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -873,10 +866,7 @@ input[type="file"]::file-selector-button:hover {
 
 
 @media only screen and (max-width: 1700px) {
-    .home-text {
-        font-size: 65px;
-        line-height: 81px;
-    }
+
 
     .play-btn {
         border: none;
@@ -949,10 +939,6 @@ input:hover {
 @media only screen and (max-width: 1300px) {
     body {
         /* background-color: #183153; */
-    }
-    .home-text {
-        font-size: 50px;
-        line-height: 70px;
     }
 
     .play-btn {
