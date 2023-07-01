@@ -5,8 +5,9 @@ import againstAi from "../../assets/against_ai.jpg";
 import background from "../../assets/background_3.jpg";
 import LeaderBoardCard from "../../components/LeaderBoard/LeaderBoard";
 import FrinedsList from "../../components/FriendsList/FriendsList";
-
+import {authContext} from "../../context/authContext";
 import "./Home.css";
+import { useContext } from "react";
 
 function Home() {
   return (

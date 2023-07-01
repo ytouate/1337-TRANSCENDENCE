@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NotificationService = void 0;
 const common_1 = require("@nestjs/common");
@@ -18,7 +19,7 @@ const jwt_1 = require("@nestjs/jwt");
 const passport_1 = require("@nestjs/passport");
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
-const prisma_service_1 = require("../Prisma/prisma.service");
+const prisma_service_1 = require("src/Prisma/prisma.service");
 let NotificationService = class NotificationService {
     constructor(jwtService, prismaServie) {
         this.jwtService = jwtService;
@@ -171,7 +172,7 @@ __decorate([
 ], NotificationService.prototype, "answerToNotification", null);
 NotificationService = __decorate([
     (0, websockets_1.WebSocketGateway)({ namespace: 'notification', cors: true }),
-    __metadata("design:paramtypes", [jwt_1.JwtService, prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [jwt_1.JwtService, typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
 ], NotificationService);
 exports.NotificationService = NotificationService;
 //# sourceMappingURL=notification.service.js.map

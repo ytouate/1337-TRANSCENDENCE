@@ -8,7 +8,7 @@ export declare class authService {
     private jwt;
     private mail;
     constructor(prisma: PrismaService, configservice: ConfigService, jwt: JwtService, mail: MailerService);
-    createUser(newData: any): Promise<import(".prisma/client").User>;
+    createUser(newData: any): Promise<any>;
     signToken(username: any, email: any): Promise<string>;
     add2fa(firstMail: any, email: any, code: any): Promise<void>;
     validateUser(data: any): Promise<any>;

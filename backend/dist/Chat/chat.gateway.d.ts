@@ -15,6 +15,6 @@ export declare class chatGateway implements OnModuleInit, OnGatewayConnection, O
     leaveRoomHandler(client: Socket, req: any): Promise<void>;
     handleConnection(client: Socket, ...args: any[]): Promise<void>;
     handleDisconnect(client: any): Promise<void>;
-    validateUserByUsername(username: any): Promise<import(".prisma/client").User>;
-    validateUserByEmail(email: any): Promise<import(".prisma/client").User>;
+    validateUserByUsername(username: any): Promise<any>;
+    validateUserByEmail(email: any): Promise<any>;
 }

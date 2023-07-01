@@ -29,7 +29,7 @@ a {
 }
 
 a:hover {
-  background-color: #e5e3dd;
+  /* background-color: #e5e3dd; */
 }
 
 .friend-card--manage:hover .dropdown-content {

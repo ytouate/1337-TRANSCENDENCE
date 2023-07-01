@@ -1,0 +1,16 @@
+.match-card--player {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.match-card {
+    background-color: var(--cards-color);
+    flex-shrink: 0;
+    padding: 20px;
+    height: 90%;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    color: white;
+    gap: 10px;
+}

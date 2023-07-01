@@ -11,13 +11,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.chatGateway = void 0;
 const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
-const prisma_service_1 = require("../Prisma/prisma.service");
+const prisma_service_1 = require("src/Prisma/prisma.service");
 const user_service_1 = require("../user/user.service");
 const common_2 = require("@nestjs/common");
 let chatGateway = class chatGateway {
@@ -102,8 +103,7 @@ __decorate([
 ], chatGateway.prototype, "leaveRoomHandler", null);
 chatGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({ namespace: 'chat', cors: true }),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        user_service_1.UserService])
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object, user_service_1.UserService])
 ], chatGateway);
 exports.chatGateway = chatGateway;
 //# sourceMappingURL=chat.gateway.js.map

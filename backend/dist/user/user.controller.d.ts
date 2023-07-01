@@ -4,16 +4,9 @@ export declare class UserController {
     private userService;
     private user;
     constructor(userService: UserService, user: authService);
-    createRoom(Param: any, req: any): Promise<string | import(".prisma/client").chatRoom>;
+    createRoom(Param: any, req: any): Promise<any>;
     setAdmin(Param: any): Promise<string>;
     changePassword(Param: any): Promise<string>;
-    getRoomByName(Param: any): Promise<import(".prisma/client").chatRoom & {
-        users: import(".prisma/client").User[];
-        messages: (import(".prisma/client").Message & {
-            user: import(".prisma/client").User;
-        })[];
-    }>;
-    getAllRooms(Param: any): Promise<(import(".prisma/client").chatRoom & {
-        users: import(".prisma/client").User[];
-    })[]>;
+    getRoomByName(Param: any): Promise<any>;
+    getAllRooms(Param: any): Promise<any>;
 }

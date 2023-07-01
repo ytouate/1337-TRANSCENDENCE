@@ -9,7 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NotificationModule = void 0;
 const common_1 = require("@nestjs/common");
 const notification_service_1 = require("./notification.service");
-const prisma_service_1 = require("../Prisma/prisma.service");
+const prisma_service_1 = require("src/Prisma/prisma.service");
 const websocket_jwt_strategie_1 = require("../strategies/websocket-jwt.strategie");
 let NotificationModule = class NotificationModule {
 };
