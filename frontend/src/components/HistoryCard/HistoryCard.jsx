@@ -6,7 +6,7 @@ function  MatchCard() {
         <div className="match-card">
             <div className="match-card--left">
                 <img src={profileImg} alt="" className="card--user-profile" />
-                <p className="match-card--player">ytouate</p>
+                <p className="match-card--player">Lorem</p>
             </div>
             <div className="match-card--status">
                 3 - 5

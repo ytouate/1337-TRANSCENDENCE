@@ -4,8 +4,7 @@
   box-shadow: 4px 4px 4px var(--box-shadow-color);
   color: white;
   font-weight: 500;
-  width: 80%;
-  height: 70px;
+  width: 100%;
   display: flex;
   justify-content: space-between;
   border-radius: 15px;
@@ -28,13 +27,8 @@ a {
   text-decoration: none;
 }
 
-a:hover {
-  /* background-color: #e5e3dd; */
-}
-
 .friend-card--manage:hover .dropdown-content {
   display: block;
-  transition: display 0.5s ease;
 }
 
 .dropdown-content {

@@ -5,7 +5,7 @@ import ytouate from "../../assets/ytouate.jpeg";
 
 export default function FriendsList() {
   return (
-    <article className="friends-group">
+    <div className="friends-group">
       <SearchBar />
       <div className="users">
         <FriendCard />
@@ -13,7 +13,8 @@ export default function FriendsList() {
         <FriendCard />
         <FriendCard />
         <FriendCard />
+        <FriendCard />
       </div>
-    </article>
+    </div>
   );
 }

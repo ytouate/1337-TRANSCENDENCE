@@ -3,13 +3,13 @@
   width: 100%;
   display: grid;
   gap: 30px;
-  grid-template-columns: 33% 33% 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: 1fr;
   padding: 20px;
   align-items: center;
 }
 
 .profile--left {
-  background-color: lightblue;
   height: 100%;
   width: 100%;
   display: grid;
@@ -19,81 +19,142 @@
 }
 
 .profile--right {
-  padding: 10px;
-  background-color: lightcoral;
   height: 100%;
   width: 100%;
   display: grid;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: 1.5fr 1fr;
   gap: 20px;
-}
-
-.profile--center {
-  background-color: lightpink;
-  height: 100%;
-  width: 100%;
   padding: 10px;
 }
 
-.profile--userdata {
-  background-color: lightyellow;
+.profile--center {
+  height: 100%;
   width: 100%;
+  padding: 10px;
+  display: flex;
+  align-items: center;
 }
 
-.profile--statistics {
+
+
+.profile--userdata {
+  background-color: #f6f3eb;
+  border-radius: 15px;
+  width: 100%;
   display: flex;
-  background-color: black;
   flex-direction: column;
   justify-content: center;
-  gap: 10px;
+  align-items: center;
+  gap: 20px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+    rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
 }
 
-.profile--statistics-header {
-    background-color: #28235c;
-    border-radius: 5px;
-    display: flex;
-    gap: 10px;
-    color: white;
-    font-weight: 600;
-    padding: 10px;
-    letter-spacing: 1px;
+.profile--achievements {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 20px;
+  border-radius: 15px;
+  width: 100%;
+  /* box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+    rgba(0, 0, 0, 0.3) 0px 30px 60px -30px; */
 }
 
-.profile--statistics-header > img {
-    width: 20px;
+.profile--achievements-header {
+  display: flex;
+  gap: 20px;
+  background-color: #f6f3eb;
+  color: black;
+  font-weight: 600;
+  padding: 10px;
+  padding-left: 20px;
+  border-radius: 10px;
 }
 
-.profile--statistics-matches {
-    display: flex;
-    overflow-x: scroll;
-    gap: 20px;
-    scroll-behavior: smooth;
-}
-::-webkit-scrollbar {
-  height: 10px;
-  width: 10px;
-  display: block;
-  
+.profile--achievements-body {
+  background-color: #f6f3eb;
+  border-radius: 15px;
 }
 
+.profile--achievements-header img {
+  width: 20px;
+}
 
-::-webkit-scrollbar-thumb {
-    background-color: #28235c;
-    border-radius: 2px;
+.settings-button {
+  height: 40px;
+  width: 150px;
+  outline: none;
+  border: none;
+  background-color: #28235c;
+  color: white;
+  font-weight: 500;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.settings-button:hover {
+  background-color: #3a338d;
+  transition: background-color 1s ease;
+}
+
+.profile--userdata-img {
+  height: 120px;
+  border-radius: 50%;
+}
+
+.profile--userdata-name {
+  font-weight: bold;
+  font-size: 20px;
+  letter-spacing: 1px;
 }
 
 .profile--histroy {
   width: 100%;
   height: 100%;
-  background-color: black;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  /* box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+    rgba(0, 0, 0, 0.3) 0px 30px 60px -30px; */
 }
 
-.profile--achievements {
-  background-color: brown;
+.profile--history-header {
+  background-color: #f6f3eb;
+  color: black;
+  font-weight: 600;
+  padding: 10px;
+  padding-left: 20px;
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+  gap: 10px;
 }
 
-.tobedone {
-  background-color: aqua;
+.profile--history-header img {
+  width: 20px;
+}
+
+
+.profile--history-matches {
+  background-color: #f6f3eb;
+  scroll-behavior: smooth;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 8px;
+  display: flex;
+  overflow-x: scroll;
+  gap: 10px;
+}
+
+::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+  display: block;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #28235c;
+  border-radius: 2px;
 }
 
 @media only screen and (max-width: 1100px) {

@@ -1,16 +1,26 @@
 .match-card--player {
-    font-size: 14px;
-    font-weight: 500;
+  font-size: 14px;
+  font-weight: 500;
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
+.match-card--status {
+  font-weight: 600;
+  padding: 0 5px 15px 5px;
+}
 .match-card {
-    background-color: var(--cards-color);
-    flex-shrink: 0;
-    padding: 20px;
-    height: 90%;
-    border-radius: 5px;
-    display: flex;
-    align-items: center;
-    color: white;
-    gap: 10px;
+  background-color: var(--cards-color);
+  flex-shrink: 0;
+  padding: 20px;
+  height: 95%;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  color: white;
+  gap: 10px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+    rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
 }
