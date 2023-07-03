@@ -49,7 +49,7 @@ export class Game {
         server: Server,
         gamePlayerPosition: Map<number, GamePosition>,
     ) {
-        var ball: Ball = {
+        let ball: Ball = {
             x: BOARD_WIDTH / 2,
             y: BOARD_HEIGHT / 2,
             speedX: BALL_SPEED_X,
@@ -67,10 +67,10 @@ export class Game {
             ball.x += ball.speedX;
             ball.y += ball.speedY;
 
-            var { reset } = this.gameLogic(ball, this.gamePosition);
+            let { reset } = this.gameLogic(ball, this.gamePosition);
 
             if (reset) {
-                var { winnerData, loserData, gameOver } =
+                let { winnerData, loserData, gameOver } =
                     this.checkScore(ball, this.gamePosition);
 
                 if (gameOver) {
@@ -91,7 +91,7 @@ export class Game {
     }
 
     private gameLogic(ball: Ball, gamePosition: GamePosition) {
-        var reset = false;
+        let reset = false;
         const { player1, player2 } = gamePosition;
 
         if (ball.x < PADDLE_MARGIN + BALL_SIZE + PADDLE_WIDTH) {
@@ -103,7 +103,7 @@ export class Game {
                     ball.speedX *= 2;
                 }
                 ball.speedX *= -1;
-                var deltaY =
+                let deltaY =
                     ball.y -
                     (player1.y + PADDLE_HEIGHT / 2);
                 ball.speedY = deltaY * 0.35;
@@ -124,7 +124,7 @@ export class Game {
                 if (!this.ballHit) {
                     ball.speedX *= 2;
                 }
-                var deltaY =
+                let deltaY =
                     ball.y -
                     (player2.y + PADDLE_HEIGHT / 2);
                 ball.speedY = deltaY * 0.35;
@@ -154,9 +154,9 @@ export class Game {
     }
 
     private checkScore(ball: Ball, gamePosition: GamePosition) {
-        var winnerData: PlayerPosition;
-        var loserData: PlayerPosition;
-        var gameOver;
+        let winnerData: PlayerPosition;
+        let loserData: PlayerPosition;
+        let gameOver;
         if (gamePosition.player1.score >= WIN_CONDITION) {
             gameOver = true;
             winnerData = gamePosition.player1;
