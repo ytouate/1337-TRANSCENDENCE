@@ -9,9 +9,16 @@ services:
       - .env
     networks:
       - game
-
-
+    volumes:
+      - game_db:/var/lib/postgresql/data
 
 networks:
   game:
-      
+
+volumes:
+  game_db:
+    driver: local
+    driver_opts:
+      type: none
+      device: /Users/mohamedkorchi/data/gamedb
+      o: bind
