@@ -47,9 +47,11 @@ const Achievements = () => {
       </div>
   </div>);
 };
+
 const ToBeDone = () => {
   return <div className="tobedone"></div>;
 };
+
 export default function Profile() {
   return (
     <section className="profile">

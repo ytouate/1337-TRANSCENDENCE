@@ -14,6 +14,12 @@ export default function FriendsList() {
         <FriendCard />
         <FriendCard />
         <FriendCard />
+        <FriendCard />
+        <FriendCard />
+        <FriendCard />
+        <FriendCard />
+        <FriendCard />
+        <FriendCard />
       </div>
     </div>
   );

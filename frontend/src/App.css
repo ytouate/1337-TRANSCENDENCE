@@ -8,8 +8,7 @@ body {
 
 .page {
     max-width: 2000px;
-    height: calc(100% - 120px);
-    margin: auto;
+    height: calc(100% - 100px);
 }
 
 .signin-page {

@@ -83,6 +83,22 @@ function LeaderBoard(props) {
               </td>
               <td className="leaderboard-rate">54%</td>
             </tr>
+            <tr>
+              <td className="leaderboard-rank">3</td>
+              <td className="leaderboard-user">
+                <img src={ytouate} alt="" />
+                <p>ytouate</p>
+              </td>
+              <td className="leaderboard-rate">54%</td>
+            </tr>
+            <tr>
+              <td className="leaderboard-rank">3</td>
+              <td className="leaderboard-user">
+                <img src={ytouate} alt="" />
+                <p>ytouate</p>
+              </td>
+              <td className="leaderboard-rate">54%</td>
+            </tr>
           </tbody>
         </table>
       </div>
