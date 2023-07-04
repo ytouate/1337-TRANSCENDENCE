@@ -118,6 +118,7 @@ input[type='file']:hover {
     background-color: #f6f3eb;
     padding: 20px;
     gap: 50px;
+    border-radius: 15px;
 }
 
 .name-field {
@@ -132,7 +133,7 @@ input[type='file']:hover {
 
 .change-name-btn {
     display: flex;
-    padding: 10px;
+    padding: 10px 20px;
     justify-content: center;
     white-space: nowrap;
     text-align: center;
@@ -145,6 +146,9 @@ input[type='file']:hover {
     color: white;
     transition: border-color 0.25s;
     margin: auto;
+}
+.change-name-btn:hover {
+    background-color: #332c77;
 }
 
 @media only screen and (max-width: 1200px) {

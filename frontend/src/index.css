@@ -46,8 +46,8 @@ select {
     padding: 0;
 }
 
-@media (max-width: 767px) {
+/* @media (max-width: 767px) {
     body {
       display: none;
     }
-  }
+  } */
