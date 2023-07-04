@@ -9,11 +9,12 @@
     align-items: center;
 }
 
-
 .settings-delete-avatar {
     padding: 20px;
     width: 50%;
+    min-width: 400px;
     color: white;
+    
     background-color: #f6f3eb;
     border-radius: 15px;
     display: flex;
@@ -31,8 +32,8 @@
     border-radius: 8px;
     border: 1px solid transparent;
     padding: 0.6em 1.2em;
-    font-size: 0.9em;
-    font-weight: 500;
+    font-size: 0.8em;
+    font-weight: 600;
     font-family: inherit;
     background-color: var(--cards-color);
     cursor: pointer;
@@ -50,14 +51,46 @@
     outline: 4px auto -webkit-focus-ring-color;
 }
 
-.settings--update-avatar {
-    border-radius: 15px;
+.settings-update-wrapper {
     width: 50%;
+    min-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.settings--header img {
+    width: 20px;
+}
+
+.settings--header {
+    display: flex;
+    gap: 20px;
+    background-color: #f6f3eb;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 15px;
+}
+
+.settings--update-avatar {
+    min-width: 400px;
+    border-radius: 15px;
     padding: 20px;
     background-color: #f6f3eb;
     display: flex;
     align-items: center;
     gap: 50px;
+}
+
+.settings--update-name {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f6f3eb;
+    padding: 20px;
+    gap: 50px;
+    border-radius: 15px;
 }
 
 .settings--avatar {
@@ -109,18 +142,6 @@ input[type='file']:hover {
     width: 100%;
 }
 
-.settings--update-name {
-    width: 50%;
-    background-color: yellowgreen;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #f6f3eb;
-    padding: 20px;
-    gap: 50px;
-    border-radius: 15px;
-}
-
 .name-field {
     color: black;
     font-weight: 600;
@@ -147,6 +168,7 @@ input[type='file']:hover {
     transition: border-color 0.25s;
     margin: auto;
 }
+
 .change-name-btn:hover {
     background-color: #332c77;
 }

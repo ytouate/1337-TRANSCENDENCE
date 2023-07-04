@@ -10,11 +10,11 @@ export default function Stats() {
         <div className="stats--body">
 
             <div className="status-card">
-                30 Game
+                30 Games
             </div>
             <div className="wins-loses-rate">
-                <div className="status-card">25 Win</div>
-                <div className="status-card">5 Loses</div>
+                <div className="status-card">25 Wins</div>
+                <div className="status-card">5 Losses</div>
                 <div className="status-card">80%  rate</div>
             </div>
         </div>
