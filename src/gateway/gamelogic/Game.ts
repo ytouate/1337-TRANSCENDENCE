@@ -24,6 +24,7 @@ export class Game {
     private round: number;
     private gameService: GameService;
     private userService: UserService;
+    // private timestamp: number;
 
     constructor(
         roomId: number,
@@ -58,16 +59,20 @@ export class Game {
 
         const room = String(this.roomId);
 
+        let timestamp = performance.now();
         const interval = setInterval(() => {
+            const now = performance.now();
+            const deltaTime = (now - timestamp) / 1000; // Convert to seconds
+            timestamp = now;
             server.to(room).emit('game_update', {
                 ball,
                 gamePosition: this.gamePosition,
             });
 
-            ball.x += ball.speedX;
-            ball.y += ball.speedY;
+            ball.x += ball.speedX * deltaTime;
+            ball.y += ball.speedY * deltaTime;
 
-            let { reset } = this.gameLogic(ball, this.gamePosition);
+            let { reset } = this.gameLogic(ball, this.gamePosition, deltaTime);
 
             if (reset) {
                 let { winnerData, loserData, gameOver } =
@@ -90,7 +95,7 @@ export class Game {
         }, 1000 / 60);
     }
 
-    private gameLogic(ball: Ball, gamePosition: GamePosition) {
+    private gameLogic(ball: Ball, gamePosition: GamePosition, deltaTime: number) {
         let reset = false;
         const { player1, player2 } = gamePosition;
 
@@ -100,13 +105,13 @@ export class Game {
                 ball.y < player1.y + PADDLE_HEIGHT
             ) {
                 if (!this.ballHit) {
-                    ball.speedX *= 2;
+                    ball.speedX *= 2 * deltaTime;
                 }
                 ball.speedX *= -1;
                 let deltaY =
                     ball.y -
                     (player1.y + PADDLE_HEIGHT / 2);
-                ball.speedY = deltaY * 0.35;
+                ball.speedY = deltaY * 0.35 * deltaTime;
                 this.ballHit = true;
             } else if (ball.x < 0) {
                 player2.score++;
