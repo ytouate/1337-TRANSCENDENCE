@@ -1,6 +1,6 @@
 import './GameOption.css';
 
-function GameOptions(props) {
+function GameOption(props) {
     return (
         <div className="card">
             <div className="circle"></div>
@@ -13,4 +13,4 @@ function GameOptions(props) {
     );
 }
 
-export default GameOptions;
+export default GameOption;

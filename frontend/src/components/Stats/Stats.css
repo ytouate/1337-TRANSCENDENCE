@@ -1,0 +1,62 @@
+.stats {
+    height: 100%;
+    justify-content: center;
+    width: 100%;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    border-radius: 15px;
+}
+
+.stats--header {
+    padding: 12px 20px;
+    border-radius: 10px;
+    color: black;
+    font-weight: bold;
+    letter-spacing: 1px;
+    font-size: 14px;
+    font-family: Michroma;
+    background-color: #f6f3eb;
+    width: 100%;
+    display: flex;
+    gap: 20px;
+}
+
+.stats--header img {
+    width: 20px;
+}
+
+.stats--body {
+    background-color: #f6f3eb;
+    border-radius: 10px;
+    padding: 20px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    justify-content: center;
+
+}
+
+.span {
+    color: #28235c;
+    font-size: 20px;
+    text-transform: uppercase;
+}
+
+.status-card {
+    background-color: #28235c;
+    padding: 10px;
+    border-radius: 15px;
+    text-align: center;
+    font-weight: 600;
+
+}
+
+.wins-loses-rate {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}

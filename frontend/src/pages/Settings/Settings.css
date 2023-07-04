@@ -1,0 +1,157 @@
+.settings {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.settings-delete-avatar {
+    padding: 20px;
+    width: 50%;
+    color: white;
+    background-color: #f6f3eb;
+    border-radius: 15px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.settings-btn {
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    white-space: nowrap;
+    text-align: center;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    padding: 0.6em 1.2em;
+    font-size: 0.9em;
+    font-weight: 500;
+    font-family: inherit;
+    background-color: var(--cards-color);
+    cursor: pointer;
+    color: white;
+    transition: border-color 0.25s;
+    margin: auto;
+}
+
+.settings-btn:hover {
+    border-color: #646cff;
+}
+
+.settings-btn:focus,
+.settings-btn:focus-visible {
+    outline: 4px auto -webkit-focus-ring-color;
+}
+
+.settings--update-avatar {
+    border-radius: 15px;
+    width: 50%;
+    padding: 20px;
+    background-color: #f6f3eb;
+    display: flex;
+    align-items: center;
+    gap: 50px;
+}
+
+.settings--avatar {
+    width: 150px;
+    border-radius: 50%;
+}
+
+.upload-btn {
+    display: flex;
+    padding: 15px 30px;
+    justify-content: center;
+    white-space: nowrap;
+    text-align: center;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    font-weight: 600;
+    font-family: inherit;
+    background-color: var(--cards-color);
+    cursor: pointer;
+    color: white;
+    transition: border-color 0.25s;
+    margin: auto;
+}
+
+.upload-btn:hover {
+    border-color: #646cff;
+}
+
+.upload-btn:focus,
+.upload-btn:focus-visible {
+    outline: 4px auto -webkit-focus-ring-color;
+}
+
+input[type='file'] {
+    background-color: #28235c;
+    color: white;
+    font-weight: 600;
+    padding-bottom: 10px;
+    border-radius: 15px;
+    width: 100%;
+}
+
+input[type='file']:hover {
+    background-color: #28235c;
+    color: white;
+    font-weight: 600;
+    padding-bottom: 10px;
+    border-radius: 15px;
+    width: 100%;
+}
+
+.settings--update-name {
+    width: 50%;
+    background-color: yellowgreen;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f6f3eb;
+    padding: 20px;
+    gap: 50px;
+}
+
+.name-field {
+    color: black;
+    font-weight: 600;
+    padding: 10px;
+    border-radius: 15px;
+    border: 1px solid black;
+    width: 100%;
+
+}
+
+.change-name-btn {
+    display: flex;
+    padding: 10px;
+    justify-content: center;
+    white-space: nowrap;
+    text-align: center;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    font-weight: 600;
+    font-family: inherit;
+    background-color: var(--cards-color);
+    cursor: pointer;
+    color: white;
+    transition: border-color 0.25s;
+    margin: auto;
+}
+
+@media only screen and (max-width: 1200px) {
+    .settings--update-avatar {
+        flex-direction: column;
+    }
+    .upload-btn {
+        width: 100%;
+    }
+}

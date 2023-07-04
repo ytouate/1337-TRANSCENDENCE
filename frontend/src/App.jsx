@@ -4,6 +4,8 @@ import "./index.css";
 import Navbar from "./components/Navbar/Navbar";
 import { authContext } from "./context/authContext.jsx";
 import Home from "./pages/Home/Home";
+import Settings from './pages/Settings/Settings'
+
 import NotFound from "./components/NotFound";
 import Cookies from "js-cookie";
 import { useEffect, useState, createContext } from "react";
@@ -26,6 +28,7 @@ const router = createBrowserRouter(
       <Route index element={<Home />} />
       <Route path="profile" element={<Profile />} />
       <Route path="signin" element={<SignIn />} />
+      <Route path="settings" element={< Settings />} />
     </Route>
   )
 );

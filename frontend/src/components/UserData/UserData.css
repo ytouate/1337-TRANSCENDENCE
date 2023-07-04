@@ -1,0 +1,40 @@
+.profile--userdata {
+    background-color: #f6f3eb;
+    border-radius: 15px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+        rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+}
+
+.profile--userdata-img {
+    height: 120px;
+    border-radius: 50%;
+}
+
+.profile--userdata-name {
+    font-weight: bold;
+    font-size: 20px;
+    letter-spacing: 1px;
+}
+
+.settings-button {
+    height: 40px;
+    width: 150px;
+    outline: none;
+    border: none;
+    background-color: #28235c;
+    color: white;
+    font-weight: 500;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.settings-button:hover {
+    background-color: #3a338d;
+    transition: background-color 1s ease;
+}
