@@ -9,27 +9,12 @@
     gap: 50px;
 }
 
-ul {
-    list-style: none;
-    /* width: 100%; */
-}
-li {
-    width: 100%;
-}
 
 .options {
     display: flex;
     gap: 50px;
 }
 
-@media only screen and (max-width: 1100px) {
-    .home {
-        grid-template-columns: 1fr;
-        grid-template-rows: 1fr 1fr 1fr;
-        justify-content: center;
-        align-items: center;
-    }
-}
 
 .home {
   height: 100%;
@@ -48,4 +33,13 @@ li {
   height: 100%;
   width: 100%;
   padding: 10px;
+}
+
+@media only screen and (max-width: 1100px) {
+  .home {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    justify-content: center;
+    align-items: center;
+  }
 }

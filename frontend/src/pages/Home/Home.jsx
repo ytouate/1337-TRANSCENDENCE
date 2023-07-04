@@ -4,22 +4,9 @@ import matchmakingImg from "../../assets/matchmaking_img.jpg";
 import againstAi from "../../assets/against_ai.jpg";
 import background from "../../assets/background_3.jpg";
 import LeaderBoardCard from "../../components/LeaderBoard/LeaderBoard";
-import FrinedsList from "../../components/FriendsList/FriendsList";
+import ActiveFriends from "../../components/ActiveFriends/ActiveFriends";
 import "./Home.css";
 
-// <section className="home">
-//   <div className="game-options">
-//     <p className="home-text">
-//       LET'S GET THE <br /> GAME BEGIN
-//     </p>
-//     <div className="options">
-//       <GameOption img={againstFriendsImg} title={"Matchmaking"} />
-//       <GameOption img={againstAi} title={"Play Against AI"} />
-//     </div>
-//   </div>
-//   <FrinedsList />
-//   <LeaderBoardCard />
-// </section>
 function Home() {
   return (
     <div className="home">
@@ -35,7 +22,7 @@ function Home() {
         </div>
       </div>
       <div className="home--center">
-        <FrinedsList />
+        <ActiveFriends />
       </div>
       <div className="home--right">
         <LeaderBoardCard />

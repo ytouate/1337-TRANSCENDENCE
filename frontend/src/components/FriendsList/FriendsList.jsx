@@ -5,7 +5,7 @@ import ytouate from "../../assets/ytouate.jpeg";
 
 export default function FriendsList() {
   return (
-    <div className="friends-group">
+    <div className="friends-wrapper">
       <SearchBar />
       <div className="users">
         <FriendCard />
