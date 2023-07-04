@@ -1,4 +1,4 @@
-import SearchBar from "../SearchBar";
+import SearchBar from "../SearchBar/SearchBar";
 import "./FriendsList.css";
 import FriendCard from "../FriendCard/FriendCard";
 import ytouate from "../../assets/ytouate.jpeg";

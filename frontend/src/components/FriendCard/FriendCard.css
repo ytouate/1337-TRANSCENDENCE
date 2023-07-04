@@ -5,6 +5,7 @@
   color: white;
   font-weight: 500;
   width: 100%;
+  max-width: 400px;
   display: flex;
   justify-content: space-between;
   border-radius: 15px;

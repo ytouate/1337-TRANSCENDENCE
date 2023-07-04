@@ -7,8 +7,10 @@ body {
 }
 
 .page {
-    max-width: 2000px;
+    margin: auto;
+    max-width: 2500px;
     height: calc(100% - 100px);
+    vertical-align: center;
 }
 
 .signin-page {
@@ -34,6 +36,7 @@ body {
     font-size: 26px;
     margin: 50px 50px 10px 50px;
 }
+
 .signin-page > a {
     width: 100%;
     margin: 0 auto;
@@ -53,18 +56,18 @@ body {
     background-color: var(--cards-color);
     outline: none;
 }
+
 .active {
     border-bottom: 2px solid black;
 }
+
 .signin-page > a > button:hover {
     transform: scale(1.01);
     background-color: #3d3964;
     color: white;
     transition: background-color 0.5s ease-in-out;
 }
-/*
-    styling the nav bar
-*/
+
 
 
 .not-found {
@@ -809,14 +812,15 @@ input[type="file"]::file-selector-button:hover {
     }
 } */
 
-.group {
+/* .group {
     display: flex;
-    line-height: 28px;
     align-items: center;
-    position: relative;
-    max-width: 390px;
-    border-radius: 5px;
-    border: 1px solid gray;
+    line-height: 28px;
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+    border-radius: 8px;
+    border: 3px solid #28235c;
     box-shadow: 4px 4px 8px gray;
 }
 
@@ -845,15 +849,15 @@ input:hover {
     border: none;
     background-color: #fff;
     box-shadow: 0 0 0 4px #4e4c69;
-}
+} */
 
-.icon {
-    position: absolute;
+/* .icon {
+    position: relative;
     left: 1rem;
     fill: #9e9ea7;
     width: 1rem;
     height: 1rem;
-}
+} */
 
 /* @media only screen and (max-width: 1300px) {
 

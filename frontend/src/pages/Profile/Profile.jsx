@@ -4,6 +4,7 @@ import historyIcon from "../../assets/history-icon.svg";
 import FriendList from "../../components/FriendsList/FriendsList";
 import ytouate from "../../assets/ytouate.jpeg";
 import trophiesIcon from '../../assets/trophies.svg'
+import statsIcon from '../../assets/stats.svg'
 
 const UserData = () => {
   return (
@@ -38,18 +39,36 @@ const History = () => {
 
 const Achievements = () => {
   return (<div className="profile--achievements">
-      <div className="profile--achievements-header">
-        <img src={trophiesIcon} alt="" />
-        <p>Achievements</p>
-      </div>
-      <div className="profile--achievements-body">
-
-      </div>
+    <div className="profile--achievements-header">
+      <img src={trophiesIcon} alt="" />
+      <p>Achievements</p>
+    </div>
+    <div className="profile--achievements-body">
+      <p>You have no achievements
+        <p className="span"> go conquer</p>
+      </p>
+    </div>
   </div>);
 };
 
 const ToBeDone = () => {
-  return <div className="tobedone"></div>;
+  return <div className="stats">
+    <div className="stats--header">
+      <img src={statsIcon} alt="" />
+      <p>Stats</p>
+    </div>
+    <div className="stats--body">
+
+      <div className="status-card">
+        30 Game
+      </div>
+      <div className="wins-loses-rate">
+        <div className="status-card">25 Win</div>
+        <div className="status-card">5 Loses</div>
+        <div className="status-card">80%  rate</div>
+      </div>
+    </div>
+  </div>;
 };
 
 export default function Profile() {
