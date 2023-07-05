@@ -14,7 +14,6 @@
     width: 50%;
     min-width: 400px;
     color: white;
-
     background-color: #f6f3eb;
     border-radius: 15px;
     display: flex;
@@ -83,6 +82,18 @@
     gap: 50px;
 }
 
+.settings--update-avatar-user-data {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    justify-content: center;
+}
+.settings--update-avatar-user-data p {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
 .settings--update-name {
     display: flex;
     justify-content: center;
