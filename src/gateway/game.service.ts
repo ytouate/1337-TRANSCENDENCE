@@ -196,9 +196,9 @@ export class GameGateWay
         const gamePositions = this.gamePlayerPosition.get(gameId);
         if (gamePositions) {
             if (userId == gamePositions.player1.id) {
-                gamePositions.player1.y = y;
+                gamePositions.player1.y = y * BOARD_HEIGHT;
             } else if (userId == gamePositions.player2.id) {
-                gamePositions.player2.y = y;
+                gamePositions.player2.y = y * BOARD_HEIGHT;
             }
             // const roomId = String(gameId);
             // client.broadcast.to(roomId).emit('opponent_mousemove', { y });

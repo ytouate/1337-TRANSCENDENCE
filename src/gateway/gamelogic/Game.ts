@@ -20,11 +20,9 @@ export class Game {
     private socket2: Socket;
     private gamePosition: GamePosition;
     private timeStart: Date;
-    private ballHit: boolean;
     private round: number;
     private gameService: GameService;
     private userService: UserService;
-    // private timestamp: number;
 
     constructor(
         roomId: number,
@@ -40,7 +38,6 @@ export class Game {
         this.socket2 = socket2;
         this.gamePosition = gamePosition;
         this.timeStart = timeStart;
-        this.ballHit = false;
         this.round = 0;
         this.gameService = gameService;
         this.userService = userService;
@@ -59,20 +56,34 @@ export class Game {
 
         const room = String(this.roomId);
 
-        let timestamp = performance.now();
         const interval = setInterval(() => {
-            const now = performance.now();
-            const deltaTime = (now - timestamp) / 1000; // Convert to seconds
-            timestamp = now;
             server.to(room).emit('game_update', {
-                ball,
-                gamePosition: this.gamePosition,
+                ball: {
+                    x: ball.x / BOARD_WIDTH,
+                    y: ball.y / BOARD_HEIGHT,
+                    speedX: ball.speedX / BOARD_WIDTH,
+                    speedY: ball.speedY / BOARD_HEIGHT,
+                },
+                gamePosition: {
+                    player1: {
+                        id: this.gamePosition.player1.id,
+                        y: this.gamePosition.player1.y / BOARD_HEIGHT,
+                        username: this.gamePosition.player1.username,
+                        score: this.gamePosition.player1.score,
+                    },
+                    player2: {
+                        id: this.gamePosition.player2.id,
+                        y: this.gamePosition.player2.y / BOARD_HEIGHT,
+                        username: this.gamePosition.player2.username,
+                        score: this.gamePosition.player2.score,
+                    },
+                },
             });
 
-            ball.x += ball.speedX * deltaTime;
-            ball.y += ball.speedY * deltaTime;
+            ball.x += ball.speedX;
+            ball.y += ball.speedY;
 
-            let { reset } = this.gameLogic(ball, this.gamePosition, deltaTime);
+            let { reset } = this.gameLogic(ball, this.gamePosition);
 
             if (reset) {
                 let { winnerData, loserData, gameOver } =
@@ -95,51 +106,43 @@ export class Game {
         }, 1000 / 60);
     }
 
-    private gameLogic(ball: Ball, gamePosition: GamePosition, deltaTime: number) {
+    private gameLogic(ball: Ball, gamePosition: GamePosition) {
         let reset = false;
         const { player1, player2 } = gamePosition;
 
-        if (ball.x < PADDLE_MARGIN + BALL_SIZE + PADDLE_WIDTH) {
-            if (
-                ball.y > player1.y &&
-                ball.y < player1.y + PADDLE_HEIGHT
-            ) {
-                if (!this.ballHit) {
-                    ball.speedX *= 2 * deltaTime;
-                }
-                ball.speedX *= -1;
-                let deltaY =
-                    ball.y -
-                    (player1.y + PADDLE_HEIGHT / 2);
-                ball.speedY = deltaY * 0.35 * deltaTime;
-                this.ballHit = true;
-            } else if (ball.x < 0) {
+        if (ball.x <= PADDLE_MARGIN + BALL_SIZE + PADDLE_WIDTH) {
+            if (ball.x < 0) {
                 player2.score++;
                 reset = true;
-            }
-        } else if (
-            ball.x >
-            BOARD_WIDTH - BALL_SIZE - PADDLE_WIDTH - PADDLE_MARGIN
-        ) {
-            if (
-                ball.y > player2.y &&
-                ball.y < player2.y + PADDLE_HEIGHT
+            } else if (
+                ball.y + BALL_SIZE >= player1.y &&
+                ball.y - BALL_SIZE <= player1.y + PADDLE_HEIGHT
             ) {
                 ball.speedX *= -1;
-                if (!this.ballHit) {
-                    ball.speedX *= 2;
-                }
-                let deltaY =
-                    ball.y -
-                    (player2.y + PADDLE_HEIGHT / 2);
+                let deltaY = ball.y - (player1.y + PADDLE_HEIGHT / 2);
                 ball.speedY = deltaY * 0.35;
-                this.ballHit = true;
-            } else if (ball.x > BOARD_WIDTH) {
+            }
+        } else if (
+            ball.x >=
+            BOARD_WIDTH - BALL_SIZE - PADDLE_WIDTH - PADDLE_MARGIN
+        ) {
+            if (ball.x >= BOARD_WIDTH) {
                 player1.score++;
                 reset = true;
+            } else if (
+                ball.y + BALL_SIZE >= player2.y &&
+                ball.y - BALL_SIZE <= player2.y + PADDLE_HEIGHT
+            ) {
+                ball.speedX *= -1;
+
+                let deltaY = ball.y - (player2.y + PADDLE_HEIGHT / 2);
+                ball.speedY = deltaY * 0.35;
             }
         }
-        if (ball.y < 0 || ball.y > BOARD_HEIGHT) {
+        if (
+            ball.y - BALL_SIZE <= 0 ||
+            ball.y + BALL_SIZE >= BOARD_HEIGHT
+        ) {
             ball.speedY *= -1;
         }
         return { reset };
@@ -155,7 +158,6 @@ export class Game {
             ball.speedX = -BALL_SPEED_X;
         }
         ball.speedY = (Math.random() < 0.5 ? -1 : 1) * BALL_SPEED_Y;
-        this.ballHit = false;
     }
 
     private checkScore(ball: Ball, gamePosition: GamePosition) {
