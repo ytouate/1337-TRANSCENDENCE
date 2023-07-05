@@ -8,7 +8,7 @@ body {
 
 .page {
     margin: auto;
-    max-width: 2000px;
+    max-width: 1700px;
     height: calc(100% - 100px);
     vertical-align: center;
 }

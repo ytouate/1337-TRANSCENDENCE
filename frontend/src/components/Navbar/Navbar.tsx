@@ -1,14 +1,14 @@
-import { Link, NavLink } from "react-router-dom";
-import profileImg from "../assets/ytouate.jpeg";
-import logoImg from "../assets/logo.png";
-import { useState } from "react";
-import ProfileHover from "./ProfileHover";
-import ModeToggler from "./ModeToggler";
-import { Outlet } from "react-router-dom";
-import { useEffect } from "react";
-import Cookies from "js-cookie";
+import { Link, NavLink, Outlet } from "react-router-dom";
+import logoImg from "../../assets/logo.png";
+import ModeToggler from "../ModeToggler";
+// import Cookies from "js-cookie";
+import './Navbar.css'
 
-function Nav(props) {
+
+type NavData = {
+    profileImg: string
+}
+function Nav(props : NavData) {
     // let [userData, setUserData] = useState({});
 
     // let token = Cookies.get("Token");
@@ -26,7 +26,6 @@ function Nav(props) {
                     <Link to="/">
                         <img className="logo" src={logoImg} alt="" />
                     </Link>
-                    
                 </div>
                 <ul className="navbar-list">
                     <li>
@@ -47,7 +46,6 @@ function Nav(props) {
                             src={props.profileImg}
                             alt=""
                         />
-                        {/* {profileHovered && <ProfileHover />} */}
                     </li>
                 </ul>
             </nav>

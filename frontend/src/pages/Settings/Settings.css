@@ -14,7 +14,7 @@
     width: 50%;
     min-width: 400px;
     color: white;
-    
+
     background-color: #f6f3eb;
     border-radius: 15px;
     display: flex;
@@ -124,7 +124,7 @@
     outline: 4px auto -webkit-focus-ring-color;
 }
 
-input[type='file'] {
+input[type="file"] {
     background-color: #28235c;
     color: white;
     font-weight: 600;
@@ -133,7 +133,7 @@ input[type='file'] {
     width: 100%;
 }
 
-input[type='file']:hover {
+input[type="file"]:hover {
     background-color: #28235c;
     color: white;
     font-weight: 600;
@@ -149,7 +149,6 @@ input[type='file']:hover {
     border-radius: 15px;
     border: 1px solid black;
     width: 100%;
-
 }
 
 .change-name-btn {

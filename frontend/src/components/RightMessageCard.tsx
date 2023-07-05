@@ -1,6 +1,10 @@
 import img from "../assets/ytouate.jpeg";
 
-function RightMessageCard(props) {
+
+type MessageData = {
+    message: string;
+}
+function RightMessageCard(props: MessageData) {
     return (
         <div className="right-message-card">
             <div className="right-message-card--container">

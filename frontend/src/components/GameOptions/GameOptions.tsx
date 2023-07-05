@@ -1,7 +1,7 @@
 import againstFriendsImg from "../../assets/against_friends_img.jpg";
 import GameOption from '../GameOptionCard/GameOption'
 import againstAi from "../../assets/against_ai.jpg";
-
+import './GameOptions.css'
 export default function () {
     return (
         <div className="game-options">

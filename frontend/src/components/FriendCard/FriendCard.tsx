@@ -1,11 +1,9 @@
 import img from "../../assets/ytouate.jpeg";
 import optionsIcon from "../../assets/options.svg";
-import { enableRipple } from "@syncfusion/ej2-base";
-import { DropDownButtonComponent } from "@syncfusion/ej2-react-splitbuttons";
 import "./FriendCard.css";
 
 function FriendCard() {
-    const isFriend = true;
+    const isFriend = false;
   let items = isFriend ? ['Invite', 'Block', 'Chat'] : ['Add', 'Block']
   const options = items.map(option => {
     return (

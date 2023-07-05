@@ -1,6 +1,6 @@
-import img from '../assets/otmallah.jpeg'
+import img from "../assets/otmallah.jpeg";
 function GroupChat() {
-    return ( 
+    return (
         <div className="groupchat">
             <div className="groupchat-left">
                 <img src={img} alt="" className="groupchat-profile" />
@@ -8,12 +8,10 @@ function GroupChat() {
                 <img src={img} alt="" className="groupchat-profile" />
             </div>
             <div className="groupchat-data">
-                <p className='groupchat-name'>group name</p>
-                <p className='groupchat-lastmessage'>Hello</p>
+                <p className="groupchat-name">group name</p>
+                <p className="groupchat-lastmessage">Hello</p>
             </div>
-            <div className="message-count">
-
-            </div>
+            <div className="message-count"></div>
         </div>
     );
 }

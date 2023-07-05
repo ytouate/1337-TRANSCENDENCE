@@ -1,6 +1,11 @@
 import './GameOption.css';
 
-function GameOption(props) {
+type GameOptionData = {
+    img: string
+    title: string
+}
+
+function GameOption(props: GameOptionData) {
     return (
         <div className="card">
             <div className="circle"></div>
