@@ -51,6 +51,7 @@ a {
 
 .dropdown {
     position: relative;
+    z-index: 1;
 }
 .profile-img-big {
     border-radius: 50%;

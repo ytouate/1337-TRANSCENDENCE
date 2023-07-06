@@ -1,0 +1,64 @@
+.signin {
+    margin: 0;
+    padding: 0;
+    color: white;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.signin-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    width: 50%;
+    max-width: 700px;
+    min-width: 500px;
+    background-color: #f3f3f4;
+    color: black;
+    border-radius: 80px 15px 15px 15px;
+}
+
+.signin-right img {
+    border-radius: 0 15px 15px 100px;
+}
+.signin-left {
+    margin: auto;
+}
+a {
+    padding: 0;
+}
+
+.signin-btn {
+    margin-top: 25px;
+    border: none;
+    padding: 10px 10px;
+    border: 1px solid #3b3587;
+    border-radius: 5px;
+    background-color: var(--cards-color);
+    color: white;
+    font-weight: 500;
+}
+
+@media only screen and (max-width: 600px) {
+    .signin-left h2 {
+        font-size: 18px;
+    }
+
+    .signin-left p {
+        font-size: 13px;
+    }
+
+    .signin-btn {
+        margin-top: 15px;
+    }
+    .signin-wrapper {
+        min-width: 450px;
+    }
+}

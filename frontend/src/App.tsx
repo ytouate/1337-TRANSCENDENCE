@@ -16,7 +16,7 @@ import {
 } from "react-router-dom";
 
 import Profile from "./pages/Profile/Profile.jsx";
-import SignIn from "./components/SignIn.js";
+import SignIn from "./pages/SignIn/SignIn.js";
 import img from "./assets/ytouate.jpeg";
 
 const router = createBrowserRouter(

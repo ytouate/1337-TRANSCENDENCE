@@ -22,7 +22,17 @@
     display: flex;
     gap: 20px;
 }
+@keyframes move-up6 {
+    to {
+        transform: translateY(-10px);
+    }
+}
 
+@keyframes move-down1 {
+    to {
+        transform: translateY(10px);
+    }
+}
 .stats--header img {
     width: 20px;
 }
@@ -37,7 +47,6 @@
     gap: 20px;
     width: 100%;
     justify-content: center;
-
 }
 
 .span {
@@ -52,9 +61,11 @@
     border-radius: 15px;
     text-align: center;
     font-weight: 600;
-
 }
 
+.status-card:hover {
+    transform: scale(1.04) rotate(1deg);
+}
 .wins-loses-rate {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));

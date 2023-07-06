@@ -13,49 +13,7 @@ body {
     vertical-align: center;
 }
 
-.signin-page {
-    width: 60%;
-    max-width: 30%;
-    height: 300px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #f6f3eb;
-    margin: auto auto;
-    border-radius: 15px;
-    box-shadow: 4px 4px gray;
-    font-family: Michroma;
-}
 
-.signin-page > h2 {
-    font-size: 26px;
-    margin: 50px 50px 10px 50px;
-}
-
-.signin-page > a {
-    width: 100%;
-    margin: 0 auto;
-    display: flex;
-    justify-content: center;
-}
-
-.signin-page > a > button {
-    width: 60%;
-    height: 60px;
-    border-radius: 15px;
-    margin-bottom: 20px;
-    cursor: pointer;
-    margin-top: 10px;
-    font-weight: bold;
-    color: white;
-    background-color: var(--cards-color);
-    outline: none;
-}
 
 .active {
     border-bottom: 2px solid black;
