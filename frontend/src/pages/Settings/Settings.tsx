@@ -2,13 +2,26 @@ import "./Settings.css";
 import ytouate from "../../assets/ytouate.jpeg";
 import updateNameIcon from "../../assets/update-name.svg";
 import updateAvatarIcon from "../../assets/update-avatar.svg";
+import { useState } from "react";
+
+
+
+function TwoFA() {
+
+}
 
 export default function () {
+
+    const [clicked, setClicked] = useState(false);
+    function handleClick() {
+        setClicked(!clicked);
+    }
+
     return (
         <div className="settings">
             <div className="settings-delete-avatar">
                 <button className="settings-btn">Delete Avatar</button>
-                <button className="settings-btn">enable 2FA</button>
+                <button onClick={handleClick} className="settings-btn">enable 2FA</button>
             </div>
             <div className="settings-update-wrapper">
                 <div className="settings--header">

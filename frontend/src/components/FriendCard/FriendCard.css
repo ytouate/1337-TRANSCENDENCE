@@ -23,7 +23,7 @@
     position: relative;
 }
 
-a {
+.dropdown-content a {
     display: block;
     color: black;
     padding: 8px 10px;
