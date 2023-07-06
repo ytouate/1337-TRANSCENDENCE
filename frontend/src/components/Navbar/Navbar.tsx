@@ -1,14 +1,15 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
 import logoImg from "../../assets/logo.png";
 import ModeToggler from "../ModeToggler";
-// import Cookies from "js-cookie";
-import './Navbar.css'
 
+// import Cookies from "js-cookie";
+import "./Navbar.css";
+import { useEffect, useRef, useState } from "react";
 
 type NavData = {
-    profileImg: string
-}
-function Nav(props : NavData) {
+    profileImg: string;
+};
+function Nav(props: NavData) {
     // let [userData, setUserData] = useState({});
 
     // let token = Cookies.get("Token");
@@ -19,6 +20,27 @@ function Nav(props : NavData) {
     //         .then((res) => res.json())
     //         .then((data) => setUserData(data));
     // }, [token]);
+    const [isMenuDropDownOpen, setMenuDropDownOpen] = useState(false);
+    const dropdownRef = useRef(null);
+    // Function to close dropdown
+    const closeHoverMenu = () => {
+        setMenuDropDownOpen(!isMenuDropDownOpen);
+    };
+    function handleClickOutside(event) {
+        if (
+            dropdownRef.current &&
+            !dropdownRef.current.contains(event.target)
+        ) {
+            setMenuDropDownOpen(!isMenuDropDownOpen);
+        }
+    }
+    useEffect(() => {
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.addEventListener("mousedown", handleClickOutside);
+        };
+        // document.removeEventListener("mousedown", handleClickOutside);
+    });
     return (
         <>
             <nav className="navbar">
@@ -40,12 +62,40 @@ function Nav(props : NavData) {
                     <li>
                         <ModeToggler />
                     </li>
-                    <li>
+                    <li className="dropdown">
                         <img
-                            className="home-profile-img"
                             src={props.profileImg}
                             alt=""
+                            onClick={closeHoverMenu}
+                            className="home-profile-img"
                         />
+                        {isMenuDropDownOpen && (
+                            <ul
+                                className="profile-dropdown-content"
+                                ref={dropdownRef}
+                            >
+                                <li>
+                                    <Link
+                                        className="profile-dropdown--userdata"
+                                        to="/"
+                                    >
+                                        <img
+                                            src={props.profileImg}
+                                            className="profile-img-big"
+                                            alt=""
+                                        />
+                                        <p>ytouate </p>
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="/settings">Settings</Link>
+                                </li>
+                                <hr />
+                                <li>
+                                    <Link to="/signin">Logout</Link>
+                                </li>
+                            </ul>
+                        )}
                     </li>
                 </ul>
             </nav>

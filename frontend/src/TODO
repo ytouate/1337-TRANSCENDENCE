@@ -1,3 +1,5 @@
 implement the hover drop down on profile which contains { settings and logout }
 set up the ui for the notification
 implement the achievements card
+implement the two factor auth component
+enhance the manage friends card
