@@ -12,3 +12,10 @@
     display: flex;
     gap: 50px;
 }
+
+@media only screen and (max-width: 500px) {
+    .options {
+        display: flex;
+        gap: 20px;
+    }
+}

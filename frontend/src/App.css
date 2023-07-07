@@ -10,7 +10,7 @@ body {
     margin: auto;
     max-width: 1700px;
     height: calc(100% - 100px);
-    vertical-align: center;
+    /* vertical-align: center; */
 }
 
 

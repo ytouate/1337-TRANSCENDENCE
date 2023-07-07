@@ -13,7 +13,7 @@ type NavData = {
 function Nav(props: NavData) {
     let [loggedIn, setLoggedIn] = useContext(authContext);
     let location = useLocation();
-    useEffect(() => setMenuDropDownOpen(false), [location]);
+    useEffect(() => setMenuDropDownOpen(false ), [location]);
     // let [userData, setUserData] = useState({});
 
     // let token = Cookies.get("Token");

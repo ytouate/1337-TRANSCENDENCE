@@ -87,3 +87,17 @@
 .button:focus-visible {
     outline: 4px auto -webkit-focus-ring-color;
 }
+
+@media only screen and (max-width: 400px) {
+    .card {
+        height: 150px;
+        width: 100px;
+    }
+    .button {
+        width: 100%;
+        white-space: nowrap;
+        padding: 5px;
+        font-size: 0.7em;
+        font-weight: 500;
+    }
+}
