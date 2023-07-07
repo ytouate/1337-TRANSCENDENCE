@@ -7,9 +7,14 @@ export default function UserData() {
         <div className="profile--userdata">
             <img className="profile--userdata-img" src={ytouate} alt="" />
             <p className="profile--userdata-name">ytouate</p>
-            <Link to="/settings">
-                <button className="settings-button">Settings</button>
-            </Link>
+            <div className="profile--userdata-buttons">
+                <Link to="/settings">
+                    <button className="settings-button">Settings</button>
+                </Link>
+                <Link to="/signin">
+                    <button className="settings-button logout">Logout</button>
+                </Link>
+            </div>
         </div>
     );
 }

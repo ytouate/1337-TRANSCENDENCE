@@ -16,6 +16,13 @@
     border-radius: 50%;
 }
 
+.profile--userdata-buttons {
+    display: flex;
+    gap: 10px;
+}
+.logout {
+    display: none;
+}
 .profile--userdata-name {
     font-weight: bold;
     font-size: 20px;
@@ -37,4 +44,10 @@
 .settings-button:hover {
     background-color: #3a338d;
     transition: background-color 1s ease;
+}
+
+@media only screen and (max-width: 580px) {
+    .logout {
+        display: block;
+    }
 }
