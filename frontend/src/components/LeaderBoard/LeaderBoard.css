@@ -7,7 +7,7 @@
     gap: 5px;
 }
 
-.leaderboard--header img {
+.leaderboard--header > img {
     width: 20px;
 }
 

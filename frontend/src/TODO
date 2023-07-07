@@ -1,6 +1,5 @@
 set up the ui for the notification
 implement the achievements card
 implement the two factor auth component
-implement the sign in page
 implement the protected routes
 implement the search functionality
