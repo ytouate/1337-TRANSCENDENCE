@@ -30,6 +30,7 @@ export class UserService {
             },
         });
 
+        // or can just return win + loss
         const gamesPlayed = await this.prisma.game.count({
             where: {
                 players: {

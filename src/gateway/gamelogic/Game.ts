@@ -9,6 +9,8 @@ import {
     PADDLE_WIDTH,
     PADDLE_HEIGHT,
     PADDLE_MARGIN,
+    INITIAL_VELOCITY,
+    VELOCITY_INCREASE,
 } from './constants';
 import { PlayerPosition, GamePosition, Ball } from './interfaces';
 import { GameService } from 'src/game/game.service';
@@ -23,6 +25,7 @@ export class Game {
     private round: number;
     private gameService: GameService;
     private userService: UserService;
+    private velocity: number;
 
     constructor(
         roomId: number,
@@ -41,6 +44,7 @@ export class Game {
         this.round = 0;
         this.gameService = gameService;
         this.userService = userService;
+        this.velocity = INITIAL_VELOCITY;
     }
 
     public startGameLoop(
@@ -56,13 +60,21 @@ export class Game {
 
         const room = String(this.roomId);
 
+        let last = performance.now();
         const interval = setInterval(() => {
+            const now = performance.now();
+            const delta = now - last;
+            last = now;
             server.to(room).emit('game_update', {
                 ball: {
                     x: ball.x / BOARD_WIDTH,
                     y: ball.y / BOARD_HEIGHT,
-                    speedX: ball.speedX / BOARD_WIDTH,
-                    speedY: ball.speedY / BOARD_HEIGHT,
+                    speedX:
+                        (ball.speedX * this.velocity * delta) /
+                        BOARD_WIDTH,
+                    speedY:
+                        (ball.speedY * this.velocity * delta) /
+                        BOARD_HEIGHT,
                 },
                 gamePosition: {
                     player1: {
@@ -80,12 +92,18 @@ export class Game {
                 },
             });
 
-            ball.x += ball.speedX;
-            ball.y += ball.speedY;
+            ball.x += ball.speedX * this.velocity * delta;
+            ball.y += ball.speedY * this.velocity * delta;
+            this.velocity += VELOCITY_INCREASE * delta;
 
-            let { reset } = this.gameLogic(ball, this.gamePosition);
+            let { reset } = this.gameLogic(
+                ball,
+                this.gamePosition,
+                delta,
+            );
 
             if (reset) {
+                this.velocity = INITIAL_VELOCITY;
                 let { winnerData, loserData, gameOver } =
                     this.checkScore(ball, this.gamePosition);
 
@@ -106,7 +124,11 @@ export class Game {
         }, 1000 / 60);
     }
 
-    private gameLogic(ball: Ball, gamePosition: GamePosition) {
+    private gameLogic(
+        ball: Ball,
+        gamePosition: GamePosition,
+        delta: number,
+    ) {
         let reset = false;
         const { player1, player2 } = gamePosition;
 
@@ -120,7 +142,7 @@ export class Game {
             ) {
                 ball.speedX *= -1;
                 let deltaY = ball.y - (player1.y + PADDLE_HEIGHT / 2);
-                ball.speedY = deltaY * 0.35;
+                ball.speedY = deltaY * 0.25;
             }
         } else if (
             ball.x >=
@@ -136,7 +158,7 @@ export class Game {
                 ball.speedX *= -1;
 
                 let deltaY = ball.y - (player2.y + PADDLE_HEIGHT / 2);
-                ball.speedY = deltaY * 0.35;
+                ball.speedY = deltaY * 0.25;
             }
         }
         if (
@@ -176,15 +198,6 @@ export class Game {
         }
         return { gameOver, winnerData, loserData };
     }
-
-    // private async updateGameScore(
-    //     prisma: PrismaService,
-    //     id: number,
-    //     score1: number,
-    //     score2: number,
-    // ) {
-
-    // }
 
     private async updateGameEnd(winnerId: number, loserId: number) {
         const durationInSeconds = Math.floor(
