@@ -172,7 +172,7 @@ export class Game {
             ball.speedY *= -1;
             ball.y += 10;
         }
-        else if (ball.y > BOARD_HEIGHT) {
+        else if (ball.y + BALL_SIZE > BOARD_HEIGHT) {
             ball.speedY *= -1;
             ball.y -= 10;
         }

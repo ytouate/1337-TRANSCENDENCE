@@ -12,7 +12,7 @@ export const PADDLE_WIDTH_RATIO = 0.01;
 export const PADDLE_HEIGHT_RATIO = 0.1;
 export const BALL_SIZE_RATIO = 0.025;
 
-export const INITIAL_VELOCITY = 0.025;
+export const INITIAL_VELOCITY = 0.035;
 export const VELOCITY_INCREASE = 0.000005;
 
 export const PADDLE_MARGIN = BOARD_WIDTH * PADDLE_MARGIN_RATIO;
