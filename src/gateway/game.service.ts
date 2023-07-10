@@ -9,7 +9,11 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { BOARD_HEIGHT, PADDLE_HEIGHT } from './gamelogic/constants';
-import { UserData, GamePosition } from './gamelogic/interfaces';
+import {
+    UserData,
+    GamePosition,
+    PlayerPosition,
+} from './gamelogic/interfaces';
 import { Game } from './gamelogic/Game';
 import { UserService } from 'src/user/user.service';
 import { GameService } from 'src/game/game.service';
@@ -141,7 +145,7 @@ export class GameGateWay
         userData1.socket.emit(event_name, {
             gameId: game.id,
             opponent: userData2.username,
-            pos: 'left',
+            order: 0,
             pref: pref1,
             pref2: pref2,
         });
@@ -149,25 +153,27 @@ export class GameGateWay
         userData2.socket.emit(event_name, {
             gameId: game.id,
             opponent: userData1.username,
-            pos: 'right',
+            order: 1,
             pref: pref2,
             pref2: pref1,
         });
 
-        this.gamePlayerPosition.set(game.id, {
-            player1: {
-                id: userData1.id,
-                username: userData1.username,
-                y: BOARD_HEIGHT / 2 - PADDLE_HEIGHT / 2,
-                score: 0,
-            },
-            player2: {
-                id: userData2.id,
-                username: userData2.username,
-                y: BOARD_HEIGHT / 2 - PADDLE_HEIGHT / 2,
-                score: 0,
-            },
-        });
+        const players: PlayerPosition[] = new Array(2);
+
+        players[0] = {
+            id: userData1.id,
+            username: userData1.username,
+            y: BOARD_HEIGHT / 2 - PADDLE_HEIGHT / 2,
+            score: 0,
+        };
+        player1[1] = {
+            id: userData2.id,
+            username: userData2.username,
+            y: BOARD_HEIGHT / 2 - PADDLE_HEIGHT / 2,
+            score: 0,
+        };
+
+        this.gamePlayerPosition.set(game.id, { players });
 
         const gamePosition = this.gamePlayerPosition.get(game.id);
 
@@ -191,17 +197,14 @@ export class GameGateWay
         @MessageBody() body: any,
         @ConnectedSocket() client: Socket,
     ) {
-        const { y, gameId, userId } = body;
+        const { y, gameId, userId, order } = body;
 
         const gamePositions = this.gamePlayerPosition.get(gameId);
         if (gamePositions) {
-            if (userId == gamePositions.player1.id) {
-                gamePositions.player1.y = y * BOARD_HEIGHT;
-            } else if (userId == gamePositions.player2.id) {
-                gamePositions.player2.y = y * BOARD_HEIGHT;
-            }
-            // const roomId = String(gameId);
-            // client.broadcast.to(roomId).emit('opponent_mousemove', { y });
+            
+            gamePositions.players[order].y = y * BOARD_HEIGHT;
+            const roomId = String(gameId);
+            client.broadcast.to(roomId).emit('opponent_mousemove', { y });
         }
     }
 

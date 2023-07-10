@@ -65,6 +65,21 @@ export class Game {
             const now = performance.now();
             const delta = now - last;
             last = now;
+
+            const players: PlayerPosition[] = new Array(2);
+
+            players[0] = {
+                id: this.gamePosition.players[0].id,
+                y: this.gamePosition.players[0].y / BOARD_HEIGHT,
+                username: this.gamePosition.players[0].username,
+                score: this.gamePosition.players[0].score,
+            };
+            players[1] = {
+                id: this.gamePosition.players[1].id,
+                y: this.gamePosition.players[1].y / BOARD_HEIGHT,
+                username: this.gamePosition.players[1].username,
+                score: this.gamePosition.players[1].score,
+            };
             server.to(room).emit('game_update', {
                 ball: {
                     x: ball.x / BOARD_WIDTH,
@@ -77,18 +92,8 @@ export class Game {
                         BOARD_HEIGHT,
                 },
                 gamePosition: {
-                    player1: {
-                        id: this.gamePosition.player1.id,
-                        y: this.gamePosition.player1.y / BOARD_HEIGHT,
-                        username: this.gamePosition.player1.username,
-                        score: this.gamePosition.player1.score,
-                    },
-                    player2: {
-                        id: this.gamePosition.player2.id,
-                        y: this.gamePosition.player2.y / BOARD_HEIGHT,
-                        username: this.gamePosition.player2.username,
-                        score: this.gamePosition.player2.score,
-                    },
+                    player1: players[0],
+                    player2: players[1],
                 },
             });
 
@@ -130,18 +135,19 @@ export class Game {
         delta: number,
     ) {
         let reset = false;
-        const { player1, player2 } = gamePosition;
+        const { players } = gamePosition;
 
         if (ball.x <= PADDLE_MARGIN + BALL_SIZE + PADDLE_WIDTH) {
             if (ball.x < 0) {
-                player2.score++;
+                players[1].score++;
                 reset = true;
             } else if (
-                ball.y + BALL_SIZE >= player1.y &&
-                ball.y - BALL_SIZE <= player1.y + PADDLE_HEIGHT
+                ball.y + BALL_SIZE >= players[0].y &&
+                ball.y - BALL_SIZE <= players[0].y + PADDLE_HEIGHT
             ) {
                 ball.speedX *= -1;
-                let deltaY = ball.y - (player1.y + PADDLE_HEIGHT / 2);
+                let deltaY =
+                    ball.y - (players[0].y + PADDLE_HEIGHT / 2);
                 ball.speedY = deltaY * 0.25;
             }
         } else if (
@@ -149,15 +155,16 @@ export class Game {
             BOARD_WIDTH - BALL_SIZE - PADDLE_WIDTH - PADDLE_MARGIN
         ) {
             if (ball.x >= BOARD_WIDTH) {
-                player1.score++;
+                players[0].score++;
                 reset = true;
             } else if (
-                ball.y + BALL_SIZE >= player2.y &&
-                ball.y - BALL_SIZE <= player2.y + PADDLE_HEIGHT
+                ball.y + BALL_SIZE >= players[1].y &&
+                ball.y - BALL_SIZE <= players[1].y + PADDLE_HEIGHT
             ) {
                 ball.speedX *= -1;
 
-                let deltaY = ball.y - (player2.y + PADDLE_HEIGHT / 2);
+                let deltaY =
+                    ball.y - (players[1].y + PADDLE_HEIGHT / 2);
                 ball.speedY = deltaY * 0.25;
             }
         }
@@ -186,15 +193,15 @@ export class Game {
         let winnerData: PlayerPosition;
         let loserData: PlayerPosition;
         let gameOver;
-        if (gamePosition.player1.score >= WIN_CONDITION) {
+        if (gamePosition.players[0].score >= WIN_CONDITION) {
             gameOver = true;
-            winnerData = gamePosition.player1;
-            loserData = gamePosition.player2;
+            winnerData = gamePosition.players[0];
+            loserData = gamePosition.players[1];
         }
-        if (gamePosition.player2.score >= WIN_CONDITION) {
+        if (gamePosition.players[1].score >= WIN_CONDITION) {
             gameOver = true;
-            winnerData = gamePosition.player2;
-            loserData = gamePosition.player1;
+            winnerData = gamePosition.players[1];
+            loserData = gamePosition.players[0];
         }
         return { gameOver, winnerData, loserData };
     }
@@ -208,8 +215,8 @@ export class Game {
         try {
             await this.gameService.updateGameEnd(
                 this.roomId,
-                this.gamePosition.player1.score,
-                this.gamePosition.player2.score,
+                this.gamePosition.players[0].score,
+                this.gamePosition.players[1].score,
                 winnerId,
                 durationInSeconds,
             );
