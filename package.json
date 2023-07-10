@@ -7,7 +7,7 @@
     "license": "UNLICENSED",
     "scripts": {
         "prisma:dev:deploy": "prisma migrate deploy",
-        "db:restart": "npm run db:rm && npm run db:up && sleep 1 && npm run prisma:dev:deploy",
+        "db:restart": "npm run db:rm && npm run db:up && sleep 3 && npm run prisma:dev:deploy",
         "db:rm": "docker compose rm game_db -s -f -v",
         "db:up": "docker compose up game_db -d",
         "build": "nest build",
