@@ -168,11 +168,13 @@ export class Game {
                 ball.speedY = deltaY * 0.25;
             }
         }
-        if (
-            ball.y - BALL_SIZE <= 0 ||
-            ball.y + BALL_SIZE >= BOARD_HEIGHT
-        ) {
+        if (ball.y - BALL_SIZE < 0) {
             ball.speedY *= -1;
+            ball.y += 10;
+        }
+        else if (ball.y > BOARD_HEIGHT) {
+            ball.speedY *= -1;
+            ball.y -= 10;
         }
         return { reset };
     }
