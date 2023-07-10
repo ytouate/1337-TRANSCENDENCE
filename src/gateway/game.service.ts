@@ -166,7 +166,7 @@ export class GameGateWay
             y: BOARD_HEIGHT / 2 - PADDLE_HEIGHT / 2,
             score: 0,
         };
-        player1[1] = {
+        players[1] = {
             id: userData2.id,
             username: userData2.username,
             y: BOARD_HEIGHT / 2 - PADDLE_HEIGHT / 2,
