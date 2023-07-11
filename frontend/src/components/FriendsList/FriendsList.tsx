@@ -1,6 +1,5 @@
 import SearchBar from "../SearchBar/SearchBar";
 import { userContext } from "../../context/Context";
-import ytouate from "../../assets/ytouate.jpeg";
 import "./FriendsList.css";
 import { Fragment, useContext } from "react";
 import FriendCard from "../FriendCard/FriendCard";

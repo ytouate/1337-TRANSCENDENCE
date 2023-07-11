@@ -23,7 +23,7 @@ let UserController = class UserController {
         this.user = user;
     }
     async createRoom(Param, req) {
-        const user = await this.user.validateUser(req.user);
+        const user = await this.user.validateUser(req.user, req);
         if (!user)
             return 'u can\'t\ create a room';
         return await this.userService.creatRoom(Param, user);

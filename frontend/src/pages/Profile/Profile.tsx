@@ -4,24 +4,23 @@ import FriendList from "../../components/FriendsList/FriendsList";
 import UserData from "../../components/UserData/UserData";
 import Achievements from "../../components/Achievements/Achievements";
 import Stats from "../../components/Stats/Stats";
-import { useEffect, useState } from "react";
 import { userContext } from "../../context/Context";
 import Cookies from "js-cookie";
+import { useLoaderData } from "react-router-dom";
 
+export async function loader() {
+  const Token = Cookies.get("Token");
+  const options = {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${Token}`,
+    },
+  };
+  const res = await fetch("http://localhost:3000/user", options);
+  return await res.json();
+}
 export default function Profile() {
-  const [user, setUser] = useState(null);
-  useEffect(() => {
-    const Token = Cookies.get("Token");
-    const options = {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${Token}`,
-      },
-    };
-    fetch("http://localhost:3000/user", options)
-      .then((res) => res.json())
-      .then((data) => setUser(data));
-  }, []);
+  const user = useLoaderData();
   return (
     <userContext.Provider value={user}>
       <section className="profile">

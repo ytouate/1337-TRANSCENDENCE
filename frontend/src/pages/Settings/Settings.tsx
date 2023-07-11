@@ -1,21 +1,37 @@
 import "./Settings.css";
-import ytouate from "../../assets/ytouate.jpeg";
 import updateNameIcon from "../../assets/update-name.svg";
 import updateAvatarIcon from "../../assets/update-avatar.svg";
-import { useContext, useState } from "react";
-import { authContext } from "../../context/Context";
-import { Navigate } from "react-router-dom";
-
+import { useState } from "react";
+import Cookies from "js-cookie";
+import { useLoaderData } from "react-router-dom";
+export async function loader() {
+  const Token = Cookies.get("Token");
+  const options = {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${Token}`,
+    },
+  };
+  const res = await fetch("http://localhost:3000/user", options);
+  return await res.json();
+}
 export default function Settings() {
-  const [loggedIn, setLoggedIn] = useContext(authContext);
   const [newName, setNewName] = useState("");
-
-  function deleteAvatar() {
+  const [newAvatar, setNewAvatar] = useState(null);
+  const token = Cookies.get("Token");
+  const user: any = useLoaderData();
+  async function deleteAvatar() {
+    fetch("http://localhost:3000/profile/deletephoto", {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }).then((data) => location.reload());
     // request to the backend endpoint to delete the avatar
     // update the picture with default picture
   }
 
-  function activate2FA(e) {
+  function activate2FA(e: any) {
     e.preventDefault();
     // request the backend to activate 2fa
   }
@@ -25,7 +41,45 @@ export default function Settings() {
     setClicked2fa(!clicked2fa);
   }
 
-  if (!loggedIn) return <Navigate to="/signin" />;
+  function changeAvatar(e: any) {
+    e.preventDefault();
+    const token = Cookies.get("Token");
+    const fd: any = new FormData();
+    fd.append("image", newAvatar);
+    const options = {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // "Content-Type": "multipart/form-data",
+      },
+      body: fd,
+    };
+    // for (const [key, value] of fd){
+    //   console.log(key, value)
+    // }
+    // console.log(fd);
+    fetch("http://localhost:3000/profile/updatephoto", options)
+      .then((res) => res.json())
+      .then((data) => console.log(data));
+  }
+  function changeName() {
+    const token = Cookies.get("Token");
+    const options = {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username: newName }),
+    };
+    fetch("http://localhost:3000/profile/updatename", options)
+      .then((res) => res.json())
+      .then((data) => console.log(data));
+  }
+
+  function updateAvatar(e: any) {
+    setNewAvatar(e.target.value);
+  }
   return (
     <div className="settings">
       <div className="settings-top">
@@ -53,11 +107,19 @@ export default function Settings() {
           <img src={updateAvatarIcon} alt="" />
           <p>update avatar</p>
         </div>
-        <form className="settings--update-avatar">
-          <div className="settings--update-avatar-user-data">
-            <img className="settings--avatar" src={ytouate} alt="" />
-            <p>ytouate</p>
-          </div>
+        <form
+          value={newAvatar}
+          onChange={updateAvatar}
+          onSubmit={changeAvatar}
+          encType="multipart/form-data"
+          className="settings--update-avatar"
+        >
+          {user && (
+            <div className="settings--update-avatar-user-data">
+              <img className="settings--avatar" src={user.urlImage} alt="" />
+              <p>{user.username}</p>
+            </div>
+          )}
           <input type="file" />
           <button className="upload-btn">Upload</button>
         </form>
@@ -74,7 +136,9 @@ export default function Settings() {
             className="name-field"
             type="text"
           />
-          <button className="btn">Change</button>
+          <button onClick={changeName} className="btn">
+            Change
+          </button>
         </form>
       </div>
     </div>

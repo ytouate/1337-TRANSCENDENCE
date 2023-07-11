@@ -1,11 +1,10 @@
 import "./UserData.css";
 import { Link } from "react-router-dom";
 import { userContext } from "../../context/Context";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 
 export default function UserData() {
   const user: any = useContext(userContext);
-
   return (
     <>
       <div className="profile--userdata">

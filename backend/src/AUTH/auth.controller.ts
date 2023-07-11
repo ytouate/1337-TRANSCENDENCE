@@ -36,7 +36,7 @@ export class authController {
     @Get('user')
     @UseGuards(AuthGuard('jwt'))
     async getp(@Req() req) {
-        const user = await this.authservice.validateUser(req.user)
+        const user = await this.authservice.validateUser(req.user, req)
         if (user)
             return user
         return {error: 'user not found', status: 404}
@@ -46,7 +46,7 @@ export class authController {
     @Post('2fa')
     @UseGuards(AuthGuard('jwt'))
     async siginWith2fa(@Req() request , @Body() req: authDto) {
-        const user = await this.authservice.validateUser(request.user)
+        const user = await this.authservice.validateUser(request.user, req)
         if (!user)
             return 'unvalide user'
         const num = await this.authservice.sigin2fa(this.authservice.generateCode(), req.email)
@@ -60,7 +60,7 @@ export class authController {
     @UseGuards(AuthGuard('jwt'))
     async verificationCode(@Body() body, @Req() req) {
         if (this.code == body.code)
-            return await this.authservice.validateUser(req.user)
+            return await this.authservice.validateUser(req.user, req)
         return 'code ghalate'
     }
 
@@ -70,4 +70,5 @@ export class authController {
         console.log(req.headers.authorization)
         return 'delete JWT token from client'
     }
+   
 }

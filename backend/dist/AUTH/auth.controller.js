@@ -32,13 +32,13 @@ let authController = class authController {
         res.redirect('http://localhost:5173');
     }
     async getp(req) {
-        const user = await this.authservice.validateUser(req.user);
+        const user = await this.authservice.validateUser(req.user, req);
         if (user)
             return user;
-        return 'user not found';
+        return { error: 'user not found', status: 404 };
     }
     async siginWith2fa(request, req) {
-        const user = await this.authservice.validateUser(request.user);
+        const user = await this.authservice.validateUser(request.user, req);
         if (!user)
             return 'unvalide user';
         const num = await this.authservice.sigin2fa(this.authservice.generateCode(), req.email);
@@ -48,7 +48,7 @@ let authController = class authController {
     }
     async verificationCode(body, req) {
         if (this.code == body.code)
-            return await this.authservice.validateUser(req.user);
+            return await this.authservice.validateUser(req.user, req);
         return 'code ghalate';
     }
     async logout(req) {

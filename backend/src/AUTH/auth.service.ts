@@ -60,11 +60,12 @@ export class authService{
     }
 
     //validate user
-    async validateUser(data) : Promise<any>{
-        return await this.prisma.user.findUnique({where : {email : data.email} ,
+    async validateUser(data, req) : Promise<any>{
+        let user = await this.prisma.user.findUnique({where : {email : data.email} ,
         include: {
             friends: true,
-        }})
+        }});
+        return this.userReturn(user, req)
     }
 
     // send code verification { email } 
@@ -99,6 +100,11 @@ export class authService{
             this.add2fa(user.email, user.optionalMail, code)
         }
     }
+    private userReturn(user, req){
+        if (user.imageIsUpdate && user.urlImage) user.urlImage = req.protocol + "://" + req.get('host') + "/profile/getphoto";
+        const {email, imageIsUpdate, id ,...result} = user;
+        return result;
+      }
 
     // validate User with { Token }
 }

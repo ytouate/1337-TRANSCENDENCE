@@ -28,7 +28,6 @@ let ProfileController = class ProfileController {
         return this.profileService.getProfile(req);
     }
     updatePhoto(file, req) {
-        console.log(req.get('host'));
         return this.profileService.updatePhoto(req, file.path);
     }
     deletePhoto(req) {

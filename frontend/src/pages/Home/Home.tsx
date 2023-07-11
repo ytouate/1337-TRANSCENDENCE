@@ -5,8 +5,7 @@ import ActiveFriends from "../../components/ActiveFriends/ActiveFriends";
 import "./Home.css";
 import { userContext } from "../../context/Context";
 
-import { useContext, useEffect, useState } from "react";
-import { Navigate, useLoaderData } from "react-router-dom";
+import { useLoaderData } from "react-router-dom";
 import Cookies from "js-cookie";
 export async function loader() {
   const Token = Cookies.get("Token");
@@ -22,6 +21,7 @@ export async function loader() {
 
 function Home() {
   const user: any = useLoaderData();
+  console.log(user);
   return (
     <userContext.Provider value={user} >
       <div className="home">

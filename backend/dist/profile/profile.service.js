@@ -48,7 +48,8 @@ let ProfileService = class ProfileService {
                 imageIsUpdate: true,
             },
         });
-        if (updateUser) {
+        if (updateUser.imageIsUpdate) {
+            console.log(updateUser);
             return this.userReturn(updateUser, req);
         }
     }
@@ -58,7 +59,7 @@ let ProfileService = class ProfileService {
                 email: req.user.email,
             },
             data: {
-                urlImage: null,
+                urlImage: "https://cdn.intra.42.fr/users/fec55c96e6cf17ed31a04f96e6b18a43/ehakam.jpg",
             },
         });
         if (updateUser) {

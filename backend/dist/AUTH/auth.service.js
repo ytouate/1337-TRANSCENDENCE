@@ -8,6 +8,17 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authService = void 0;
 const common_1 = require("@nestjs/common");
@@ -55,11 +66,12 @@ let authService = class authService {
             data: { optionalMail: email, codeVerification: code }
         });
     }
-    async validateUser(data) {
-        return await this.prisma.user.findUnique({ where: { email: data.email },
+    async validateUser(data, req) {
+        let user = await this.prisma.user.findUnique({ where: { email: data.email },
             include: {
                 friends: true,
             } });
+        return this.userReturn(user, req);
     }
     async sigin2fa(code, email) {
         const mail = await this.mail.sendMail({
@@ -82,6 +94,12 @@ let authService = class authService {
             const code = await this.sigin2fa(this.generateCode(), user.optionalMail);
             this.add2fa(user.email, user.optionalMail, code);
         }
+    }
+    userReturn(user, req) {
+        if (user.imageIsUpdate && user.urlImage)
+            user.urlImage = req.protocol + "://" + req.get('host') + "/profile/getphoto";
+        const { email, imageIsUpdate, id } = user, result = __rest(user, ["email", "imageIsUpdate", "id"]);
+        return result;
     }
 };
 authService = __decorate([

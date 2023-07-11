@@ -22,6 +22,7 @@ export class ProfileService implements IProfileService{
         }
     }
     async updatePhoto(req, filePath) {
+      
       const updateUser = await this.prismaService.user.update({
         where: {
           email: req.user.email,
@@ -31,7 +32,8 @@ export class ProfileService implements IProfileService{
           imageIsUpdate: true,
         },
       })
-      if (updateUser){
+      if (updateUser.imageIsUpdate){
+        console.log(updateUser);
         return this.userReturn(updateUser, req)
       }
     }
@@ -42,7 +44,7 @@ export class ProfileService implements IProfileService{
               email: req.user.email,
             },
             data: {
-              urlImage: null,
+              urlImage: "https://cdn.intra.42.fr/users/fec55c96e6cf17ed31a04f96e6b18a43/ehakam.jpg",
             },
           })
           if (updateUser){
