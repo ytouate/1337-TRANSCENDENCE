@@ -163,14 +163,22 @@ export class GameGateWay
         players[0] = {
             id: userData1.id,
             username: userData1.username,
+            opponent: userData2.username,
             y: BOARD_HEIGHT / 2 - PADDLE_HEIGHT / 2,
             score: 0,
+            order: 0,
+            pref: pref1,
+            pref2: pref2,
         };
         players[1] = {
             id: userData2.id,
             username: userData2.username,
+            opponent: userData1.username,
             y: BOARD_HEIGHT / 2 - PADDLE_HEIGHT / 2,
             score: 0,
+            order: 1,
+            pref: pref2,
+            pref2: pref1,
         };
 
         this.gamePlayerPosition.set(game.id, { players });
@@ -201,19 +209,50 @@ export class GameGateWay
 
         const gamePositions = this.gamePlayerPosition.get(gameId);
         if (gamePositions) {
-            
             gamePositions.players[order].y = y * BOARD_HEIGHT;
             const roomId = String(gameId);
-            client.broadcast.to(roomId).emit('opponent_mousemove', { y });
+            client.broadcast
+                .to(roomId)
+                .emit('opponent_mousemove', { y });
         }
     }
 
+    checkifPlayerInGame(
+        userId: number,
+    ): { gameId: number; p: PlayerPosition } | undefined {
+        for (const [gameId, gamePosition] of this
+            .gamePlayerPosition) {
+            for (let p of gamePosition.players) {
+                if (p.id === userId) return { gameId, p };
+            }
+        }
+        return undefined;
+    }
+
     @SubscribeMessage('queueUp')
-    async queueUp(@MessageBody() body: any) {
+    async queueUp(
+        @MessageBody() body: any,
+        @ConnectedSocket() client: Socket,
+    ) {
         const userId = body.userId;
 
         if (this.queue.includes(userId)) {
             console.log('User already in the queue');
+            return;
+        }
+        let check = this.checkifPlayerInGame(userId);
+        if (check) {
+            client.emit('match_found', {
+                gameId: check.gameId,
+                opponent: check.p.opponent,
+                order: check.p.order,
+                pref: check.p.pref,
+                pref2: check.p.pref2,
+            });
+
+            const roomId = String(check.gameId);
+            client.join(roomId);
+
             return;
         }
         this.queue.push(userId);

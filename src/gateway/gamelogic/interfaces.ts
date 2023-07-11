@@ -1,3 +1,4 @@
+import { Preference } from '@prisma/client';
 import { Socket } from 'socket.io';
 
 export interface UserData {
@@ -9,8 +10,12 @@ export interface UserData {
 export interface PlayerPosition {
     id: number;
     username: string;
+    opponent: string
     y: number;
     score: number;
+    order: number;
+    pref: Preference;
+    pref2: Preference;
 }
 
 export interface GamePosition {
@@ -20,8 +25,8 @@ export interface GamePosition {
 }
 
 export interface Ball {
-    x: number,
-    y: number,
-    speedX: number,
-    speedY: number,
+    x: number;
+    y: number;
+    speedX: number;
+    speedY: number;
 }

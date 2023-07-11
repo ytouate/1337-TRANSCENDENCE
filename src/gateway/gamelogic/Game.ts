@@ -72,13 +72,21 @@ export class Game {
                 id: this.gamePosition.players[0].id,
                 y: this.gamePosition.players[0].y / BOARD_HEIGHT,
                 username: this.gamePosition.players[0].username,
+                opponent: this.gamePosition.players[0].opponent,
                 score: this.gamePosition.players[0].score,
+                order: this.gamePosition.players[0].order,
+                pref: this.gamePosition.players[0].pref,
+                pref2: this.gamePosition.players[0].pref,
             };
             players[1] = {
                 id: this.gamePosition.players[1].id,
                 y: this.gamePosition.players[1].y / BOARD_HEIGHT,
                 username: this.gamePosition.players[1].username,
+                opponent: this.gamePosition.players[1].opponent,
                 score: this.gamePosition.players[1].score,
+                order: this.gamePosition.players[1].order,
+                pref: this.gamePosition.players[1].pref,
+                pref2: this.gamePosition.players[1].pref,
             };
             server.to(room).emit('game_update', {
                 ball: {
@@ -138,26 +146,23 @@ export class Game {
         const { players } = gamePosition;
 
         if (ball.x <= PADDLE_MARGIN + BALL_SIZE + PADDLE_WIDTH) {
-            if (ball.x < 0) {
-                players[1].score++;
-                reset = true;
-            } else if (
+            if (
                 ball.y + BALL_SIZE >= players[0].y &&
                 ball.y - BALL_SIZE <= players[0].y + PADDLE_HEIGHT
             ) {
                 ball.speedX *= -1;
                 let deltaY =
                     ball.y - (players[0].y + PADDLE_HEIGHT / 2);
-                ball.speedY = deltaY * 0.25;
+                ball.speedY = deltaY * 0.22;
+            } else if (ball.x - BALL_SIZE <= 0) {
+                players[1].score++;
+                reset = true;
             }
         } else if (
             ball.x >=
             BOARD_WIDTH - BALL_SIZE - PADDLE_WIDTH - PADDLE_MARGIN
         ) {
-            if (ball.x >= BOARD_WIDTH) {
-                players[0].score++;
-                reset = true;
-            } else if (
+            if (
                 ball.y + BALL_SIZE >= players[1].y &&
                 ball.y - BALL_SIZE <= players[1].y + PADDLE_HEIGHT
             ) {
@@ -165,14 +170,16 @@ export class Game {
 
                 let deltaY =
                     ball.y - (players[1].y + PADDLE_HEIGHT / 2);
-                ball.speedY = deltaY * 0.25;
+                ball.speedY = deltaY * 0.22;
+            } else if (ball.x + BALL_SIZE >= BOARD_WIDTH) {
+                players[0].score++;
+                reset = true;
             }
         }
-        if (ball.y - BALL_SIZE < 0) {
+        if (ball.y - BALL_SIZE <= 0) {
             ball.speedY *= -1;
             ball.y += 10;
-        }
-        else if (ball.y + BALL_SIZE > BOARD_HEIGHT) {
+        } else if (ball.y + BALL_SIZE >= BOARD_HEIGHT) {
             ball.speedY *= -1;
             ball.y -= 10;
         }
