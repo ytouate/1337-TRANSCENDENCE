@@ -19,11 +19,10 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
-var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProfileService = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("src/Prisma/prisma.service");
+const prisma_service_1 = require("../Prisma/prisma.service");
 const fs_1 = require("fs");
 const mime_types_1 = require("mime-types");
 let ProfileService = class ProfileService {
@@ -101,7 +100,7 @@ let ProfileService = class ProfileService {
 };
 ProfileService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], ProfileService);
 exports.ProfileService = ProfileService;
 //# sourceMappingURL=profile.service.js.map
