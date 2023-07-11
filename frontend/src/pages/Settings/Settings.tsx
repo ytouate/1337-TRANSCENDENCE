@@ -3,24 +3,50 @@ import ytouate from "../../assets/ytouate.jpeg";
 import updateNameIcon from "../../assets/update-name.svg";
 import updateAvatarIcon from "../../assets/update-avatar.svg";
 import { useContext, useState } from "react";
-import { authContext } from "../../context/authContext";
+import { authContext } from "../../context/Context";
 import { Navigate } from "react-router-dom";
 
-export default function () {
+export default function Settings() {
   const [loggedIn, setLoggedIn] = useContext(authContext);
-  const [clicked, setClicked] = useState(false);
-  function handleClick() {
-    setClicked(!clicked);
+  const [newName, setNewName] = useState("");
+
+  function deleteAvatar() {
+    // request to the backend endpoint to delete the avatar
+    // update the picture with default picture
+  }
+
+  function activate2FA(e) {
+    e.preventDefault();
+    // request the backend to activate 2fa
+  }
+
+  const [clicked2fa, setClicked2fa] = useState(false);
+  function handleClick2fa() {
+    setClicked2fa(!clicked2fa);
   }
 
   if (!loggedIn) return <Navigate to="/signin" />;
   return (
     <div className="settings">
-      <div className="settings-delete-avatar">
-        <button className="settings-btn">Delete Avatar</button>
-        <button onClick={handleClick} className="settings-btn">
-          enable 2FA
-        </button>
+      <div className="settings-top">
+        <div className="settings-top-buttons">
+          <button className="settings-btn" onClick={deleteAvatar}>
+            Delete Avatar
+          </button>
+          <button onClick={handleClick2fa} className="settings-btn">
+            enable 2FA
+          </button>
+        </div>
+        {clicked2fa && (
+          <form onSubmit={activate2FA} className="settings--active-2fa">
+            <input
+              className="name-field"
+              type="email"
+              placeholder="ytouate@gmail.com"
+            />
+            <button className="btn">Enable</button>
+          </form>
+        )}
       </div>
       <div className="settings-update-wrapper">
         <div className="settings--header">
@@ -42,8 +68,13 @@ export default function () {
           <p>update name</p>
         </div>
         <form className="settings--update-name">
-          <input className="name-field" type="text" />
-          <button className="change-name-btn">Change</button>
+          <input
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            className="name-field"
+            type="text"
+          />
+          <button className="btn">Change</button>
         </form>
       </div>
     </div>

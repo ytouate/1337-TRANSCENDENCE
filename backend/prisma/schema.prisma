@@ -41,7 +41,7 @@ model chatRoom {
   timeCreate DateTime  @default(now())
   users      User[]    @relation("userInChatRoom")
   messages   Message[]
-  mutes     User[]      @realation("mutesUserInChatRoom")
+  //mutes     User[]      @realation("mutesUserInChatRoom")
   status    String     @default("public")
   password  String?
   // add password { protected chat }

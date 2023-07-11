@@ -8,17 +8,24 @@
     gap: 20px;
 }
 
-.settings-delete-avatar {
+.settings-top-buttons {
     padding: 20px;
+    display: flex;
+    gap: 20px;
+    background-color: #f6f3eb;
+    border-radius: 15px;
+}
+.settings-top {
+    display: grid;
+    gap: 10px;
     width: 50%;
     min-width: 400px;
     color: white;
-    background-color: #f6f3eb;
+    
     border-radius: 15px;
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-    gap: 20px;
+    
+    
+    
 }
 
 .settings-btn {
@@ -89,11 +96,23 @@
     gap: 5px;
     justify-content: center;
 }
+
 .settings--update-avatar-user-data p {
     font-weight: 600;
     letter-spacing: 0.5px;
 }
+
 .settings--update-name {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f6f3eb;
+    padding: 20px;
+    gap: 50px;
+    border-radius: 15px;
+}
+
+.settings--active-2fa {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -161,7 +180,7 @@ input[type="file"]:hover {
     width: 100%;
 }
 
-.change-name-btn {
+.btn {
     display: flex;
     padding: 10px 20px;
     justify-content: center;

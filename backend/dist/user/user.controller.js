@@ -83,7 +83,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getAllRooms", null);
 UserController = __decorate([
-    (0, common_1.Controller)('user'),
+    (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [user_service_1.UserService,
         auth_service_1.authService])
 ], UserController);

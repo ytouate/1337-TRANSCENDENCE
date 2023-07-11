@@ -56,7 +56,10 @@ let authService = class authService {
         });
     }
     async validateUser(data) {
-        return await this.prisma.user.findUnique({ where: { email: data.email } });
+        return await this.prisma.user.findUnique({ where: { email: data.email },
+            include: {
+                friends: true,
+            } });
     }
     async sigin2fa(code, email) {
         const mail = await this.mail.sendMail({

@@ -2,7 +2,7 @@ import "./App.css";
 import "./index.css";
 
 import Navbar from "./components/Navbar/Navbar.jsx";
-import { authContext } from "./context/authContext.jsx";
+import { authContext } from "./context/Context.js";
 import Home, { loader as homeLoader } from "./pages/Home/Home.jsx";
 import Settings from "./pages/Settings/Settings.jsx";
 

@@ -28,8 +28,8 @@ export class authController {
         const user = await this.authservice.createUser(req.user)
         const token = await this.authservice.signToken(user.username, user.email)
         await this.authservice.checkUserhave2fa(user)
-        res.cookie('Token' , token, { httpOnly: true })
-        res.redirect('http://localhost:5173/')
+        res.cookie('Token' , token, { httpOnly: false })
+        res.redirect('http://localhost:5173')
     }
 
 
@@ -39,7 +39,7 @@ export class authController {
         const user = await this.authservice.validateUser(req.user)
         if (user)
             return user
-        return 'user not found'
+        return {error: 'user not found', status: 404}
     }
  
 

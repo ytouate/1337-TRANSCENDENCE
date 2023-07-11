@@ -5,7 +5,7 @@ import ModeToggler from "../ModeToggler";
 // import Cookies from "js-cookie";
 import "./Navbar.css";
 import { useContext, useEffect, useRef, useState } from "react";
-import { authContext } from "../../context/authContext";
+import { authContext } from "../../context/Context";
 
 type NavData = {
     profileImg: string;

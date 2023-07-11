@@ -61,7 +61,10 @@ export class authService{
 
     //validate user
     async validateUser(data) : Promise<any>{
-        return await this.prisma.user.findUnique({where : {email : data.email} })
+        return await this.prisma.user.findUnique({where : {email : data.email} ,
+        include: {
+            friends: true,
+        }})
     }
 
     // send code verification { email } 
