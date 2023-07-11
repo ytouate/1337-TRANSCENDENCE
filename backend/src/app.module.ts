@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { authModule } from './AUTH/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './Prisma/prisma.module';
-import { ProfileModule } from './Profile/profile.module';
+import { ProfileModule } from './profile/profile.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { UserModule } from './user/user.module';
 import { NotificationModule } from './notification/notification.module';

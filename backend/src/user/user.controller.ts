@@ -4,7 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { authService } from 'src/AUTH/auth.service';
 
 
-@Controller('user')
+@Controller('users')
 export class UserController {
 
     constructor (
@@ -15,7 +15,7 @@ export class UserController {
     @Post('createRoom')
     @UseGuards(AuthGuard('jwt'))
     async createRoom(@Query() Param, @Req() req) {
-        const user = await this.user.validateUser(req.user)
+        const user = await this.user.validateUser(req.user, req)
         if (!user)
             return 'u can\'t\ create a room'
         return await this.userService.creatRoom(Param, user)

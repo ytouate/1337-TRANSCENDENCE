@@ -4,26 +4,38 @@ import FriendList from "../../components/FriendsList/FriendsList";
 import UserData from "../../components/UserData/UserData";
 import Achievements from "../../components/Achievements/Achievements";
 import Stats from "../../components/Stats/Stats";
-import { useContext } from "react";
-import { authContext } from "../../context/authContext";
-import { Navigate } from "react-router-dom";
+import { userContext } from "../../context/Context";
+import Cookies from "js-cookie";
+import { useLoaderData } from "react-router-dom";
 
+export async function loader() {
+  const Token = Cookies.get("Token");
+  const options = {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${Token}`,
+    },
+  };
+  const res = await fetch("http://localhost:3000/user", options);
+  return await res.json();
+}
 export default function Profile() {
-    let [loggedIn, setLoggedIn] = useContext(authContext);
-    if (!loggedIn) return <Navigate to="/signin" replace={true} />;
-    return (
-        <section className="profile">
-            <div className="profile--left">
-                <UserData />
-                <History />
-            </div>
-            <div className="profile--center">
-                <FriendList />
-            </div>
-            <div className="profile--right">
-                <Achievements />
-                <Stats />
-            </div>
-        </section>
-    );
+  const user = useLoaderData();
+  return (
+    <userContext.Provider value={user}>
+      <section className="profile">
+        <div className="profile--left">
+          <UserData />
+          <History />
+        </div>
+        <div className="profile--center">
+          <FriendList />
+        </div>
+        <div className="profile--right">
+          <Achievements />
+          <Stats />
+        </div>
+      </section>
+    </userContext.Provider>
+  );
 }

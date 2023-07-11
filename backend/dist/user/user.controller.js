@@ -23,7 +23,7 @@ let UserController = class UserController {
         this.user = user;
     }
     async createRoom(Param, req) {
-        const user = await this.user.validateUser(req.user);
+        const user = await this.user.validateUser(req.user, req);
         if (!user)
             return 'u can\'t\ create a room';
         return await this.userService.creatRoom(Param, user);
@@ -83,7 +83,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getAllRooms", null);
 UserController = __decorate([
-    (0, common_1.Controller)('user'),
+    (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [user_service_1.UserService,
         auth_service_1.authService])
 ], UserController);

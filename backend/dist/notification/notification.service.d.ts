@@ -1,4 +1,5 @@
 import { JwtService } from '@nestjs/jwt';
+import { Notification } from '@prisma/client';
 import { Socket } from 'socket.io';
 import { PrismaService } from 'src/Prisma/prisma.service';
 export declare class NotificationService {

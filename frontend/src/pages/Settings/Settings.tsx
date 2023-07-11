@@ -1,51 +1,172 @@
 import "./Settings.css";
-import ytouate from "../../assets/ytouate.jpeg";
 import updateNameIcon from "../../assets/update-name.svg";
 import updateAvatarIcon from "../../assets/update-avatar.svg";
-import { useContext, useState } from "react";
-import { authContext } from "../../context/authContext";
-import { Navigate } from "react-router-dom";
+import { useState } from "react";
+import Cookies from "js-cookie";
+import { useLoaderData } from "react-router-dom";
+export async function loader() {
+    const Token = Cookies.get("Token");
+    const options = {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${Token}`,
+        },
+    };
+    const res = await fetch("http://localhost:3000/user", options);
+    return await res.json();
+}
+export default function Settings() {
+    const [newName, setNewName] = useState("");
+    const [newAvatar, setNewAvatar] = useState(null);
+    const token = Cookies.get("Token");
+    const user: any = useLoaderData();
+    console.log(user)
 
-export default function () {
-  const [loggedIn, setLoggedIn] = useContext(authContext);
-  const [clicked, setClicked] = useState(false);
-  function handleClick() {
-    setClicked(!clicked);
-  }
+    async function deleteAvatar() {
+        fetch("http://localhost:3000/profile/deletephoto", {
+            method: "DELETE",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }).then(() => location.reload());
+    }
 
-  if (!loggedIn) return <Navigate to="/signin" />;
-  return (
-    <div className="settings">
-      <div className="settings-delete-avatar">
-        <button className="settings-btn">Delete Avatar</button>
-        <button onClick={handleClick} className="settings-btn">
-          enable 2FA
-        </button>
-      </div>
-      <div className="settings-update-wrapper">
-        <div className="settings--header">
-          <img src={updateAvatarIcon} alt="" />
-          <p>update avatar</p>
+    function activate2FA(e: any) {
+        e.preventDefault();
+        const token = Cookies.get("Token");
+        const options: any = {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email: email2fa }),
+        };
+        fetch("http://localhost:3000/2fa", options)
+            .then((data) => data.json())
+            .then((res) => console.log(res))
+            .catch(err => console.log(err))
+    }
+
+    const [clicked2fa, setClicked2fa] = useState(false);
+    const [email2fa, setEmail2fa] = useState("");
+
+    function handleClick2fa() {
+        setClicked2fa(!clicked2fa);
+    }
+
+    function changeAvatar(e: any) {
+        e.preventDefault();
+        const token = Cookies.get("Token");
+        const fd: any = new FormData();
+        fd.append("image", newAvatar);
+        const options = {
+            method: "PUT",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                // "Content-Type": "multipart/form-data",
+            },
+            body: fd,
+        };
+        fetch("http://localhost:3000/profile/updatephoto", options)
+            .then((res) => res.json())
+            .then((data) => console.log(data));
+    }
+
+    function changeName() {
+        const token = Cookies.get("Token");
+        const options = {
+            method: "PUT",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username: newName }),
+        };
+        fetch("http://localhost:3000/profile/updatename", options)
+            .then((res) => res.json())
+            .then((data) => console.log(data));
+    }
+
+    function updateAvatar(e: any) {
+        e.preventDefault();
+
+        setNewAvatar(e.target.value);
+    }
+
+    return (
+        <div className="settings">
+            <div className="settings-top">
+                <div className="settings-top-buttons">
+                    <button className="settings-btn" onClick={deleteAvatar}>
+                        Delete Avatar
+                    </button>
+                    <button onClick={handleClick2fa} className="settings-btn">
+                        enable 2FA
+                    </button>
+                    <button className="settings-btn">
+                        disable 2FA
+                    </button>
+                </div>
+                {clicked2fa && (
+                    <form
+                        onSubmit={activate2FA}
+                        className="settings--active-2fa"
+                    >
+                        <input
+                            className="name-field"
+                            type="email"
+                            placeholder="example@mail.com"
+                            value={email2fa}
+                            onChange={(e) => setEmail2fa(e.target.value)}
+                        />
+                        <button className="btn">Enable</button>
+                    </form>
+                )}
+            </div>
+            <div className="settings-update-wrapper">
+                <div className="settings--header">
+                    <img src={updateAvatarIcon} alt="" />
+                    <p>update avatar</p>
+                </div>
+                <form
+                    value={newAvatar}
+                    onChange={updateAvatar}
+                    onSubmit={changeAvatar}
+                    encType="multipart/form-data"
+                    className="settings--update-avatar"
+                >
+                    {user && (
+                        <div className="settings--update-avatar-user-data">
+                            <img
+                                className="settings--avatar"
+                                src={user.urlImage}
+                                alt=""
+                            />
+                            <p>{user.username}</p>
+                        </div>
+                    )}
+                    <input type="file" />
+                    <button className="upload-btn">Upload</button>
+                </form>
+            </div>
+            <div className="settings-update-wrapper">
+                <div className="settings--header">
+                    <img src={updateNameIcon} alt="" />
+                    <p>update name</p>
+                </div>
+                <form className="settings--update-name">
+                    <input
+                        value={newName}
+                        onChange={(e) => setNewName(e.target.value)}
+                        className="name-field"
+                        type="text"
+                    />
+                    <button onClick={changeName} className="btn">
+                        Change
+                    </button>
+                </form>
+            </div>
         </div>
-        <form className="settings--update-avatar">
-          <div className="settings--update-avatar-user-data">
-            <img className="settings--avatar" src={ytouate} alt="" />
-            <p>ytouate</p>
-          </div>
-          <input type="file" />
-          <button className="upload-btn">Upload</button>
-        </form>
-      </div>
-      <div className="settings-update-wrapper">
-        <div className="settings--header">
-          <img src={updateNameIcon} alt="" />
-          <p>update name</p>
-        </div>
-        <form className="settings--update-name">
-          <input className="name-field" type="text" />
-          <button className="change-name-btn">Change</button>
-        </form>
-      </div>
-    </div>
-  );
+    );
 }

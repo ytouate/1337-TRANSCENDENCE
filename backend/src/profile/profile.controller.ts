@@ -31,7 +31,6 @@ export class ProfileController {
     }))
     @Put('updatephoto')
     updatePhoto(@UploadedFile() file, @Req() req){
-        console.log(req.get('host'));
         return this.profileService.updatePhoto(req, file.path);
     }
     @Delete('deletephoto')

@@ -28,31 +28,31 @@ export class authController {
         const user = await this.authservice.createUser(req.user)
         const token = await this.authservice.signToken(user.username, user.email)
         await this.authservice.checkUserhave2fa(user)
-        res.cookie('Token' , token, { httpOnly: true })
-        res.redirect('http://localhost:5173/')
+        res.cookie('Token' , token, { httpOnly: false })
+        res.redirect('http://localhost:5173')
     }
 
 
     @Get('user')
     @UseGuards(AuthGuard('jwt'))
     async getp(@Req() req) {
-        const user = await this.authservice.validateUser(req.user)
+        const user = await this.authservice.validateUser(req.user, req)
         if (user)
             return user
-        return 'user not found'
+        return {error: 'user not found', status: 404}
     }
  
 
     @Post('2fa')
     @UseGuards(AuthGuard('jwt'))
-    async siginWith2fa(@Req() request , @Body() req: authDto) {
-        const user = await this.authservice.validateUser(request.user)
+    async siginWith2fa(@Req() request , @Body() body: authDto) {
+        const user = await this.authservice.validateUser(request.user, request)
         if (!user)
             return 'unvalide user'
-        const num = await this.authservice.sigin2fa(this.authservice.generateCode(), req.email)
-        this.code = num;
-        await this.authservice.add2fa(user.email, req.email, num)
-        return '2fa'
+        // const num = await this.authservice.sigin2fa(this.authservice.generateCode(), body.email)
+        // this.code = num;
+        await this.authservice.add2fa(user.email, body.email, 0)
+        return {status: 201, message: '2fa activated succefully'}
     }
 
 
@@ -60,7 +60,7 @@ export class authController {
     @UseGuards(AuthGuard('jwt'))
     async verificationCode(@Body() body, @Req() req) {
         if (this.code == body.code)
-            return await this.authservice.validateUser(req.user)
+            return await this.authservice.validateUser(req.user, req)
         return 'code ghalate'
     }
 
@@ -70,4 +70,5 @@ export class authController {
         console.log(req.headers.authorization)
         return 'delete JWT token from client'
     }
+   
 }
