@@ -27,20 +27,24 @@ function ChallengeCard(props: any) {
 }
 export default function ActiveFriends() {
   const user: any = useContext(userContext);
-  const activeFriends = user.friends.map((friend) => {
-    return (
-      <ChallengeCard
-        img={friend.img}
-        name={friend.name}
-        status={friend.status}
-      />
-    );
-  });
+  let activeFriends = [];
+  if (user){
+
+     activeFriends = user.friends.map((friend) => {
+      return (
+        <ChallengeCard
+          img={friend.img}
+          name={friend.name}
+          status={friend.status}
+        />
+      );
+    });
+  }
   return (
     <div className="active-friends">
       <div className="active-friends--header">
         <img src={swordsIcon} alt="" />
-        <p>Invite Friends</p>
+        <p>Challenge Friends</p>
       </div>
       <div className="active-friends--body">
         <div className="scroll-div">

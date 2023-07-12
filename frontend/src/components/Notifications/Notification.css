@@ -1,0 +1,60 @@
+.notification-drop {
+  position: relative;
+  display: inline-block;
+  font-family: "Ubuntu", sans-serif;
+  color: #444;
+}
+
+.notification-content {
+  right: 0;
+  list-style: none;
+  display: none;
+  position: absolute;
+  background-color: #f6f3eb;
+  min-width: 220px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  /* padding: 12px 16px; */
+  border-radius: 5px;
+  z-index: 1;
+}
+
+.notification-drop .item {
+  padding: 10px;
+  font-size: 18px;
+  position: relative;
+  border-bottom: 1px solid #ddd;
+}
+
+.notification-drop:hover .notification-content {
+  display: block;
+}
+
+.item img {
+  width: 30px;
+}
+
+.btn__badge {
+  background: #ff5d5d;
+  color: white;
+  font-size: 10px;
+  position: absolute;
+  top: 0;
+  right: 0px;
+  padding: 3px 10px;
+  border-radius: 50%;
+}
+
+.notification-card {
+  padding: 20px;
+}
+
+.notification-card:nth-child(1):hover {
+  border-radius: 5px 5px 0 0;
+}
+.notification-card:last-child:hover {
+  border-radius: 0 0 5px 5px;
+}
+.notification-card:hover {
+  background: #ddd;
+  color: rgba(0, 0, 0, 0.8);
+}

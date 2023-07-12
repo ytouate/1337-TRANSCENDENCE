@@ -1,4 +1,6 @@
 import img from "../assets/otmallah.jpeg";
+
+
 function Nav() {
     return (
         <nav className="chat-nav">

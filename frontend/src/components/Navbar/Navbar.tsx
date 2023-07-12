@@ -5,9 +5,10 @@ import {
   useLoaderData,
   useLocation,
 } from "react-router-dom";
+
 import logoImg from "../../assets/logo.png";
 import ModeToggler from "../ModeToggler";
-
+import Notifications from "../Notifications/Notification";
 import Cookies from "js-cookie";
 import "./Navbar.css";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -73,9 +74,10 @@ function Nav(props: NavData) {
           <li>
             <NavLink to="profile">Profile</NavLink>
           </li>
-          <li>
+          {/* <li>
             <ModeToggler />
-          </li>
+          </li> */}
+          <Notifications />
 
           <li className="dropdown">
             {user && (
@@ -108,12 +110,7 @@ function Nav(props: NavData) {
                 </li>
                 <hr />
                 <li>
-                  <Link
-                    to={'/signin'}
-                    
-                  >
-                    Logout
-                  </Link>
+                  <Link to={"/signin"}>Logout</Link>
                 </li>
               </ul>
             )}

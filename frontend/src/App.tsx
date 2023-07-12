@@ -20,6 +20,7 @@ import {
 import Profile, { loader as ProfileLoader } from "./pages/Profile/Profile.jsx";
 import SignIn from "./pages/SignIn/SignIn.js";
 import img from "./assets/ytouate.jpeg";
+import Chat from './pages/Chat/Chat'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -31,6 +32,7 @@ const router = createBrowserRouter(
         element={<Home />}
       />
       <Route path="profile" loader={ProfileLoader} element={<Profile />} />
+      <Route path="chat"  element={<Chat />} />
       <Route path="signin"  element={<SignIn />} />
       <Route path="settings" loader={settingsLoader} element={<Settings />} />
     </Route>
