@@ -1,24 +1,21 @@
 version: '3.8'
-
 services:
-  game_db:
+  dev-db:
     image: postgres:13
     ports:
-      - 5432:5432
-    env_file:
-      - .env
-    networks:
-      - game
-    volumes:
-      - game_db:/var/lib/postgresql/data
-
+      - 5434:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: nest
+  # backend:
+    # build: 
+      # context: ./backend
+    # volumes:
+      # - ./backend:/app
+    # ports:
+      # - 3000:3000
+    # depends_on:
+      # - dev-db
 networks:
-  game:
-
-volumes:
-  game_db:
-    driver: local
-    driver_opts:
-      type: none
-      device: /Users/mohamedkorchi/data/gamedb
-      o: bind
+  default:
