@@ -2,20 +2,21 @@
   position: relative;
   display: inline-block;
   font-family: "Ubuntu", sans-serif;
-  color: #444;
+  list-style: none;
 }
 
 .notification-content {
+  padding: 20px;
   right: 0;
   list-style: none;
   display: none;
   position: absolute;
   background-color: #f6f3eb;
-  min-width: 220px;
+  width: 350px;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-  /* padding: 12px 16px; */
   border-radius: 5px;
   z-index: 1;
+  border: 1px solid lightgray;
 }
 
 .notification-drop .item {
@@ -26,7 +27,11 @@
 }
 
 .notification-drop:hover .notification-content {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  /* padding: 10px 0; */
 }
 
 .item img {
@@ -44,17 +49,61 @@
   border-radius: 50%;
 }
 
-.notification-card {
-  padding: 20px;
-}
-
 .notification-card:nth-child(1):hover {
   border-radius: 5px 5px 0 0;
 }
+
 .notification-card:last-child:hover {
   border-radius: 0 0 5px 5px;
 }
+
+.notification-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: rgb(100, 100, 100);
+  -webkit-transition: color 0.5s ease-in-out;
+  transition: color 0.5s ease-in-out;
+}
+.notification-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
 .notification-card:hover {
-  background: #ddd;
-  color: rgba(0, 0, 0, 0.8);
+  color: black;
+}
+
+.notification-card--action {
+  width: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  border: none;
+  height: 25px;
+  padding: 5px 10px;
+  font-size: 12px;
+  margin-right: 5px;
+  cursor: pointer;
+  color: white;
+  background-color: var(--cards-color);
+}
+
+.notification-card--action:hover {
+  transform: scale(1.01);
+  background-color: #3d3964;
+
+  transition: background-color 0.5s ease-in-out;
+}
+
+.notification-card--data {
+  font-size: 14px;
+  margin-left: 10px;
+  
+}
+
+.notification-card--title {
+  font-weight: bold;
 }

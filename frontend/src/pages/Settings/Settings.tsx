@@ -90,6 +90,7 @@ export default function Settings() {
   }
 
   function changeName() {
+    console.log(newName);
     const token = Cookies.get("Token");
     const options = {
       method: "PUT",

@@ -21,6 +21,7 @@ export class ProfileService implements IProfileService{
           return this.userReturn(user, req)
         }
     }
+    
     async updatePhoto(req, filePath) {
       
       const updateUser = await this.prismaService.user.update({

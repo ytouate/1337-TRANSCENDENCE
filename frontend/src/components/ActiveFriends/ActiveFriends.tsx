@@ -2,7 +2,7 @@ import "./ActiveFriends.css";
 import swordsIcon from "../../assets/sword.svg";
 import { userContext } from "../../context/Context.js";
 import { useContext } from "react";
-function ChallengeCard(props: any) {
+export function ChallengeCard(props: any) {
   return (
     <div className="challenge-card">
       <img src={props.img} alt="" />
@@ -25,6 +25,8 @@ function ChallengeCard(props: any) {
     </div>
   );
 }
+
+
 export default function ActiveFriends() {
   const user: any = useContext(userContext);
   let activeFriends = [];
