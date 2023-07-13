@@ -1,6 +1,7 @@
 # dependencies
+./dist/*
 node_modules/
-prisma/migrations/*
+./prisma/migrations/*
 # IDE
 /.idea
 /.awcache

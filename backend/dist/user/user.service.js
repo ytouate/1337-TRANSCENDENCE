@@ -17,25 +17,24 @@ let UserService = class UserService {
         this.prismaService = prismaService;
     }
     async creatRoom(Param, user) {
-        let { roomName, status, password } = Param;
+        let { roomName, password } = Param;
         if (!password)
             password = '';
         const room = await this.getRoomByName(roomName);
         if (!room) {
             try {
-                await this.addStatusOfUser(user, 'Admin');
-                const room = await this.prismaService.chatRoom.create({
+                await this.setAdmin({ 'username': user.username, 'roomName': roomName });
+                await this.prismaService.chatRoom.create({
                     data: {
                         roomName: roomName,
                         timeCreate: new Date(Date.now()),
                         users: {
                             connect: { id: user.id }
                         },
-                        status: status,
                         password: password
                     }
                 });
-                return room;
+                return { 'message': `room ${roomName} already exist` };
             }
             catch (error) {
                 console.log(error);
@@ -44,11 +43,10 @@ let UserService = class UserService {
                 this.prismaService.$disconnect();
             }
         }
-        return `room ${roomName} already exist`;
+        return { 'message': `room ${roomName} already exist` };
     }
     async addUserToRoom(user, name) {
         let room = await this.prismaService.chatRoom.findFirst({ where: { roomName: name } });
-        await this.addStatusOfUser(user, 'member');
         if (!await this.avoidDuplicate(user, name)) {
             await this.prismaService.chatRoom.update({
                 where: { id: room.id },
@@ -64,19 +62,25 @@ let UserService = class UserService {
     }
     async deleteUserFromRoom(user, name) {
         const room = await this.prismaService.chatRoom.findFirst({ where: { roomName: name }, include: { users: true } });
-        await this.prismaService.chatRoom.update({
-            where: { id: room.id },
-            data: {
-                users: {
-                    disconnect: {
-                        id: user.id
+        try {
+            await this.prismaService.chatRoom.update({
+                where: { id: room.id },
+                data: {
+                    users: {
+                        disconnect: {
+                            id: user.id
+                        }
                     }
                 }
-            }
-        });
+            });
+            return { 'message': `user has deleted from ${name}` };
+        }
+        catch (error) {
+            return { 'message': error };
+        }
     }
     async getAllRooms() {
-        return await this.prismaService.chatRoom.findMany({ include: { users: true } });
+        return await this.prismaService.chatRoom.findMany({ include: { users: true, messages: true } });
     }
     async getRoomByName(name) {
         return await this.prismaService.chatRoom.findFirst({
@@ -86,16 +90,6 @@ let UserService = class UserService {
             include: {
                 users: true,
                 messages: { include: { user: true } },
-            }
-        });
-    }
-    async addStatusOfUser(user, status) {
-        await this.prismaService.user.update({
-            where: {
-                email: user.email
-            },
-            data: {
-                status: status
             }
         });
     }
@@ -143,7 +137,7 @@ let UserService = class UserService {
             if (password != room.password)
                 return undefined;
         }
-        return 'public';
+        return true;
     }
     async getUserWithUsername(name) {
         return await this.prismaService.user.findFirst({ where: { username: name } });

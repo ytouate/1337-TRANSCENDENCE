@@ -35,10 +35,10 @@ model User {
   activitystatus     Boolean @default(false)
   roomChat         chatRoom[]     @relation("userInChatRoom")
   message          Message[]
-  preference       Preference?
-  games            Game[]         @relation("GameUsers")
-  win              Int            @default(0)
-  loss             Int            @default(0)
+  preference Preference?
+  games Game[] @relation("GameUsers")
+  win Int @default(0)
+  loss Int @default(0)
 }
 
 model chatRoom {
