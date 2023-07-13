@@ -87,15 +87,17 @@
   font-size: 12px;
   margin-right: 5px;
   cursor: pointer;
-  color: white;
-  background-color: var(--cards-color);
+  color: black;
+  background-color: #dedede;
+  border: 1px solid lightgray;
+  transition: font-weight 0.5s ease-in-out;
 }
 
 .notification-card--action:hover {
-  transform: scale(1.01);
-  background-color: #3d3964;
-
+  letter-spacing: 0.5px;
+  background-color: #d3cfcf;
   transition: background-color 0.5s ease-in-out;
+  transition:  letter-spacing 0.5s ease-in-out;
 }
 
 .notification-card--data {
