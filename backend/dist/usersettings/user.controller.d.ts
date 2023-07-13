@@ -5,6 +5,6 @@ export declare class UserSettingsController {
     blockUser(req: any, body: any): void;
     unfriedUser(req: any, body: any): void;
     unblockUser(req: any, body: any): void;
-    searchUsers(req: any, body: any): Promise<import(".prisma/client").User[]>;
+    searchUsers(req: any, pattern: any): Promise<import(".prisma/client").User[]>;
     getUser(req: any, id: any): Promise<any>;
 }

@@ -19,9 +19,9 @@ export class UserSettingsController {
     unblockUser(@Req() req, @Body() body){
         this.userService.unblockUser(req.user, body);
     }
-    @Get('search')
-    searchUsers(@Req() req, @Body() body){
-        return this.userService.searchUser(req.user, body.pattern)
+    @Get('search/:pattern')
+    searchUsers(@Req() req, @Param('pattern') pattern){
+        return this.userService.searchUser(req.user, pattern)
     }
     @Get(':id')
     getUser(@Req() req, @Param('id') id){

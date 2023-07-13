@@ -29,8 +29,8 @@ let UserSettingsController = class UserSettingsController {
     unblockUser(req, body) {
         this.userService.unblockUser(req.user, body);
     }
-    searchUsers(req, body) {
-        return this.userService.searchUser(req.user, body.pattern);
+    searchUsers(req, pattern) {
+        return this.userService.searchUser(req.user, pattern);
     }
     getUser(req, id) {
         return this.userService.getUser(req.user, parseInt(id));
@@ -61,9 +61,9 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UserSettingsController.prototype, "unblockUser", null);
 __decorate([
-    (0, common_1.Get)('search'),
+    (0, common_1.Get)('search/:pattern'),
     __param(0, (0, common_1.Req)()),
-    __param(1, (0, common_1.Body)()),
+    __param(1, (0, common_1.Param)('pattern')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", void 0)
