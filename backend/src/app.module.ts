@@ -21,7 +21,10 @@ import { PrismaService } from './Prisma/prisma.service';
 import { UserSettingsService } from './usersettings/user.service';
 
 @Module({
-  imports: [UserModule ,chatModule ,NotificationModule,  ProfileModule, MailerModule , ConfigModule.forRoot({ isGlobal: true }) , authModule, PrismaModule, UserSettingsModule, NotificationModule, GameModule, PrefModule, GateWayModule],
+  imports: [UserModule ,chatModule ,NotificationModule, 
+          ProfileModule, MailerModule , ConfigModule.forRoot({ isGlobal: true }) ,
+          authModule, PrismaModule, UserSettingsModule, NotificationModule, GameModule,
+          PrefModule, GateWayModule],
   controllers: [appController],
   providers: [UserService, appController, chatGateway, GameService, PrefService, GameGateWay, PrismaService, UserSettingsService],
 })

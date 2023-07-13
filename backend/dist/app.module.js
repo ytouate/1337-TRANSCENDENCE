@@ -32,7 +32,10 @@ let AppModule = class AppModule {
 };
 AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [user_module_2.UserModule, chat_gateway_module_1.chatModule, notification_module_1.NotificationModule, profile_module_1.ProfileModule, mailer_1.MailerModule, config_1.ConfigModule.forRoot({ isGlobal: true }), auth_module_1.authModule, prisma_module_1.PrismaModule, user_module_1.UserSettingsModule, notification_module_1.NotificationModule, game_module_1.GameModule, pref_module_1.PrefModule, game_module_2.GateWayModule],
+        imports: [user_module_2.UserModule, chat_gateway_module_1.chatModule, notification_module_1.NotificationModule,
+            profile_module_1.ProfileModule, mailer_1.MailerModule, config_1.ConfigModule.forRoot({ isGlobal: true }),
+            auth_module_1.authModule, prisma_module_1.PrismaModule, user_module_1.UserSettingsModule, notification_module_1.NotificationModule, game_module_1.GameModule,
+            pref_module_1.PrefModule, game_module_2.GateWayModule],
         controllers: [app_controller_1.appController],
         providers: [user_service_1.UserService, app_controller_1.appController, chat_gateway_1.chatGateway, game_service_1.GameService, pref_service_1.PrefService, game_service_2.GameGateWay, prisma_service_1.PrismaService, user_service_2.UserSettingsService],
     })

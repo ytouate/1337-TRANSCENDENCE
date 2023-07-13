@@ -16,7 +16,7 @@ export class UserService {
         {
             try {
                 await this.addStatusOfUser(user, 'Admin')
-                const room = await this.prismaService.chatRoom.create(
+                await this.prismaService.chatRoom.create(
                     {
                         data : {
                             roomName : roomName,
@@ -29,14 +29,14 @@ export class UserService {
                         }
                     }
                 )
-                return room
+                return {'message' : `room ${roomName} already exist`}
             }
             catch(error) {
                 console.log(error)
             }
             finally { this.prismaService.$disconnect() }
         }
-        return `room ${roomName} already exist`
+        return {'message' : `room ${roomName} already exist`}
     }
 
     // add user to specific room
@@ -64,40 +64,46 @@ export class UserService {
     // delete user from current room
     async deleteUserFromRoom(user, name) {
         const room = await this.prismaService.chatRoom.findFirst({where : {roomName : name} , include : {users : true}})
-        await this.prismaService.chatRoom.update({
-            where : {id : room.id},
-            data : {
-                users :
-                {
-                    disconnect : 
+        try {
+            await this.prismaService.chatRoom.update({
+                where : {id : room.id},
+                data : {
+                    users :
                     {
-                        id : user.id
+                        disconnect : 
+                        {
+                            id : user.id
+                        }
                     }
                 }
-            }
-        })
+            })
+            return {'message' : `user has deleted from ${name}`}
+        }
+        catch(error) { return {'message' : error} }
     }
 
     // show all available rooms
     async getAllRooms() {
-        return await this.prismaService.chatRoom.findMany({include : {users : true}})
+        return await this.prismaService.chatRoom.findMany({include : {users : true , messages : true}})
     }
 
     // get a specific room by name
     async getRoomByName(name) {
-        return await this.prismaService.chatRoom.findFirst(
-            {
-                where : 
-                { 
-                    roomName : name
-                },
-                include :
+        try {
+            return await this.prismaService.chatRoom.findFirst(
                 {
-                    users : true,
-                    messages : { include : { user : true} },
+                    where : 
+                    { 
+                        roomName : name
+                    },
+                    include :
+                    {
+                        users : true,
+                        messages : { include : { user : true} },
+                    }
                 }
-            }
-        )
+            )
+        } catch(error){  }
     }
 
     // set status of user
@@ -173,7 +179,7 @@ export class UserService {
             if (password != room.password)
                 return undefined       
         }
-        return 'public' 
+        return true 
     }  
 
 

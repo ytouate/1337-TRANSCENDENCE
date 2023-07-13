@@ -26,8 +26,7 @@ let authController = class authController {
         const user = await this.authservice.createUser(req.user);
         const token = await this.authservice.signToken(user.username, user.email);
         await this.authservice.checkUserhave2fa(user);
-        console.log('her backend: ', token);
-        res.cookie('Token', token, { httpOnly: true });
+        res.cookie('Token', token);
         res.redirect('http://localhost:5173/');
     }
     async getp(req) {
