@@ -18,7 +18,6 @@ export declare class UserSettingsService {
         gamesPlayed: number;
         id: number;
         email: string;
-        socketId: string;
         username: string;
         urlImage: string;
         imageIsUpdate: boolean;

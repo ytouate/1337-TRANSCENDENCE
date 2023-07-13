@@ -17,13 +17,13 @@ let UserService = class UserService {
         this.prismaService = prismaService;
     }
     async creatRoom(Param, user) {
-        let { roomName, status, password } = Param;
+        let { roomName, password } = Param;
         if (!password)
             password = '';
         const room = await this.getRoomByName(roomName);
         if (!room) {
             try {
-                await this.addStatusOfUser(user, 'Admin');
+                await this.setAdmin({ 'username': user.username, 'roomName': roomName });
                 await this.prismaService.chatRoom.create({
                     data: {
                         roomName: roomName,
@@ -31,7 +31,6 @@ let UserService = class UserService {
                         users: {
                             connect: { id: user.id }
                         },
-                        status: status,
                         password: password
                     }
                 });
@@ -48,7 +47,6 @@ let UserService = class UserService {
     }
     async addUserToRoom(user, name) {
         let room = await this.prismaService.chatRoom.findFirst({ where: { roomName: name } });
-        await this.addStatusOfUser(user, 'member');
         if (!await this.avoidDuplicate(user, name)) {
             await this.prismaService.chatRoom.update({
                 where: { id: room.id },
@@ -85,26 +83,13 @@ let UserService = class UserService {
         return await this.prismaService.chatRoom.findMany({ include: { users: true, messages: true } });
     }
     async getRoomByName(name) {
-        try {
-            return await this.prismaService.chatRoom.findFirst({
-                where: {
-                    roomName: name
-                },
-                include: {
-                    users: true,
-                    messages: { include: { user: true } },
-                }
-            });
-        }
-        catch (error) { }
-    }
-    async addStatusOfUser(user, status) {
-        await this.prismaService.user.update({
+        return await this.prismaService.chatRoom.findFirst({
             where: {
-                email: user.email
+                roomName: name
             },
-            data: {
-                status: status
+            include: {
+                users: true,
+                messages: { include: { user: true } },
             }
         });
     }

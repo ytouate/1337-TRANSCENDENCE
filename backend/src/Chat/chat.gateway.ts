@@ -59,7 +59,7 @@ export class chatGateway  implements OnModuleInit , OnGatewayConnection , OnGate
         if (user)
         {
             const Id = this.socketId.get(user.email)
-            console.log("id = " ,Id)
+            this.socketId.delete(user.email)
             console.log(`client  ${Id} leave room ${client.handshake.query.roomName}`)
             this.server.in(Id).socketsLeave(client.handshake.query.roomName)
             this.user.deleteUserFromRoom(user , client.handshake.query.roomName)

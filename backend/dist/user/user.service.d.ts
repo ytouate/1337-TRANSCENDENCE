@@ -19,7 +19,6 @@ export declare class UserService {
             user: import(".prisma/client").User;
         })[];
     }>;
-    addStatusOfUser(user: any, status: any): Promise<void>;
     avoidDuplicate(user: any, name: any): Promise<import(".prisma/client").User>;
     addDataInMessageTable(data: any, id: any, user: any): Promise<import(".prisma/client").Message>;
     putDataInDatabase(name: any, data: any, user: any): Promise<void>;
