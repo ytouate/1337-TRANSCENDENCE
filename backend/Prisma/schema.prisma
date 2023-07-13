@@ -21,18 +21,24 @@ model Notification {
 model User {
   id               Int            @id @default(autoincrement())
   email            String         @unique
-  socketId         String?
   username         String         @unique
   urlImage         String?
   imageIsUpdate    Boolean        @default(false)
   optionalMail     String?
   codeVerification Int?
-  status           String?
   friends          User[]         @relation("UserFriends")
   friendOf         User[]         @relation("UserFriends")
+  blocked          User[]         @relation("blocking")
+  blockedBy        User[]         @relation("blocking")
   notifications    Notification[] @relation("userNotificaiton")
+  status           String?
+  activitystatus     Boolean @default(false)
   roomChat         chatRoom[]     @relation("userInChatRoom")
   message          Message[]
+  preference Preference?
+  games Game[] @relation("GameUsers")
+  win Int @default(0)
+  loss Int @default(0)
 }
 
 model chatRoom {
@@ -41,10 +47,11 @@ model chatRoom {
   timeCreate DateTime  @default(now())
   users      User[]    @relation("userInChatRoom")
   messages   Message[]
-  //mutes     User[]      @realation("mutesUserInChatRoom")
-  status    String     @default("public")
-  password  String?
-  // add password { protected chat }
+  admins     String[]
+  muteUsers  String[]
+  banUsers   String[]
+  status     String    @default("public")
+  password   String?
 }
 
 model Message {
@@ -52,7 +59,36 @@ model Message {
   data     String
   time     DateTime @default(now())
   roomId   Int
-  userId   Int      
+  userId   Int
   user     User     @relation(fields: [userId], references: [id])
   roomData chatRoom @relation(fields: [roomId], references: [id])
+}
+
+model Preference {
+  id          Int    @id @default(autoincrement())
+  ballColor   String @default("black")
+  paddleColor String @default("black")
+  mapTheme    String @default("galaxy_pink")
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @unique
+}
+
+model Game {
+  id          Int        @id @default(autoincrement())
+  status      GameStatus @default(OUTGOING)
+  players     User[]     @relation("GameUsers")
+  score1      Int        @default(0)
+  score2      Int        @default(0)
+  winnerId    Int        @default(-1)
+  createdAt   DateTime   @default(now())
+  duration    Int        @default(0)
+  playerOrder Int
+
+  @@map("games")
+}
+
+enum GameStatus {
+  FINISHED
+  OUTGOING
 }

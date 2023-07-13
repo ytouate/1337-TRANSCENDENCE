@@ -1,9 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { PrismaService } from "src/Prisma/prisma.service";
+import { PrismaService } from "src/prisma/prisma.service";
 import { imageLink } from "./auth.strategy42";
 import { JwtService } from "@nestjs/jwt";
 import { MailerService } from "@nestjs-modules/mailer";
+import { userReturn } from "src/utils/user.return";
 
 @Injectable()
 export class authService{
@@ -60,12 +61,9 @@ export class authService{
     }
 
     //validate user
-    async validateUser(data, req) : Promise<any>{
-        let user = await this.prisma.user.findUnique({where : {email : data.email} ,
-        include: {
-            friends: true,
-        }});
-        return this.userReturn(user, req)
+    async validateUser(req) : Promise<any>{
+        const user =  await this.prisma.user.findUnique({where : {email : req.user.email} })
+        return userReturn(req.user, req)
     }
 
     // send code verification { email } 
@@ -100,11 +98,6 @@ export class authService{
             this.add2fa(user.email, user.optionalMail, code)
         }
     }
-    private userReturn(user, req){
-        if (user.imageIsUpdate && user.urlImage) user.urlImage = req.protocol + "://" + req.get('host') + "/profile/getphoto";
-        const {email, imageIsUpdate, id ,...result} = user;
-        return result;
-      }
 
     // validate User with { Token }
 }

@@ -15,10 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProfileController = void 0;
 const common_1 = require("@nestjs/common");
 const multer_1 = require("multer");
-const iprofile_service_1 = require("./iprofile.service");
 const passport_1 = require("@nestjs/passport");
 const platform_express_1 = require("@nestjs/platform-express");
 const mimeTypes = require("mime-types");
+const profile_service_1 = require("./profile.service");
 let ProfileController = class ProfileController {
     constructor(profileService) {
         this.profileService = profileService;
@@ -28,7 +28,7 @@ let ProfileController = class ProfileController {
         return this.profileService.getProfile(req);
     }
     updatePhoto(file, req) {
-        console.log('file: ', file);
+        console.log(req.get('host'));
         return this.profileService.updatePhoto(req, file.path);
     }
     deletePhoto(req) {
@@ -37,11 +37,12 @@ let ProfileController = class ProfileController {
     updateName(req) {
         return this.profileService.updateName(req.body.username, req);
     }
-    getPhotoProfile(req, res) {
-        return this.profileService.getPhotoProfile(req, res);
+    getPhotoProfile(req, res, username) {
+        return this.profileService.getPhotoProfile(req, res, username);
     }
 };
 __decorate([
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     (0, common_1.Get)(''),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
@@ -59,6 +60,7 @@ __decorate([
             }
         })
     })),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     (0, common_1.Put)('updatephoto'),
     __param(0, (0, common_1.UploadedFile)()),
     __param(1, (0, common_1.Req)()),
@@ -67,6 +69,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ProfileController.prototype, "updatePhoto", null);
 __decorate([
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     (0, common_1.Delete)('deletephoto'),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
@@ -74,6 +77,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ProfileController.prototype, "deletePhoto", null);
 __decorate([
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     (0, common_1.Put)('updatename'),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
@@ -81,18 +85,17 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ProfileController.prototype, "updateName", null);
 __decorate([
-    (0, common_1.Get)('getphoto'),
+    (0, common_1.Get)('getphoto/:username'),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Res)({ passthrough: true })),
+    __param(2, (0, common_1.Param)('username')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
-    __metadata("design:returntype", common_1.StreamableFile)
+    __metadata("design:paramtypes", [Object, Object, Object]),
+    __metadata("design:returntype", Promise)
 ], ProfileController.prototype, "getPhotoProfile", null);
 ProfileController = __decorate([
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     (0, common_1.Controller)('profile'),
-    __param(0, (0, common_1.Inject)(iprofile_service_1.InterfacePfoileServiceProvider)),
-    __metadata("design:paramtypes", [Object])
+    __metadata("design:paramtypes", [profile_service_1.ProfileService])
 ], ProfileController);
 exports.ProfileController = ProfileController;
 //# sourceMappingURL=profile.controller.js.map

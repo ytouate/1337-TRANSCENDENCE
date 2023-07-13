@@ -25,5 +25,5 @@
 - the admin want to add user in room or delete user room
 
 
-- mute {can't send message for limited time}
-- when i change status of user he change in all rooms
+- guard admin
+- ban user { request to  leavRoom event and add it in table of ban users}

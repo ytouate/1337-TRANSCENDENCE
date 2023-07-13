@@ -1,8 +1,8 @@
-import { OnModuleInit, Param, Query, UseGuards } from "@nestjs/common";
+import { OnModuleInit, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import {  ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Socket ,Server } from "socket.io";
-import { PrismaService } from "src/Prisma/prisma.service";
+import { PrismaService } from "src/prisma/prisma.service";
 import { UserService } from "src/user/user.service";
 import { Req } from "@nestjs/common";
 
@@ -37,7 +37,7 @@ export class chatGateway  implements OnModuleInit , OnGatewayConnection , OnGate
     @UseGuards(AuthGuard('websocket-jwt'))
     async handle(@ConnectedSocket() client : Socket , @Req() req) {
         console.log(`client  ${client.id} connected and joining the room ${client.handshake.query.roomName}`)
-        const user = await this.validateUserByEmail(req.user.email)
+        const user = await this.validateUserByEmail(req.user.email, client.handshake.query.roomName)
         if (user)
         {
             const result = await this.user.joiningTheRoom(client.handshake.query, user);
@@ -46,8 +46,8 @@ export class chatGateway  implements OnModuleInit , OnGatewayConnection , OnGate
             this.socketId.set(user.email, client.id)
             this.server.in(client.id).socketsJoin(client.handshake.query.roomName)
             this.user.addUserToRoom(user, client.handshake.query.roomName)      
+            return `${user.username} has joined in ${client.handshake.query.roomName}`
         }
-        return `${user.username} has joined in ${client.handshake.query.roomName}`
     }
 
 
@@ -59,7 +59,7 @@ export class chatGateway  implements OnModuleInit , OnGatewayConnection , OnGate
         if (user)
         {
             const Id = this.socketId.get(user.email)
-            console.log("id = " ,Id)
+            this.socketId.delete(user.email)
             console.log(`client  ${Id} leave room ${client.handshake.query.roomName}`)
             this.server.in(Id).socketsLeave(client.handshake.query.roomName)
             this.user.deleteUserFromRoom(user , client.handshake.query.roomName)
@@ -82,7 +82,11 @@ export class chatGateway  implements OnModuleInit , OnGatewayConnection , OnGate
     }
 
     //check the user if exist 
-    async validateUserByEmail(email) {
-        return await this.prisma.user.findUnique({where : {email : email}})
+    async validateUserByEmail(email, roomName) {
+        const user =  await this.prisma.user.findUnique({where : {email : email}})
+        const room = await this.prisma.chatRoom.findFirst({ where : {roomName : roomName} })
+        if (room.banUsers.indexOf(user.email) < 0)
+            return user
     }
+
 }

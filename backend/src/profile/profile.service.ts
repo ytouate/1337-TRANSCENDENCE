@@ -1,15 +1,15 @@
 import { Injectable, StreamableFile } from '@nestjs/common';
-import { IProfileService } from './iprofile.service';
-import { PrismaService } from 'src/Prisma/prisma.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 import {User} from 'prisma'
 import { createReadStream } from 'fs';
 import { Response } from 'express';
 import { MIMEType } from 'util';
 import { lookup } from 'mime-types';
+import { userReturn } from 'src/utils/user.return';
 
 
 @Injectable()
-export class ProfileService implements IProfileService{
+export class ProfileService{
     constructor(private prismaService: PrismaService){
 }
     async getProfile(req) {
@@ -18,12 +18,10 @@ export class ProfileService implements IProfileService{
             email: req.user.email,
         }})
         if (user){
-          return this.userReturn(user, req)
+          return userReturn(user, req)
         }
     }
-    
     async updatePhoto(req, filePath) {
-      
       const updateUser = await this.prismaService.user.update({
         where: {
           email: req.user.email,
@@ -33,23 +31,21 @@ export class ProfileService implements IProfileService{
           imageIsUpdate: true,
         },
       })
-      if (updateUser.imageIsUpdate){
-        console.log(updateUser);
-        return this.userReturn(updateUser, req)
+      if (updateUser){
+        return userReturn(updateUser, req)
       }
     }
-
     async deletePhoto(req) {
         const updateUser = await this.prismaService.user.update({
             where: {
               email: req.user.email,
             },
             data: {
-              urlImage: "https://cdn.intra.42.fr/users/fec55c96e6cf17ed31a04f96e6b18a43/ehakam.jpg",
+              urlImage: null,
             },
           })
           if (updateUser){
-            return this.userReturn(updateUser, req)
+            return userReturn(updateUser, req)
         }
     }
     async updateName(newUserame, req) {
@@ -62,12 +58,12 @@ export class ProfileService implements IProfileService{
             },
           })
         if (updateUser){
-          return this.userReturn(updateUser, req);
+          return userReturn(updateUser, req);
         }
     }
-    async getPhotoProfile(req, res): Promise<StreamableFile>{
+    async getPhotoProfile(req, res, username): Promise<StreamableFile>{
        const user: User = await this.prismaService.user.findUnique({where : {
-        email: req.user.email,
+        username: username,
     }})
     if (user){
         const file = createReadStream(user.urlImage);
@@ -77,10 +73,5 @@ export class ProfileService implements IProfileService{
         })
         return new StreamableFile(file);
     }
-    }
-    private userReturn(user, req){
-      if (user.imageIsUpdate && user.urlImage) user.urlImage = req.protocol + "://" + req.get('host') + "/profile/getphoto";
-      const {email, imageIsUpdate, id ,...result} = user;
-      return result;
     }
 }

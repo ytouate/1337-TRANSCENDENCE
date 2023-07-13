@@ -3,7 +3,7 @@ import { authService } from "./auth.service";
 import { authController } from "./auth.controller";
 import { ConfigModule } from "@nestjs/config";
 import { AuthStrategy } from "./auth.strategy42";
-import { PrismaModule } from "src/Prisma/prisma.module";
+import { PrismaModule } from "src/prisma/prisma.module";
 import { JwtModule } from "@nestjs/jwt";
 import { MailerModule } from "@nestjs-modules/mailer";
 

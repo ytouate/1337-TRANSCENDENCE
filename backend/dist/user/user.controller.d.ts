@@ -1,11 +1,12 @@
 import { UserService } from './user.service';
-import { authService } from 'src/AUTH/auth.service';
 export declare class UserController {
     private userService;
-    private user;
-    constructor(userService: UserService, user: authService);
-    createRoom(Param: any, req: any): Promise<string | import(".prisma/client").chatRoom>;
+    constructor(userService: UserService);
+    createRoom(Param: any, req: any): Promise<"u can't create a room" | {
+        message: string;
+    }>;
     setAdmin(Param: any): Promise<string>;
+    muteUser(Param: any): Promise<import(".prisma/client").chatRoom>;
     changePassword(Param: any): Promise<string>;
     getRoomByName(Param: any): Promise<import(".prisma/client").chatRoom & {
         users: import(".prisma/client").User[];
@@ -15,5 +16,6 @@ export declare class UserController {
     }>;
     getAllRooms(Param: any): Promise<(import(".prisma/client").chatRoom & {
         users: import(".prisma/client").User[];
+        messages: import(".prisma/client").Message[];
     })[]>;
 }

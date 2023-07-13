@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/Prisma/prisma.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class UserService {
@@ -8,15 +8,15 @@ export class UserService {
     
     // create room {2 users => n users}
     async creatRoom(Param , user) {
-        let {roomName , status , password} = Param
+        let {roomName  , password} = Param
         if (!password)
             password = ''
         const room = await this.getRoomByName(roomName)
         if (!room)
         {
             try {
-                await this.addStatusOfUser(user, 'Admin')
-                const room = await this.prismaService.chatRoom.create(
+                await this.setAdmin({'username' : user.username , 'roomName' : roomName})
+                await this.prismaService.chatRoom.create(
                     {
                         data : {
                             roomName : roomName,
@@ -24,25 +24,23 @@ export class UserService {
                             users : {
                                 connect : { id : user.id}
                             },
-                            status : status,
                             password : password
                         }
                     }
                 )
-                return room
+                return {'message' : `room ${roomName} already exist`}
             }
             catch(error) {
                 console.log(error)
             }
             finally { this.prismaService.$disconnect() }
         }
-        return `room ${roomName} already exist`
+        return {'message' : `room ${roomName} already exist`}
     }
 
     // add user to specific room
     async addUserToRoom(user , name) {
         let room = await this.prismaService.chatRoom.findFirst({where : {roomName : name}})
-        await this.addStatusOfUser(user , 'member')
         if (!await this.avoidDuplicate(user, name))
         {
             await this.prismaService.chatRoom.update({
@@ -64,23 +62,27 @@ export class UserService {
     // delete user from current room
     async deleteUserFromRoom(user, name) {
         const room = await this.prismaService.chatRoom.findFirst({where : {roomName : name} , include : {users : true}})
-        await this.prismaService.chatRoom.update({
-            where : {id : room.id},
-            data : {
-                users :
-                {
-                    disconnect : 
+        try {
+            await this.prismaService.chatRoom.update({
+                where : {id : room.id},
+                data : {
+                    users :
                     {
-                        id : user.id
+                        disconnect : 
+                        {
+                            id : user.id
+                        }
                     }
                 }
-            }
-        })
+            })
+            return {'message' : `user has deleted from ${name}`}
+        }
+        catch(error) { return {'message' : error} }
     }
 
     // show all available rooms
     async getAllRooms() {
-        return await this.prismaService.chatRoom.findMany({include : {users : true}})
+        return await this.prismaService.chatRoom.findMany({include : {users : true , messages : true}})
     }
 
     // get a specific room by name
@@ -100,19 +102,6 @@ export class UserService {
         )
     }
 
-    // set status of user
-    async addStatusOfUser(user, status) {
-        await this.prismaService.user.update({
-            where : 
-            {   
-                email : user.email
-            },
-            data : 
-            {
-                status : status
-            }
-        })
-    }
 
     // check user is has already joined
     async   avoidDuplicate(user, name){
@@ -173,7 +162,7 @@ export class UserService {
             if (password != room.password)
                 return undefined       
         }
-        return 'public' 
+        return true 
     }  
 
 
@@ -187,28 +176,18 @@ export class UserService {
     async   setAdmin(param) {
         const member = await this.prismaService.user.findFirst({where : {username : param.username}})
         const room = await this.prismaService.chatRoom.findFirst({ where : {roomName : param.roomName} })
-        console.log(member)
-        console.log(room)
-        if (room)
+        if (room.admins.indexOf(member.email) < 0)
         {
             await this.prismaService.chatRoom.update(
             {
                 where : {id : room.id} , 
                 data : {
-                    users : {
-                        update : {
-                            where : {
-                                email : member.email
-                            },
-                            data : {
-                                status : param.status
-                            }
-                        }
-                    }
+                    admins : {push : member.email}
                 }
             }    
             )
         }
+        return room
     }
 
 
@@ -223,5 +202,58 @@ export class UserService {
             data : { password : password }
         })
         }
+    }
+a
+
+    // ban users
+    async   banUser(param) {
+        const {username , roomName} = param
+        const member = await this.prismaService.user.findFirst({where : {username : username}})
+        const room = await this.prismaService.chatRoom.findFirst({where : {roomName : roomName}})
+        if (room.banUsers.indexOf(member.email) < 0)
+        {
+            await this.prismaService.chatRoom.update(
+                {
+                    where : {id : room.id} , 
+                    data : 
+                    {
+                        banUsers : 
+                        {
+                            push : member.email
+                        }
+                    }
+                }
+            )
+        }
+        return room
+    }
+
+    // mute users
+    async   muteUsers(param) {
+        const {username , roomName} = param
+        const member = await this.prismaService.user.findFirst({where : {username : username}})
+        const room = await this.prismaService.chatRoom.findFirst({where : {roomName : roomName}})
+        if (room.muteUsers.indexOf(member.email) < 0)
+        {
+            await this.prismaService.chatRoom.update(
+                {
+                    where : {id : room.id} , 
+                    data : 
+                    {
+                        muteUsers : 
+                        {
+                            push : member.email
+                        }
+                    }
+                }
+            )
+        }
+        return room
+    }
+
+    // validate user to create chat
+    async   validateUserToCreateChat(req)
+    {
+        return await this.prismaService.user.findUnique({where : {email : req.user.email}})
     }
 }

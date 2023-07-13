@@ -1,19 +1,18 @@
-import { Controller, Delete, Get, Inject, Put, Req, Res, StreamableFile, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
-import { IProfileService } from './iprofile.service';
+import { Controller, Delete, Get, Inject, Param, Put, Req, Res, StreamableFile, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { diskStorage } from 'multer';
-import {InterfacePfoileServiceProvider } from './iprofile.service';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as mimeTypes from 'mime-types';
 import { createReadStream } from 'fs';
+import { ProfileService } from './profile.service';
 
 
-@UseGuards(AuthGuard('jwt'))
+
 @Controller('profile')
 export class ProfileController {
-    private 
-    constructor(@Inject(InterfacePfoileServiceProvider) private profileService){}
+    constructor( private profileService: ProfileService){}
    
+    @UseGuards(AuthGuard('jwt'))
     @Get('')
     getProfile(@Req() req){
         console.log(req.user)
@@ -29,21 +28,24 @@ export class ProfileController {
             }
         })
     }))
+    @UseGuards(AuthGuard('jwt'))
     @Put('updatephoto')
     updatePhoto(@UploadedFile() file, @Req() req){
-        console.log('file: ', file);
+        console.log(req.get('host'));
         return this.profileService.updatePhoto(req, file.path);
     }
+    @UseGuards(AuthGuard('jwt'))
     @Delete('deletephoto')
     deletePhoto(@Req() req){
         return this.profileService.deletePhoto(req)
     }
+    @UseGuards(AuthGuard('jwt'))
     @Put('updatename')
     updateName(@Req() req){
         return this.profileService.updateName(req.body.username, req);
     }
-    @Get('getphoto')
-    getPhotoProfile(@Req() req, @Res({ passthrough: true }) res): StreamableFile {
-        return this.profileService.getPhotoProfile(req, res);
+    @Get('getphoto/:username')
+    getPhotoProfile(@Req() req, @Res({ passthrough: true }) res, @Param('username') username): Promise<StreamableFile> {
+        return this.profileService.getPhotoProfile(req, res, username);
     }
 }

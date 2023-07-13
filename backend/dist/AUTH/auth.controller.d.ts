@@ -1,5 +1,4 @@
 import { authService } from "./auth.service";
-import { authDto } from "./DTO/auth.DTO";
 export declare class authController {
     private authservice;
     constructor(authservice: authService);
@@ -7,7 +6,10 @@ export declare class authController {
     gett(): void;
     getProfilee(res: any, req: any): Promise<void>;
     getp(req: any): Promise<any>;
-    siginWith2fa(request: any, body: authDto): Promise<"unvalide user" | {
+    siginWith2fa(request: any, req: any): Promise<{
+        message: string;
+        status?: undefined;
+    } | {
         status: number;
         message: string;
     }>;

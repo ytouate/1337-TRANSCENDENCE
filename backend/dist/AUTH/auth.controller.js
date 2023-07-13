@@ -17,37 +17,36 @@ const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const common_2 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
-const auth_DTO_1 = require("./DTO/auth.DTO");
 let authController = class authController {
     constructor(authservice) {
         this.authservice = authservice;
     }
     gett() { }
     async getProfilee(res, req) {
-        console.log('her backend');
         const user = await this.authservice.createUser(req.user);
         const token = await this.authservice.signToken(user.username, user.email);
         await this.authservice.checkUserhave2fa(user);
-        res.cookie('Token', token, { httpOnly: false });
-        res.redirect('http://localhost:5173');
+        res.cookie('Token', token);
+        res.redirect('http://localhost:5173/');
     }
     async getp(req) {
-        const user = await this.authservice.validateUser(req.user, req);
+        const user = await this.authservice.validateUser(req);
         if (user)
             return user;
-        return { error: 'user not found', status: 404 };
+        return { 'message': 'user not found' };
     }
-    async siginWith2fa(request, body) {
-        const user = await this.authservice.validateUser(request.user, request);
+    async siginWith2fa(request, req) {
+        const user = await this.authservice.validateUser(request);
         if (!user)
-            return 'unvalide user';
-        await this.authservice.add2fa(user.email, body.email, 0);
-        return { status: 201, message: '2fa activated succefully' };
+            return { 'message': 'unvalide user' };
+        await this.authservice.add2fa(user.email, req.email, 0);
+        return { 'status': 200, 'message': 'adding 2fa success' };
     }
     async verificationCode(body, req) {
-        if (this.code == body.code)
-            return await this.authservice.validateUser(req.user, req);
-        return 'code ghalate';
+        const user = await this.authservice.validateUser(req);
+        if (user && user.code == body.code)
+            return user;
+        return { 'message': 'incorrect code' };
     }
     async logout(req) {
         console.log(req.headers.authorization);
@@ -84,7 +83,7 @@ __decorate([
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, auth_DTO_1.authDto]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], authController.prototype, "siginWith2fa", null);
 __decorate([

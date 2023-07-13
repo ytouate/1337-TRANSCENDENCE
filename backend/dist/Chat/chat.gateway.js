@@ -17,7 +17,7 @@ const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
-const prisma_service_1 = require("../Prisma/prisma.service");
+const prisma_service_1 = require("../prisma/prisma.service");
 const user_service_1 = require("../user/user.service");
 const common_2 = require("@nestjs/common");
 let chatGateway = class chatGateway {
@@ -34,7 +34,7 @@ let chatGateway = class chatGateway {
     }
     async handle(client, req) {
         console.log(`client  ${client.id} connected and joining the room ${client.handshake.query.roomName}`);
-        const user = await this.validateUserByEmail(req.user.email);
+        const user = await this.validateUserByEmail(req.user.email, client.handshake.query.roomName);
         if (user) {
             const result = await this.user.joiningTheRoom(client.handshake.query, user);
             if (result == undefined)
@@ -42,14 +42,14 @@ let chatGateway = class chatGateway {
             this.socketId.set(user.email, client.id);
             this.server.in(client.id).socketsJoin(client.handshake.query.roomName);
             this.user.addUserToRoom(user, client.handshake.query.roomName);
+            return `${user.username} has joined in ${client.handshake.query.roomName}`;
         }
-        return `${user.username} has joined in ${client.handshake.query.roomName}`;
     }
     async leaveRoomHandler(client, req) {
         const user = await this.validateUserByUsername(client.handshake.query.username);
         if (user) {
             const Id = this.socketId.get(user.email);
-            console.log("id = ", Id);
+            this.socketId.delete(user.email);
             console.log(`client  ${Id} leave room ${client.handshake.query.roomName}`);
             this.server.in(Id).socketsLeave(client.handshake.query.roomName);
             this.user.deleteUserFromRoom(user, client.handshake.query.roomName);
@@ -64,8 +64,11 @@ let chatGateway = class chatGateway {
     async validateUserByUsername(username) {
         return await this.prisma.user.findFirst({ where: { username: username } });
     }
-    async validateUserByEmail(email) {
-        return await this.prisma.user.findUnique({ where: { email: email } });
+    async validateUserByEmail(email, roomName) {
+        const user = await this.prisma.user.findUnique({ where: { email: email } });
+        const room = await this.prisma.chatRoom.findFirst({ where: { roomName: roomName } });
+        if (room.banUsers.indexOf(user.email) < 0)
+            return user;
     }
 };
 __decorate([

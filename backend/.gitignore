@@ -1,6 +1,7 @@
 # dependencies
+prisma/migrations/
 node_modules/
-
+dist/
 # IDE
 /.idea
 /.awcache
@@ -46,3 +47,4 @@ build/config\.gypi
 
 .npmrc
 pnpm-lock.yaml
+./profileimages/*

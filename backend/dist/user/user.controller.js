@@ -16,14 +16,12 @@ exports.UserController = void 0;
 const common_1 = require("@nestjs/common");
 const user_service_1 = require("./user.service");
 const passport_1 = require("@nestjs/passport");
-const auth_service_1 = require("../AUTH/auth.service");
 let UserController = class UserController {
-    constructor(userService, user) {
+    constructor(userService) {
         this.userService = userService;
-        this.user = user;
     }
     async createRoom(Param, req) {
-        const user = await this.user.validateUser(req.user, req);
+        const user = await this.userService.validateUserToCreateChat(req);
         if (!user)
             return 'u can\'t\ create a room';
         return await this.userService.creatRoom(Param, user);
@@ -31,6 +29,9 @@ let UserController = class UserController {
     async setAdmin(Param) {
         await this.userService.setAdmin(Param);
         return `the user ${Param.username} has moved from member to admin`;
+    }
+    async muteUser(Param) {
+        return await this.userService.muteUsers(Param);
     }
     async changePassword(Param) {
         await this.userService.changePasswordOfProtectedRoom(Param);
@@ -45,7 +46,6 @@ let UserController = class UserController {
 };
 __decorate([
     (0, common_1.Post)('createRoom'),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     __param(0, (0, common_1.Query)()),
     __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
@@ -54,15 +54,20 @@ __decorate([
 ], UserController.prototype, "createRoom", null);
 __decorate([
     (0, common_1.Post)('addAdmin'),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "setAdmin", null);
 __decorate([
+    (0, common_1.Post)('muteUser'),
+    __param(0, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "muteUser", null);
+__decorate([
     (0, common_1.Post)('changePassword'),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -83,9 +88,9 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getAllRooms", null);
 UserController = __decorate([
-    (0, common_1.Controller)('users'),
-    __metadata("design:paramtypes", [user_service_1.UserService,
-        auth_service_1.authService])
+    (0, common_1.Controller)('user'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
+    __metadata("design:paramtypes", [user_service_1.UserService])
 ], UserController);
 exports.UserController = UserController;
 //# sourceMappingURL=user.controller.js.map

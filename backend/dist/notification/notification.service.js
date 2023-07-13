@@ -17,13 +17,32 @@ const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const passport_1 = require("@nestjs/passport");
 const websockets_1 = require("@nestjs/websockets");
-const socket_io_1 = require("socket.io");
-const prisma_service_1 = require("../Prisma/prisma.service");
+const prisma_service_1 = require("../prisma/prisma.service");
 let NotificationService = class NotificationService {
     constructor(jwtService, prismaServie) {
         this.jwtService = jwtService;
         this.prismaServie = prismaServie;
-        this.socketByID = new Map();
+        this.socketById = new Map();
+    }
+    handleDisconnect(client) {
+        this.changeActivityStatusToOffline(client);
+    }
+    async changeActivityStatusToOffline(client) {
+        const userObj = this.jwtService.verify(client.handshake.headers.authorization.slice(7));
+        const user = await this.prismaServie.user.findFirst({
+            where: {
+                username: userObj.username
+            }
+        });
+        this.prismaServie.user.update({
+            where: {
+                username: userObj.username,
+            },
+            data: {
+                activitystatus: true,
+            }
+        });
+        this.socketById.delete(user.id);
     }
     handleConnection(client) {
         this.pushClientInMap(client);
@@ -43,9 +62,9 @@ let NotificationService = class NotificationService {
             }
         });
         notification.sender = notif.senderAndReicever[0];
-        if (this.socketByID.has((_a = notif.senderAndReicever[1]) === null || _a === void 0 ? void 0 : _a.id)) {
-            for (let i = 0; i < this.socketByID.get(notif.senderAndReicever[1].id).length; i++) {
-                this.socketByID.get(notif.senderAndReicever[1].id)[i].emit('receive_notification', notification);
+        if (this.socketById.has((_a = notif.senderAndReicever[1]) === null || _a === void 0 ? void 0 : _a.id)) {
+            for (let i = 0; i < this.socketById.get(notif.senderAndReicever[1].id).length; i++) {
+                this.socketById.get(notif.senderAndReicever[1].id)[i].emit('receive_notification', notification);
             }
         }
     }
@@ -80,30 +99,50 @@ let NotificationService = class NotificationService {
                     username: userObj.username
                 }
             });
-            if (!this.socketByID.has(user.id))
-                this.socketByID.set(user.id, [client]);
+            if (!this.socketById.has(user.id))
+                this.socketById.set(user.id, [client]);
             else
-                this.socketByID.get(user.id).push(client);
+                this.socketById.get(user.id).push(client);
+            await this.prismaServie.user.update({
+                where: {
+                    username: userObj.username,
+                },
+                data: {
+                    activitystatus: true,
+                }
+            });
         }
         catch (erro) {
             client.disconnect();
         }
     }
     async answerToNotification(body, req) {
-        console.log(body);
         if (body.status == 'accepted') {
-            await this.acceptNotificaion(body);
+            let notification = await this.acceptNotificaion(body);
             this.deleteNotification(body);
+            let acceptation = {
+                title: notification.title,
+                reicever: notification.senderAndReicever[1].username,
+                status: 'accepted'
+            };
+            for (let i = 0; i < this.socketById.get(notification.senderAndReicever[1].id).length; i++) {
+                this.socketById.get(notification.senderAndReicever[0].id)[i].emit('receive_notification', acceptation);
+            }
         }
         else if (body.status == 'rejected')
             this.deleteNotification(body);
     }
     deleteNotification(messageBody) {
-        this.prismaServie.notification.delete({
-            where: {
-                id: messageBody.id,
-            }
-        });
+        try {
+            this.prismaServie.notification.delete({
+                where: {
+                    id: messageBody.id,
+                }
+            });
+        }
+        catch (error) {
+            throw new common_1.InternalServerErrorException();
+        }
     }
     async acceptNotificaion(messageBody) {
         try {
@@ -139,18 +178,13 @@ let NotificationService = class NotificationService {
                     }
                 }
             });
+            return notification;
         }
         catch (error) {
             throw new common_1.InternalServerErrorException();
         }
     }
 };
-__decorate([
-    __param(0, (0, websockets_1.ConnectedSocket)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [socket_io_1.Socket]),
-    __metadata("design:returntype", void 0)
-], NotificationService.prototype, "handleConnection", null);
 __decorate([
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('websocket-jwt')),
     (0, websockets_1.SubscribeMessage)('send_notification'),

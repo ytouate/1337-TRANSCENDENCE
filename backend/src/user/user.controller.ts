@@ -4,32 +4,35 @@ import { AuthGuard } from '@nestjs/passport';
 import { authService } from 'src/AUTH/auth.service';
 
 
-@Controller('users')
+@Controller('user')
+@UseGuards(AuthGuard('jwt'))
 export class UserController {
 
     constructor (
-        private userService:UserService,
-        private user:authService
+        private userService:UserService
         ){}
 
     @Post('createRoom')
-    @UseGuards(AuthGuard('jwt'))
     async createRoom(@Query() Param, @Req() req) {
-        const user = await this.user.validateUser(req.user, req)
+        const user = await this.userService.validateUserToCreateChat(req)
         if (!user)
             return 'u can\'t\ create a room'
         return await this.userService.creatRoom(Param, user)
     }
 
     @Post('addAdmin')
-    @UseGuards(AuthGuard('jwt'))
     async setAdmin(@Query() Param) {
         await this.userService.setAdmin(Param)
         return `the user ${Param.username} has moved from member to admin`
     }
 
+    @Post('muteUser')
+    async   muteUser(@Query() Param) {
+        return await this.userService.muteUsers(Param)
+    } 
+
+
     @Post('changePassword')
-    @UseGuards(AuthGuard('jwt'))
     async   changePassword(@Query() Param) {
         await   this.userService.changePasswordOfProtectedRoom(Param)
         return 'the password has changed'

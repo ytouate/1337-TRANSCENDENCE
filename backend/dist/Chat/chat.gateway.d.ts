@@ -1,7 +1,7 @@
 import { OnModuleInit } from "@nestjs/common";
 import { OnGatewayConnection, OnGatewayDisconnect } from "@nestjs/websockets";
 import { Socket, Server } from "socket.io";
-import { PrismaService } from "src/Prisma/prisma.service";
+import { PrismaService } from "src/prisma/prisma.service";
 import { UserService } from "src/user/user.service";
 export declare class chatGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDisconnect {
     private prisma;
@@ -16,5 +16,5 @@ export declare class chatGateway implements OnModuleInit, OnGatewayConnection, O
     handleConnection(client: Socket, ...args: any[]): Promise<void>;
     handleDisconnect(client: any): Promise<void>;
     validateUserByUsername(username: any): Promise<import(".prisma/client").User>;
-    validateUserByEmail(email: any): Promise<import(".prisma/client").User>;
+    validateUserByEmail(email: any, roomName: any): Promise<import(".prisma/client").User>;
 }
