@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserSettingsService } from './user.service';
 
@@ -19,9 +19,9 @@ export class UserSettingsController {
     unblockUser(@Req() req, @Body() body){
         this.userService.unblockUser(req.user, body);
     }
-    @Get('search/:pattern')
-    searchUsers(@Req() req, @Param('pattern') pattern){
-        return this.userService.searchUser(req.user, pattern)
+    @Get('search')
+    searchUsers(@Req() req, @Query() query){
+        return this.userService.searchUser(req.user, query.pattern)
     }
     @Get(':id')
     getUser(@Req() req, @Param('id') id){
