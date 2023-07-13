@@ -15,10 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProfileController = void 0;
 const common_1 = require("@nestjs/common");
 const multer_1 = require("multer");
-const iprofile_service_1 = require("./iprofile.service");
 const passport_1 = require("@nestjs/passport");
 const platform_express_1 = require("@nestjs/platform-express");
 const mimeTypes = require("mime-types");
+const profile_service_1 = require("./profile.service");
 let ProfileController = class ProfileController {
     constructor(profileService) {
         this.profileService = profileService;
@@ -91,12 +91,11 @@ __decorate([
     __param(2, (0, common_1.Param)('username')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object, Object]),
-    __metadata("design:returntype", common_1.StreamableFile)
+    __metadata("design:returntype", Promise)
 ], ProfileController.prototype, "getPhotoProfile", null);
 ProfileController = __decorate([
     (0, common_1.Controller)('profile'),
-    __param(0, (0, common_1.Inject)(iprofile_service_1.InterfacePfoileServiceProvider)),
-    __metadata("design:paramtypes", [Object])
+    __metadata("design:paramtypes", [profile_service_1.ProfileService])
 ], ProfileController);
 exports.ProfileController = ProfileController;
 //# sourceMappingURL=profile.controller.js.map

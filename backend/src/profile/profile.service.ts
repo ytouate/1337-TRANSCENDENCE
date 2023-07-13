@@ -1,5 +1,4 @@
 import { Injectable, StreamableFile } from '@nestjs/common';
-import { IProfileService } from './iprofile.service';
 import { PrismaService } from 'src/Prisma/prisma.service';
 import {User} from 'prisma'
 import { createReadStream } from 'fs';
@@ -10,7 +9,7 @@ import { userReturn } from 'src/utils/user.return';
 
 
 @Injectable()
-export class ProfileService implements IProfileService{
+export class ProfileService{
     constructor(private prismaService: PrismaService){
 }
     async getProfile(req) {

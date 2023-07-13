@@ -1,18 +1,16 @@
 import { Controller, Delete, Get, Inject, Param, Put, Req, Res, StreamableFile, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
-import { IProfileService } from './iprofile.service';
 import { diskStorage } from 'multer';
-import {InterfacePfoileServiceProvider } from './iprofile.service';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as mimeTypes from 'mime-types';
 import { createReadStream } from 'fs';
+import { ProfileService } from './profile.service';
 
 
 
 @Controller('profile')
 export class ProfileController {
-    private 
-    constructor(@Inject(InterfacePfoileServiceProvider) private profileService){}
+    constructor( private profileService: ProfileService){}
    
     @UseGuards(AuthGuard('jwt'))
     @Get('')
@@ -47,7 +45,7 @@ export class ProfileController {
         return this.profileService.updateName(req.body.username, req);
     }
     @Get('getphoto/:username')
-    getPhotoProfile(@Req() req, @Res({ passthrough: true }) res, @Param('username') username): StreamableFile {
+    getPhotoProfile(@Req() req, @Res({ passthrough: true }) res, @Param('username') username): Promise<StreamableFile> {
         return this.profileService.getPhotoProfile(req, res, username);
     }
 }

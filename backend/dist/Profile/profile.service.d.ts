@@ -1,7 +1,6 @@
 import { StreamableFile } from '@nestjs/common';
-import { IProfileService } from './iprofile.service';
 import { PrismaService } from 'src/Prisma/prisma.service';
-export declare class ProfileService implements IProfileService {
+export declare class ProfileService {
     private prismaService;
     constructor(prismaService: PrismaService);
     getProfile(req: any): Promise<any>;

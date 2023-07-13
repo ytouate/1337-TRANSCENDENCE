@@ -9,22 +9,19 @@ export declare class UserSettingsService {
     searchUser(user: any, pattern: any): Promise<User[]>;
     private checkUserStatus;
     unblockUser(source: any, target: any): Promise<void>;
-    getUser(user: any, id: any): Promise<User | {
-        status: number;
-        message: string;
-    }>;
+    getUser(user: any, id: any): Promise<any>;
     getUserByUsername(name: string): Promise<User>;
     getUserById(userId: number): Promise<{
         gamesPlayed: number;
         id: number;
         email: string;
-        socketId: string;
         username: string;
         urlImage: string;
         imageIsUpdate: boolean;
         optionalMail: string;
         codeVerification: number;
         status: string;
+        activitystatus: boolean;
         win: number;
         loss: number;
         preference: import(".prisma/client").Preference;

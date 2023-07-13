@@ -90,7 +90,7 @@ let UserSettingsService = class UserSettingsService {
             }
         });
         usersSearch.map((obj) => {
-            obj.status = this.checkUserStatus(sourceUser, obj);
+            obj.friendStatus = this.checkUserStatus(sourceUser, obj);
         });
         console.log(usersSearch);
         return usersSearch;
@@ -136,7 +136,7 @@ let UserSettingsService = class UserSettingsService {
             },
         });
         if (userToReturn) {
-            userToReturn.status = this.checkUserStatus(sourceUser, userToReturn);
+            userToReturn.friendStatus = this.checkUserStatus(sourceUser, userToReturn);
             return userToReturn;
         }
         return {

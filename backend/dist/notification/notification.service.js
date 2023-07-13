@@ -17,13 +17,32 @@ const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const passport_1 = require("@nestjs/passport");
 const websockets_1 = require("@nestjs/websockets");
-const socket_io_1 = require("socket.io");
 const prisma_service_1 = require("../Prisma/prisma.service");
 let NotificationService = class NotificationService {
     constructor(jwtService, prismaServie) {
         this.jwtService = jwtService;
         this.prismaServie = prismaServie;
         this.socketById = new Map();
+    }
+    handleDisconnect(client) {
+        this.changeActivityStatusToOffline(client);
+    }
+    async changeActivityStatusToOffline(client) {
+        const userObj = this.jwtService.verify(client.handshake.headers.authorization.slice(7));
+        const user = await this.prismaServie.user.findFirst({
+            where: {
+                username: userObj.username
+            }
+        });
+        this.prismaServie.user.update({
+            where: {
+                username: userObj.username,
+            },
+            data: {
+                activitystatus: true,
+            }
+        });
+        this.socketById.delete(user.id);
     }
     handleConnection(client) {
         this.pushClientInMap(client);
@@ -84,6 +103,14 @@ let NotificationService = class NotificationService {
                 this.socketById.set(user.id, [client]);
             else
                 this.socketById.get(user.id).push(client);
+            await this.prismaServie.user.update({
+                where: {
+                    username: userObj.username,
+                },
+                data: {
+                    activitystatus: true,
+                }
+            });
         }
         catch (erro) {
             client.disconnect();
@@ -158,12 +185,6 @@ let NotificationService = class NotificationService {
         }
     }
 };
-__decorate([
-    __param(0, (0, websockets_1.ConnectedSocket)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [socket_io_1.Socket]),
-    __metadata("design:returntype", void 0)
-], NotificationService.prototype, "handleConnection", null);
 __decorate([
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('websocket-jwt')),
     (0, websockets_1.SubscribeMessage)('send_notification'),

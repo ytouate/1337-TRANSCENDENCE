@@ -86,8 +86,8 @@ export class UserSettingsService {
                 }
             }
         });
-        usersSearch.map((obj) =>{
-            obj.status = this.checkUserStatus(sourceUser, obj);
+        usersSearch.map((obj: any) =>{
+            obj.friendStatus = this.checkUserStatus(sourceUser, obj);
         } )
         console.log(usersSearch);
         return usersSearch;
@@ -130,13 +130,13 @@ export class UserSettingsService {
                 blockedBy: true,
             }
         })
-        let userToReturn = await this.prismaService.user.findUnique({
+        let userToReturn: any = await this.prismaService.user.findUnique({
             where: {
                 id: id
             },
         })
         if (userToReturn){
-            userToReturn.status = this.checkUserStatus(sourceUser, userToReturn);
+            userToReturn.friendStatus = this.checkUserStatus(sourceUser, userToReturn);
             return userToReturn;
         }
         return {

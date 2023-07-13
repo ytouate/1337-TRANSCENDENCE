@@ -1,23 +1,45 @@
 import { InternalServerErrorException, Req, UseGuards } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
-import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets';
 import { Notification, User } from '@prisma/client';
 import { Server, Socket } from 'socket.io';
 import { PrismaService } from 'src/Prisma/prisma.service';
 
 
 @WebSocketGateway({namespace: 'notification', cors: true})
-export class NotificationService {
+export class NotificationService implements OnGatewayConnection, OnGatewayDisconnect{
     socketById: Map<number, Socket[]> ;
     constructor(private jwtService: JwtService, private prismaServie: PrismaService){
         this.socketById = new Map<number, Socket[]>();
     }
-   
+    //disconnect client by delete socket from map
+    handleDisconnect(client: Socket) {
+        this.changeActivityStatusToOffline(client)
+    }
+   // make user offline and delete socket from map
+    async changeActivityStatusToOffline(client: Socket){
+        const userObj: any = this.jwtService.verify(client.handshake.headers.authorization.slice(7));
+        const user: User = await this.prismaServie.user.findFirst({
+            where: {
+                username: userObj.username
+            }
+        })
+        this.prismaServie.user.update({
+            where: {
+                username: userObj.username,
+            },
+            data: {
+                activitystatus: true,
+            }
+        })
+        this.socketById.delete(user.id);
+    }
     //get socket from connecting clients
-    handleConnection(@ConnectedSocket() client: Socket) {
+    handleConnection(client: Socket) {
         this.pushClientInMap(client);
     }
+
     //get the sending message
     @UseGuards(AuthGuard('websocket-jwt'))
     @SubscribeMessage('send_notification')
@@ -42,7 +64,6 @@ export class NotificationService {
             }
         }
     }
-
     //push notification to database
     async pushNotificationToDb(notificationBody, req){
         const sender = await this.prismaServie.user.findUnique({
@@ -81,6 +102,14 @@ export class NotificationService {
                 this.socketById.set(user.id, [client]);
             else
                 this.socketById.get(user.id).push(client);
+            await this.prismaServie.user.update({
+                where: {
+                    username: userObj.username,
+                },
+                data: {
+                    activitystatus: true,
+                }
+            })
         }
         catch(erro){
             client.disconnect();

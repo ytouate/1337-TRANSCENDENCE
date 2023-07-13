@@ -21,25 +21,24 @@ model Notification {
 model User {
   id               Int            @id @default(autoincrement())
   email            String         @unique
-  socketId         String?
   username         String         @unique
   urlImage         String?
   imageIsUpdate    Boolean        @default(false)
   optionalMail     String?
   codeVerification Int?
-  friends   User[]    @relation("UserFriends")
-  friendOf  User[]    @relation("UserFriends")
-  blocked   User[]    @relation("blocking")
-  blockedBy User[]    @relation("blocking")
-  notifications Notification[] @relation("userNotificaiton")
+  friends          User[]         @relation("UserFriends")
+  friendOf         User[]         @relation("UserFriends")
+  blocked          User[]         @relation("blocking")
+  blockedBy        User[]         @relation("blocking")
+  notifications    Notification[] @relation("userNotificaiton")
   status           String?
+  activitystatus     Boolean @default(false)
   roomChat         chatRoom[]     @relation("userInChatRoom")
   message          Message[]
-
-  preference Preference?
-  games Game[] @relation("GameUsers")
-  win Int @default(0)
-  loss Int @default(0)
+  preference       Preference?
+  games            Game[]         @relation("GameUsers")
+  win              Int            @default(0)
+  loss             Int            @default(0)
 }
 
 model chatRoom {
@@ -64,7 +63,6 @@ model Message {
   user     User     @relation(fields: [userId], references: [id])
   roomData chatRoom @relation(fields: [roomId], references: [id])
 }
-
 
 model Preference {
   id          Int    @id @default(autoincrement())
