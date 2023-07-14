@@ -19,6 +19,7 @@ export async function loader() {
   const res = await fetch("http://localhost:3000/user", options);
   return await res.json();
 }
+
 export default function Profile() {
   const user = useLoaderData();
   return (

@@ -4,10 +4,10 @@ import "./FriendsList.css";
 import { Fragment, useContext, useState } from "react";
 import FriendCard from "../FriendCard/FriendCard";
 import Cookies from "js-cookie";
+
 export default function FriendsList() {
   const [searchPattern, setSearchPattern] = useState("");
   const user: any = useContext(userContext);
-  console.log('user: ', user);
   var friendList = null;
   if (user) {
     friendList = user.friends.map((friend: any) => {
@@ -32,9 +32,10 @@ export default function FriendsList() {
       },
     };
     fetch(
-      `http://localhost:3000/users/search?` + new URLSearchParams({
-        pattern: searchPattern
-      }),
+      `http://localhost:3000/users/search?` +
+        new URLSearchParams({
+          pattern: searchPattern,
+        }),
       options
     )
       .then((res) => res.json())
