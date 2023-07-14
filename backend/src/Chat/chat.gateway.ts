@@ -8,7 +8,7 @@ import { Req } from "@nestjs/common";
 
 
 @WebSocketGateway({ namespace : 'chat' , cors : true})
-export class chatGateway  implements OnModuleInit , OnGatewayConnection , OnGatewayDisconnect {
+export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
     constructor (
         private prisma: PrismaService,
         private user: UserService
@@ -28,14 +28,28 @@ export class chatGateway  implements OnModuleInit , OnGatewayConnection , OnGate
         this.user.putDataInDatabase(client.handshake.query.roomName, data, req.user)
     }
 
-    onModuleInit() {
-        
+
+  // joining the socket of user in  specific room
+    @SubscribeMessage('createRoom')
+    @UseGuards(AuthGuard('websocket-jwt'))
+    async handleCreationOfTheRoom(@ConnectedSocket() client : Socket , @Req() req) {
+        console.log(`client  ${client.id} connected and creat the room ${client.handshake.query.roomName}`)
+        const user = await this.validateUserByEmail(req.user.email, client.handshake.query.roomName)
+        if (user)
+        {
+            this.user.creatRoom({
+                'roomName' : client.handshake.query.roomName ,
+                'status'   : client.handshake.query.status  ,
+                'password' : client.handshake.query.password} , user)
+            this.socketId.set(user.email, client.id)
+            this.server.in(client.id).socketsJoin(client.handshake.query.roomName)  
+            return `${user.username} has create the room ${client.handshake.query.roomName}`
+        }
     }
 
     // joining the socket of user in  specific room
     @SubscribeMessage('joinRoom')
-    @UseGuards(AuthGuard('websocket-jwt'))
-    async handle(@ConnectedSocket() client : Socket , @Req() req) {
+    async handleJoiningTheRoom(@ConnectedSocket() client : Socket , @Req() req) {
         console.log(`client  ${client.id} connected and joining the room ${client.handshake.query.roomName}`)
         const user = await this.validateUserByEmail(req.user.email, client.handshake.query.roomName)
         if (user)
@@ -53,7 +67,6 @@ export class chatGateway  implements OnModuleInit , OnGatewayConnection , OnGate
 
     // leave the socket from room
     @SubscribeMessage('leaveRoom')
-    @UseGuards(AuthGuard('websocket-jwt'))
     async leaveRoomHandler(@ConnectedSocket() client: Socket, @Req() req) {
         const user = await this.validateUserByUsername(client.handshake.query.username)
         if (user)

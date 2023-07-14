@@ -1,8 +1,7 @@
-import { Controller, Post, Res, Req , UseGuards, Body, RequestMapping, HttpStatus } from "@nestjs/common";
+import { Controller, Post, Res, Req , UseGuards, Body} from "@nestjs/common";
 import { authService } from "./auth.service";
 import { Get } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
-import { authDto } from "./DTO/auth.DTO";
 
 
 @Controller()
@@ -20,7 +19,7 @@ export class authController {
 
     @Get('/redirect/signin')
     @UseGuards(AuthGuard('42'))
-    async getProfilee(
+    async signin(
         @Res({passthrough : true}) res,
         @Req() req) 
     {
@@ -35,7 +34,7 @@ export class authController {
 
     @Get('user')
     @UseGuards(AuthGuard('jwt'))
-    async getp(@Req() req) {
+    async getUser(@Req() req) {
         const user = await this.authservice.validateUser(req)
         if (user)
             return user
