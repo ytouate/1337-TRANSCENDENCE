@@ -12,18 +12,10 @@ export class UserController {
         private userService:UserService
         ){}
 
-    @Post('createRoom')
-    async createRoom(@Query() Param, @Req() req) {
-        const user = await this.userService.validateUserToCreateChat(req)
-        if (!user)
-            return 'u can\'t\ create a room'
-        return await this.userService.creatRoom(Param, user)
-    }
-
     @Post('addAdmin')
     async setAdmin(@Query() Param) {
         await this.userService.setAdmin(Param)
-        return `the user ${Param.username} has moved from member to admin`
+        return {'message' : `the user ${Param.username} has moved from member to admin`}
     }
 
     @Post('muteUser')
@@ -35,7 +27,7 @@ export class UserController {
     @Post('changePassword')
     async   changePassword(@Query() Param) {
         await   this.userService.changePasswordOfProtectedRoom(Param)
-        return 'the password has changed'
+        return {'meesage' : 'the password has changed'}
     }
 
     @Get('getRoom')
