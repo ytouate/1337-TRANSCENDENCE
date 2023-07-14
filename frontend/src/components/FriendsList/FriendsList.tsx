@@ -7,6 +7,7 @@ import Cookies from "js-cookie";
 export default function FriendsList() {
   const [searchPattern, setSearchPattern] = useState("");
   const user: any = useContext(userContext);
+  console.log('user: ', user);
   var friendList = null;
   if (user) {
     friendList = user.friends.map((friend: any) => {

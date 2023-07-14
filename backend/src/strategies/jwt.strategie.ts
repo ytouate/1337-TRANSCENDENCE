@@ -2,7 +2,6 @@ import { Global, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
 import { Strategy , ExtractJwt} from "passport-jwt";
-import { pairwise } from "rxjs";
 
 @Global()
 @Injectable()
