@@ -5,15 +5,4 @@ import { createReadStream } from "fs";
 
 @Controller()
 export class appController{
-
-    @Get('name')
-    Home(name) {
-        return { message : `Heelo world ${name}`}
-    }
-
-
-    @Get('api/chat')
-    getindex() {
-        return 'message'
-    }
 }

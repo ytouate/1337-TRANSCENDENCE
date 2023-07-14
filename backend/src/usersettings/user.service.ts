@@ -86,6 +86,8 @@ export class UserSettingsService {
                 }
             }
         });
+        let index  = usersSearch.findIndex((user) => user.username == sourceUser.username);
+        usersSearch.splice(index ,index);
         usersSearch.map((obj: any) =>{
             obj.friendStatus = this.checkUserStatus(sourceUser, obj);
         } )

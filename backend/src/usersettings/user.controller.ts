@@ -21,7 +21,10 @@ export class UserSettingsController {
     }
     @Get('search')
     searchUsers(@Req() req, @Query() query){
-        return this.userService.searchUser(req.user, query.pattern)
+        let queryNoSpaces = query.pattern.trim();
+        if (queryNoSpaces.length > 0)
+            return this.userService.searchUser(req.user, queryNoSpaces)
+        return [];
     }
     @Get(':id')
     getUser(@Req() req, @Param('id') id){
