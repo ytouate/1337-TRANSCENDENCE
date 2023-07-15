@@ -2,6 +2,7 @@ import "./Notification.css";
 import bell from "../../assets/bell.svg";
 import { ChallengeCard } from "../ActiveFriends/ActiveFriends";
 import ytouate from "../../assets/ytouate.jpeg";
+import { Fragment } from "react";
 
 /*
 
@@ -18,16 +19,9 @@ function NotificationCard(props: any) {
     <li className="notification-card">
       <div className="notification-card--data">
         <p className="notification-card--title">{props.title}</p>
-        <p>
-          {props.sender}{" "}
-          {props.title == "Request"
-            ? "sent you a friend request"
-            : props.title == "Message"
-            ? "sent you a new message"
-            : "Challenged you"}
-        </p>
+        <p>{props.description}</p>
       </div>
-      <div className="notification-actions">
+      <div className=" notification-actions">
         <button className="notification-card--action">{buttonType}</button>
         {props.title != "Message" && (
           <button className="notification-card--action">Reject</button>
@@ -36,19 +30,30 @@ function NotificationCard(props: any) {
     </li>
   );
 }
-export default function Notification() {
+
+export default function Notification(props: any) {
+  let notifications = []
+  if (props.notifs) {
+     notifications = props.notifs.map((notif: any) => {
+      return (
+        <Fragment key={notif.id}>
+          <NotificationCard
+            title={notif.title}
+            description={notif.description}
+            sender={notif.sender.username}
+          />
+          <hr />
+        </Fragment>
+      );
+    });
+  }
+
   return (
     <ul className="notification-drop">
       <li className="item">
         <img src={bell} alt="" />
-        <span className="btn__badge">4</span>
-        <ul className="notification-content">
-          <NotificationCard title="Request" sender="ytouate" />
-          <hr />
-          <NotificationCard title="Message" sender="otmallah" />
-          <hr />
-          <NotificationCard title="Challenge" sender="ilefhail" />
-        </ul>
+        <span className="btn__badge">{notifications.length}</span>
+        <ul className="notification-content">{notifications}</ul>
       </li>
     </ul>
   );

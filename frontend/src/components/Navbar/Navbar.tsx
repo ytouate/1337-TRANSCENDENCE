@@ -13,9 +13,11 @@ import Cookies from "js-cookie";
 import "./Navbar.css";
 import { useContext, useEffect, useRef, useState } from "react";
 import { authContext } from "../../context/Context";
+import { Socket } from "socket.io-client";
 
 type NavData = {
   profileImg: string;
+  socket: Socket;
 };
 
 export async function loader() {
@@ -29,8 +31,12 @@ export async function loader() {
 
 function Nav(props: NavData) {
   const user: any = useLoaderData();
-  let [loggedIn, setLoggedIn] = useContext(authContext);
   let location = useLocation();
+  const socket: any = useContext(authContext);
+  const [notifications, setNotifications] = useState<any>([]);
+  socket.on("receive_notification", (param: any) => {
+    setNotifications((prev: any) => [...prev, param]);
+  });
   useEffect(() => setMenuDropDownOpen(false), [location]);
   const [isMenuDropDownOpen, setMenuDropDownOpen] = useState(false);
   const dropdownRef: any = useRef(null);
@@ -72,12 +78,12 @@ function Nav(props: NavData) {
             <NavLink to="chat">Chat</NavLink>
           </li>
           <li>
-            <NavLink to="profile">Profile</NavLink>
+            <NavLink to={`profile/${user.id}`}>Profile</NavLink>
           </li>
           {/* <li>
             <ModeToggler />
           </li> */}
-          <Notifications />
+          <Notifications notifs={notifications} />
 
           <li className="dropdown">
             {user && (

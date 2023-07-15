@@ -5,6 +5,7 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Notification, User } from '@prisma/client';
 import { Server, Socket } from 'socket.io';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { userReturn } from 'src/utils/user.return';
 
 
 @WebSocketGateway({namespace: 'notification', cors: true})
@@ -25,18 +26,19 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
                 username: userObj.username
             }
         })
-        this.prismaServie.user.update({
+        await this.prismaServie.user.update({
             where: {
                 username: userObj.username,
             },
             data: {
-                activitystatus: true,
+                activitystatus: false,
             }
         })
         this.socketById.delete(user.id);
     }
     //get socket from connecting clients
     handleConnection(client: Socket) {
+        // console.log(client);
         this.pushClientInMap(client);
     }
 
@@ -44,28 +46,36 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
     @UseGuards(AuthGuard('websocket-jwt'))
     @SubscribeMessage('send_notification')
     async getNotification(@MessageBody() body: any, @Req() req){
+        console.log(body);
         const notifcation = await this.pushNotificationToDb(body, req)
-        this.sendNotification(notifcation)
+        this.sendNotification(notifcation, req)
     }
     //send notification to the target
-    async sendNotification(notification){
-        const notif = await this.prismaServie.notification.findUnique({
+    async sendNotification(notification, req){
+        const notif: any = await this.prismaServie.notification.findUnique({
             where: {
                 id : notification.id
             },
-            include:{
-                senderAndReicever: true,
+            include: {
+                reicever: true,
             }
         })
-        notification.sender = notif.senderAndReicever[0];
-        if (this.socketById.has(notif.senderAndReicever[1]?.id)){
-            for (let i = 0;i < this.socketById.get(notif.senderAndReicever[1].id).length;i++){
-                this.socketById.get(notif.senderAndReicever[1].id)[i].emit('receive_notification', notification);
+        const sender = await this.prismaServie.user.findFirst({
+            where: {
+                id: notif.senderId,
+            },
+        })
+        notif.sender = userReturn(sender, req);
+        if (this.socketById.has(notif.reiceverId)){
+            for (let i = 0;i < this.socketById.get(notif.reiceverId).length;i++){
+                this.socketById.get(notif.reiceverId)[i].emit('receive_notification', notif);
             }
         }
+        console.log(notif)
     }
     //push notification to database
     async pushNotificationToDb(notificationBody, req){
+        console.log("notification : ", notificationBody)
         const sender = await this.prismaServie.user.findUnique({
             where: {
                 username: req.user.username,
@@ -76,14 +86,12 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
                 username: notificationBody.username
             }
         })
-        let userIds = [sender.id, reicever.id]
         let notification: Notification = await this.prismaServie.notification.create({
             data: {
+                senderId: sender.id,
                 description: notificationBody.description,
                 title: notificationBody.title,
-                senderAndReicever: {
-                    connect: userIds.map((id) => ({id})),
-                },
+                reiceverId: reicever.id
             }
         });
         
@@ -102,7 +110,7 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
                 this.socketById.set(user.id, [client]);
             else
                 this.socketById.get(user.id).push(client);
-            await this.prismaServie.user.update({
+            let r = await this.prismaServie.user.update({
                 where: {
                     username: userObj.username,
                 },
@@ -110,6 +118,7 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
                     activitystatus: true,
                 }
             })
+            console.log(r);
         }
         catch(erro){
             client.disconnect();
@@ -124,11 +133,11 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
             this.deleteNotification(body);
             let acceptation = {
                 title: notification.title,
-                reicever: notification.senderAndReicever[1].username,
+                reicever: notification.reicever.username,
                 status: 'accepted'
             }
-            for (let i = 0;i < this.socketById.get(notification.senderAndReicever[1].id).length;i++){
-                this.socketById.get(notification.senderAndReicever[0].id)[i].emit('receive_notification', acceptation);
+            for (let i = 0;i < this.socketById.get(notification.reicever.id).length;i++){
+                this.socketById.get(notification.senderId)[i].emit('receive_notification', acceptation);
             }
         }
         else if (body.status == 'rejected') this.deleteNotification(body);
@@ -153,29 +162,29 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
                     id: messageBody.id,
                 },
                 include: {
-                    senderAndReicever: true
+                    reicever: true
                 }
             })
             await this.prismaServie.user.update({
                 where: {
-                    id: notification.senderAndReicever[0].id
+                    id: notification.senderId
                 },
                 data: {
                     friends:{
                         connect: {
-                            id: notification.senderAndReicever[1].id
+                            id: notification.reicever.id
                         }
                     }
                 }
             })
             await this.prismaServie.user.update({
                 where: {
-                    id: notification.senderAndReicever[1].id
+                    id: notification.reicever.id
                 },
                 data: {
                     friends:{
                         connect: {
-                            id: notification.senderAndReicever[0].id
+                            id: notification.senderId
                         }
                     }
                 }

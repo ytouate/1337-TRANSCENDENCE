@@ -17,18 +17,21 @@ export class UserSettingsController {
     
     @Delete('unblock')
     unblockUser(@Req() req, @Body() body){
+        
         this.userService.unblockUser(req.user, body);
     }
+
     @Get('search')
     searchUsers(@Req() req, @Query() query){
         let queryNoSpaces = query.pattern.trim();
         if (queryNoSpaces.length > 0)
-            return this.userService.searchUser(req.user, queryNoSpaces)
+            return this.userService.searchUser(req, queryNoSpaces)
         return [];
     }
+
     @Get(':id')
     getUser(@Req() req, @Param('id') id){
-        return this.userService.getUser(req.user, parseInt(id));
+        return this.userService.getUser(req, parseInt(id));
     } 
 
 }

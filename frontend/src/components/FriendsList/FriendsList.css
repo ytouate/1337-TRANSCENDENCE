@@ -13,6 +13,14 @@
     padding: 20px;
     font-family: "Michroma";
     border-radius: 15px;
+    height: 100%;
+}
+
+.friends-list-nav {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 10px;
 }
 
 
