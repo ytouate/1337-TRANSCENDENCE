@@ -68,7 +68,7 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
         notif.sender = userReturn(sender, req);
         if (this.socketById.has(notif.reiceverId)){
             for (let i = 0;i < this.socketById.get(notif.reiceverId).length;i++){
-                this.socketById.get(notif.reiceverId)[i].emit('receive_notification'Pr, notif);
+                this.socketById.get(notif.reiceverId)[i].emit('receive_notification', notif);
             }
         }
         console.log(notif)

@@ -37,7 +37,6 @@ function Nav(props: NavData) {
   socket.on("receive_notification", (param: any) => {
     setNotifications((prev: any) => [...prev, param]);
   });
-  console.log('notifs: ', notifications);
   useEffect(() => setMenuDropDownOpen(false), [location]);
   const [isMenuDropDownOpen, setMenuDropDownOpen] = useState(false);
   const dropdownRef: any = useRef(null);

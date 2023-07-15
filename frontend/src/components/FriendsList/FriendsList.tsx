@@ -7,7 +7,6 @@ import Cookies from "js-cookie";
 import { Link } from "react-router-dom";
 
 export function MyFriends(props: any) {
-  
   return (
     <>
       {props.friendList && props.friendList.length > 0 ? (
@@ -80,19 +79,19 @@ export default function FriendsList() {
     )
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setSearchFriends(
           data.map((friend: any) => {
             setIsSearching(true);
             return (
-              <Link to={`/profile/${friend.id}`} key={friend.id}>
+              <Fragment key={friend.id}>
                 <FriendCard
+                  id={friend.id}
                   actions={["Add", "Block"]}
                   status={friend.status}
                   img={friend.urlImage}
                   name={friend.username}
                 />
-              </Link>
+              </Fragment>
             );
           })
         );
@@ -142,14 +141,6 @@ export default function FriendsList() {
       </div>
       <div className="friends-list--body">
         <div className="scroll-div">
-          {/* {isSearching ? (
-            <SearchedUsers
-              searchedFriends={searchedFriends}
-              backToMyFriends={() => setIsSearching(false)}
-            />
-          ) : (
-            <MyFriends friendList={friendList} />
-          )} */}
           {section == "friends" ? (
             <MyFriends friendList={friendList} />
           ) : section == "search" ? (

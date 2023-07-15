@@ -53,6 +53,7 @@
 .friend-card--left {
   display: flex;
   align-items: center;
+  color: white;
   gap: 15px;
 }
 

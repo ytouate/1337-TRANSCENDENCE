@@ -10,7 +10,6 @@ import { useLoaderData } from "react-router-dom";
 import { useContext } from "react";
 
 export async function userLoader({ params }: any) {
-  console.log(params.id);
   const Token = Cookies.get("Token");
   const options = {
     method: "GET",
