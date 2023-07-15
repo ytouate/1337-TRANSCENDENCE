@@ -27,3 +27,5 @@
 
 - guard admin
 - ban user { request to  leavRoom event and add it in table of ban users}
+- hash password of chatroom
+

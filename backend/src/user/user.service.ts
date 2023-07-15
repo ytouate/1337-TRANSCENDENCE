@@ -8,14 +8,13 @@ export class UserService {
     
     // create room {2 users => n users}
     async creatRoom(Param , user) {
-        let {roomName  , password} = Param
+        let {roomName  , status, password} = Param
         if (!password)
             password = ''
         const room = await this.getRoomByName(roomName)
         if (!room)
         {
             try {
-                await this.setAdmin({'username' : user.username , 'roomName' : roomName})
                 await this.prismaService.chatRoom.create(
                     {
                         data : {
@@ -24,10 +23,12 @@ export class UserService {
                             users : {
                                 connect : { id : user.id}
                             },
+                            status : status,
                             password : password
                         }
                     }
-                )
+                    )
+                await this.setAdmin({'username' : user.username , 'roomName' : roomName})
                 return {'message' : `room ${roomName} already exist`}
             }
             catch(error) {

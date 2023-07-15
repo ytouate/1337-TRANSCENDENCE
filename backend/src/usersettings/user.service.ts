@@ -2,6 +2,7 @@ import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundE
 import { Notification, User } from '@prisma/client';
 import { stat } from 'fs';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { userReturn } from 'src/utils/user.return';
 
 @Injectable()
 export class UserSettingsService {
@@ -52,7 +53,7 @@ export class UserSettingsService {
     }
     //push user to block scalar
     async addUserToBlocking(source, target){  
-        this.prismaService.user.update({
+        let user = await this.prismaService.user.update({
             where: {
                 email: source.email,
             },
@@ -64,13 +65,15 @@ export class UserSettingsService {
                 }
             }
         })
+        console.log(user);
+
     }
     // search implimentation
-    async searchUser(user, pattern){
+    async searchUser(req, pattern){
         
         let sourceUser = await this.prismaService.user.findUnique({
             where: {
-                email: user.email
+                email: req.user.email
             },
             include: {
                 friends: true,
@@ -79,17 +82,30 @@ export class UserSettingsService {
             }
         })
         
-        let usersSearch = await this.prismaService.user.findMany({
+        let usersSearch: any = await this.prismaService.user.findMany({
             where: {
                 username: {
                     contains: pattern,
                 }
             }
         });
+        let index  = usersSearch.findIndex((user) => user.username == sourceUser.username);
+        if (index != -1)
+            usersSearch = usersSearch.splice(index ,index);
         usersSearch.map((obj: any) =>{
-            obj.friendStatus = this.checkUserStatus(sourceUser, obj);
+            obj = userReturn(obj, req);
+            obj.friendStatus = false;
+            obj.me = false;
+            let status = this.checkUserStatus(sourceUser, obj);
+            if (status == 'blocked'){
+                usersSearch.findIndex((user) => user.username == sourceUser.username);
+                usersSearch = usersSearch.splice(index ,index);
+            }
+            else if (status == 'friend')
+                obj.friendStatus = true;
+            else if (status == 'me')
+                obj.me = true;
         } )
-        console.log(usersSearch);
         return usersSearch;
     }
     //  check status user for the user who make request 
@@ -97,15 +113,16 @@ export class UserSettingsService {
         if (user.blocked.find(obj => obj.email === targetUser.email))
             return 'blocked';
         else if (user.blockedBy.find(obj => obj.email === targetUser.email))
-            return  'blockedBy';
+            return  'blocked';
         else if (user.friends.find(obj => obj.email === targetUser.email))
             return 'friend'
+        else if (user.username == targetUser.username)
+            return 'me'
         else
            return 'notFriend'
     }
-    //unblock User
     async unblockUser(source, target){
-        this.prismaService.user.update({
+        await this.prismaService.user.update({
             where: {
                 email: source.email,
             },
@@ -119,10 +136,10 @@ export class UserSettingsService {
         })
     }
     //return user by id
-    async getUser(user, id){
+    async getUser(req, id){
         let sourceUser = await this.prismaService.user.findUnique({
             where: {
-                email: user.email
+                email: req.user.email
             },
             include: {
                 friends: true,
@@ -134,10 +151,28 @@ export class UserSettingsService {
             where: {
                 id: id
             },
-        })
+            include: {
+                friends: true,
+                blocked: true,
+                blockedBy: true,
+            }
+        });
         if (userToReturn){
-            userToReturn.friendStatus = this.checkUserStatus(sourceUser, userToReturn);
-            return userToReturn;
+            userToReturn.friendStatus = false;
+            userToReturn.me = false;
+            let status = this.checkUserStatus(sourceUser, userToReturn);
+            if (status == 'friend')
+                userToReturn.friendStatus = true;
+            else if (status == 'blocked')
+                throw new NotFoundException({}, 'not found');
+            else if (status == 'me')
+                userToReturn.me = true;
+            if (userToReturn.me == false) {
+                delete userToReturn.friends;
+                delete userToReturn.blockedBy;
+            }
+            delete userToReturn.blockedBy;
+            return userReturn(userToReturn, req);
         }
         return {
             status: 404,
@@ -159,6 +194,7 @@ export class UserSettingsService {
 
     async getUserById(userId: number) {
         // console.log('m here');
+        userId = Math.floor(userId)
         const user = await this.prismaService.user.findUnique({
             where: {
                 id: userId,
