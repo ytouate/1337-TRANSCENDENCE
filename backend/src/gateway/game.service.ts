@@ -46,10 +46,12 @@ export class GameGateWay
         });
     }
 
+
+    // called when a client is connected
     async handleConnection(@ConnectedSocket() client: Socket) {
-        // console.log('handleConnection');
         this.addClient(client);
     }
+
 
     getUserIdBySocket(socket: Socket): number | undefined {
         for (const [userId, userData] of this.userSockets) {
@@ -60,6 +62,7 @@ export class GameGateWay
         return undefined;
     }
 
+    // remove a client from the userSockets and queue
     removeClient(client: Socket) {
         const userId = this.getUserIdBySocket(client);
 
@@ -75,10 +78,12 @@ export class GameGateWay
         }
     }
 
+    // called when a client disconnects
     handleDisconnect(@ConnectedSocket() client: Socket) {
         this.removeClient(client);
     }
 
+    // add client to the userSockets
     async addClient(client: Socket) {
         const { userId } = client.handshake.query;
 
@@ -101,6 +106,8 @@ export class GameGateWay
         this.userSockets.set(user.id, userData);
     }
 
+
+    // match two players and start the game
     async matchPlayers(
         player1: number,
         player2: number,
@@ -124,6 +131,7 @@ export class GameGateWay
         const roomId = String(game.id);
         console.log('Joining Room:', roomId);
 
+        // join the players to a room
         userData1.socket.join(roomId);
         userData2.socket.join(roomId);
 
@@ -185,6 +193,7 @@ export class GameGateWay
 
         const gamePosition = this.gamePlayerPosition.get(game.id);
 
+        // Create a new Game instance and start the game loop
         const gameInstance = new Game(
             game.id,
             userData1.socket,
@@ -200,6 +209,9 @@ export class GameGateWay
         );
     }
 
+
+    // event handler so each player ..
+    // emit their mouse movement to the server
     @SubscribeMessage('mouseMove')
     mouseMove(
         @MessageBody() body: any,
@@ -210,13 +222,10 @@ export class GameGateWay
         const gamePositions = this.gamePlayerPosition.get(gameId);
         if (gamePositions) {
             gamePositions.players[order].y = y * BOARD_HEIGHT;
-            const roomId = String(gameId);
-            client.broadcast
-                .to(roomId)
-                .emit('opponent_mousemove', { y });
         }
     }
 
+    // Check if a player is already in a game
     checkifPlayerInGame(
         userId: number,
     ): { gameId: number; p: PlayerPosition } | undefined {
@@ -229,6 +238,7 @@ export class GameGateWay
         return undefined;
     }
 
+    // event handler, used when players queue up
     @SubscribeMessage('queueUp')
     async queueUp(
         @MessageBody() body: any,
@@ -240,6 +250,7 @@ export class GameGateWay
             console.log('User already in the queue');
             return;
         }
+
         let check = this.checkifPlayerInGame(userId);
         if (check) {
             client.emit('match_found', {
@@ -256,6 +267,8 @@ export class GameGateWay
             return;
         }
         this.queue.push(userId);
+        // if more than 2 players in the queue,
+        // take the oldest ones in the queue and match them
         if (this.queue.length >= 2) {
             const player1 = this.queue.shift();
             const player2 = this.queue.shift();
@@ -263,16 +276,11 @@ export class GameGateWay
         }
     }
 
+    // event to handle players' invite
     @SubscribeMessage('gameInvite')
     async gameInvite(@MessageBody() body: any) {
         const userId: number = body.userId;
         const opponentUsername: string = body.opponentUsername;
-
-        // const opponent = await this.prisma.user.findUnique({
-        //     where: {
-        //         username: opponentUsername,
-        //     },
-        // });
 
         const opponent = await this.userService.getUserByUsername(
             opponentUsername,
@@ -290,12 +298,6 @@ export class GameGateWay
             return;
         }
 
-        // const senderInfo = await this.prisma.user.findUnique({
-        //     where: {
-        //         id: myData.id,
-        //     },
-        // });
-
         const senderInfo = await this.userService.getUserById(userId);
 
         if (!senderInfo) {
@@ -308,14 +310,17 @@ export class GameGateWay
         });
     }
 
+
+    // event handler, when the player responds to an invite from another player
     @SubscribeMessage('inviteResponse')
     async inviteResponse(@MessageBody() body: any) {
         const userId: number = body.userId;
         const opponentId: number = body.opponentId;
         const status: string = body.status;
 
+        // if the invitee accepts, match the two players
+        // else sends a feedback to the inviter that the player declined
         if (status === 'accepted') {
-            // this.matchPlayers(opponent.id, userId);
             console.log('players matched');
             await new Promise(() => {
                 setTimeout(() => {

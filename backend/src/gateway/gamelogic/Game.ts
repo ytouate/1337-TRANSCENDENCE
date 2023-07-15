@@ -105,6 +105,7 @@ export class Game {
                 },
             });
 
+            // updating the ball position
             ball.x += ball.speedX * this.velocity * delta;
             ball.y += ball.speedY * this.velocity * delta;
             this.velocity += VELOCITY_INCREASE * delta;
@@ -121,6 +122,7 @@ export class Game {
                     this.checkScore(ball, this.gamePosition);
 
                 if (gameOver) {
+                    // emit to players that the game is over, and some data about the game
                     server.to(room).emit('game_over', {
                         winnerData,
                     });
@@ -137,6 +139,8 @@ export class Game {
         }, 1000 / 60);
     }
 
+
+    // game logic for ball collision, update scores, update speed/direction of the ball
     private gameLogic(
         ball: Ball,
         gamePosition: GamePosition,
@@ -186,6 +190,7 @@ export class Game {
         return { reset };
     }
 
+    // Reset the ball position and speed for a new round
     private resetBall(ball: Ball) {
         this.round++;
         ball.x = BOARD_WIDTH / 2;
@@ -198,6 +203,7 @@ export class Game {
         ball.speedY = (Math.random() < 0.5 ? -1 : 1) * BALL_SPEED_Y;
     }
 
+    // check if a player has reached the winning condition
     private checkScore(ball: Ball, gamePosition: GamePosition) {
         let winnerData: PlayerPosition;
         let loserData: PlayerPosition;
@@ -215,6 +221,7 @@ export class Game {
         return { gameOver, winnerData, loserData };
     }
 
+    // update game and data and user statistics
     private async updateGameEnd(winnerId: number, loserId: number) {
         const durationInSeconds = Math.floor(
             (new Date().getTime() -
