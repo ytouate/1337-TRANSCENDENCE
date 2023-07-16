@@ -31,7 +31,6 @@ export default function ActiveFriends() {
   const user: any = useContext(userContext);
   let activeFriends = [];
   if (user){
-
      activeFriends = user.friends.map((friend) => {
       return (
         <ChallengeCard

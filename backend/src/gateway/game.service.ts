@@ -9,20 +9,14 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { BOARD_HEIGHT, PADDLE_HEIGHT } from './gamelogic/constants';
-import {
-    UserData,
-    GamePosition,
-    PlayerPosition,
-} from './gamelogic/interfaces';
+import { UserData, GamePosition, PlayerPosition } from './gamelogic/interfaces';
 import { Game } from './gamelogic/Game';
 import { GameService } from 'src/game/game.service';
 import { PrefService } from 'src/pref/pref.service';
 import { UserSettingsService } from 'src/usersettings/user.service';
 
 @WebSocketGateway({ cors: true })
-export class GameGateWay
-    implements OnGatewayConnection, OnModuleInit
-{
+export class GameGateWay implements OnGatewayConnection, OnModuleInit {
     userSockets: Map<number, UserData>;
     queue: number[];
     gamePlayerPosition: Map<number, GamePosition>;
@@ -46,8 +40,8 @@ export class GameGateWay
         });
     }
 
+    // called when a client is connected
     async handleConnection(@ConnectedSocket() client: Socket) {
-        // console.log('handleConnection');
         this.addClient(client);
     }
 
@@ -60,14 +54,13 @@ export class GameGateWay
         return undefined;
     }
 
+    // remove a client from the userSockets and queue
     removeClient(client: Socket) {
         const userId = this.getUserIdBySocket(client);
 
         if (userId) {
             this.userSockets.delete(userId);
-            const index = this.queue.findIndex(
-                (element) => element === userId,
-            );
+            const index = this.queue.findIndex((element) => element === userId);
             if (index !== -1) {
                 this.queue.splice(index, 1);
             }
@@ -75,16 +68,16 @@ export class GameGateWay
         }
     }
 
+    // called when a client disconnects
     handleDisconnect(@ConnectedSocket() client: Socket) {
         this.removeClient(client);
     }
 
+    // add client to the userSockets
     async addClient(client: Socket) {
         const { userId } = client.handshake.query;
 
-        const user = await this.userService.getUserById(
-            Number(userId),
-        );
+        const user = await this.userService.getUserById(Number(userId));
 
         if (!user) return;
 
@@ -101,11 +94,8 @@ export class GameGateWay
         this.userSockets.set(user.id, userData);
     }
 
-    async matchPlayers(
-        player1: number,
-        player2: number,
-        gameInvite: boolean,
-    ) {
+    // match two players and start the game
+    async matchPlayers(player1: number, player2: number, gameInvite: boolean) {
         // Get the sockets for the matched players
         const userData1 = this.userSockets.get(player1);
         const userData2 = this.userSockets.get(player2);
@@ -124,6 +114,7 @@ export class GameGateWay
         const roomId = String(game.id);
         console.log('Joining Room:', roomId);
 
+        // join the players to a room
         userData1.socket.join(roomId);
         userData2.socket.join(roomId);
 
@@ -131,16 +122,10 @@ export class GameGateWay
 
         console.log('emitting to user 2:');
 
-        const event_name = gameInvite
-            ? 'game_invite_start'
-            : 'match_found';
+        const event_name = gameInvite ? 'game_invite_start' : 'match_found';
 
-        const pref1 = await this.prefService.getUserPref(
-            userData1.id,
-        );
-        const pref2 = await this.prefService.getUserPref(
-            userData2.id,
-        );
+        const pref1 = await this.prefService.getUserPref(userData1.id);
+        const pref2 = await this.prefService.getUserPref(userData2.id);
 
         userData1.socket.emit(event_name, {
             gameId: game.id,
@@ -185,6 +170,7 @@ export class GameGateWay
 
         const gamePosition = this.gamePlayerPosition.get(game.id);
 
+        // Create a new Game instance and start the game loop
         const gameInstance = new Game(
             game.id,
             userData1.socket,
@@ -194,34 +180,26 @@ export class GameGateWay
             this.gameService,
             this.userService,
         );
-        gameInstance.startGameLoop(
-            this.server,
-            this.gamePlayerPosition,
-        );
+        gameInstance.startGameLoop(this.server, this.gamePlayerPosition);
     }
 
+    // event handler so each player ..
+    // emit their mouse movement to the server
     @SubscribeMessage('mouseMove')
-    mouseMove(
-        @MessageBody() body: any,
-        @ConnectedSocket() client: Socket,
-    ) {
+    mouseMove(@MessageBody() body: any, @ConnectedSocket() client: Socket) {
         const { y, gameId, userId, order } = body;
 
         const gamePositions = this.gamePlayerPosition.get(gameId);
         if (gamePositions) {
             gamePositions.players[order].y = y * BOARD_HEIGHT;
-            const roomId = String(gameId);
-            client.broadcast
-                .to(roomId)
-                .emit('opponent_mousemove', { y });
         }
     }
 
+    // Check if a player is already in a game
     checkifPlayerInGame(
         userId: number,
     ): { gameId: number; p: PlayerPosition } | undefined {
-        for (const [gameId, gamePosition] of this
-            .gamePlayerPosition) {
+        for (const [gameId, gamePosition] of this.gamePlayerPosition) {
             for (let p of gamePosition.players) {
                 if (p.id === userId) return { gameId, p };
             }
@@ -229,17 +207,16 @@ export class GameGateWay
         return undefined;
     }
 
+    // event handler, used when players queue up
     @SubscribeMessage('queueUp')
-    async queueUp(
-        @MessageBody() body: any,
-        @ConnectedSocket() client: Socket,
-    ) {
+    async queueUp(@MessageBody() body: any, @ConnectedSocket() client: Socket) {
         const userId = body.userId;
 
         if (this.queue.includes(userId)) {
             console.log('User already in the queue');
             return;
         }
+
         let check = this.checkifPlayerInGame(userId);
         if (check) {
             client.emit('match_found', {
@@ -256,6 +233,8 @@ export class GameGateWay
             return;
         }
         this.queue.push(userId);
+        // if more than 2 players in the queue,
+        // take the oldest ones in the queue and match them
         if (this.queue.length >= 2) {
             const player1 = this.queue.shift();
             const player2 = this.queue.shift();
@@ -263,16 +242,11 @@ export class GameGateWay
         }
     }
 
+    // event to handle players' invite
     @SubscribeMessage('gameInvite')
     async gameInvite(@MessageBody() body: any) {
         const userId: number = body.userId;
         const opponentUsername: string = body.opponentUsername;
-
-        // const opponent = await this.prisma.user.findUnique({
-        //     where: {
-        //         username: opponentUsername,
-        //     },
-        // });
 
         const opponent = await this.userService.getUserByUsername(
             opponentUsername,
@@ -290,12 +264,6 @@ export class GameGateWay
             return;
         }
 
-        // const senderInfo = await this.prisma.user.findUnique({
-        //     where: {
-        //         id: myData.id,
-        //     },
-        // });
-
         const senderInfo = await this.userService.getUserById(userId);
 
         if (!senderInfo) {
@@ -308,14 +276,16 @@ export class GameGateWay
         });
     }
 
+    // event handler, when the player responds to an invite from another player
     @SubscribeMessage('inviteResponse')
     async inviteResponse(@MessageBody() body: any) {
         const userId: number = body.userId;
         const opponentId: number = body.opponentId;
         const status: string = body.status;
 
+        // if the invitee accepts, match the two players
+        // else sends a feedback to the inviter that the player declined
         if (status === 'accepted') {
-            // this.matchPlayers(opponent.id, userId);
             console.log('players matched');
             await new Promise(() => {
                 setTimeout(() => {
@@ -335,6 +305,27 @@ export class GameGateWay
                         status: 'declined',
                     });
             }
+        }
+    }
+
+    @SubscribeMessage('spectateGame')
+    async spectateGame(
+        @MessageBody() body: any,
+        @ConnectedSocket() client: Socket,
+    ) {
+        const gameId: number = body.gameId;
+
+        const gamePosition = this.gamePlayerPosition.get(gameId);
+        if (gamePosition) {
+            const roomId = String(gameId);
+
+            this.server.to(client.id).emit('spectate_ready', {
+                gameId: gameId,
+                player1: gamePosition.players[0],
+                player2: gamePosition.players[1],
+            });
+
+            client.join(roomId);
         }
     }
 }

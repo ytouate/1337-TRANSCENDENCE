@@ -5,7 +5,6 @@ import { authContext } from "../../context/Context";
 import { redirect, Link } from "react-router-dom";
 
 function SignIn() {
-  let [loggedIng, setLoggedIn] = useContext(authContext);
   return (
     <div className="signin">
       <div className="signin-wrapper">

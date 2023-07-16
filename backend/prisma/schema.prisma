@@ -11,11 +11,13 @@ datasource db {
 }
 
 model Notification {
-  id                Int      @id @default(autoincrement())
-  description       String
-  title             String
-  senderAndReicever User[]   @relation("userNotificaiton")
-  time              DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  senderId    Int   
+  description String
+  title       String
+  reiceverId   Int
+  reicever    User     @relation(fields: [reiceverId], references: [id])
+  time        DateTime @default(now())
 }
 
 model User {
@@ -30,15 +32,16 @@ model User {
   friendOf         User[]         @relation("UserFriends")
   blocked          User[]         @relation("blocking")
   blockedBy        User[]         @relation("blocking")
-  notifications    Notification[] @relation("userNotificaiton")
+  notifications    Notification[] 
   status           String?
-  activitystatus     Boolean @default(false)
+  activitystatus   Boolean        @default(false)
   roomChat         chatRoom[]     @relation("userInChatRoom")
   message          Message[]
-  preference Preference?
-  games Game[] @relation("GameUsers")
-  win Int @default(0)
-  loss Int @default(0)
+  preference       Preference?
+  games            Game[]         @relation("GameUsers")
+  win              Int            @default(0)
+  loss             Int            @default(0)
+  winRate          Float          @default(0) 
 }
 
 model chatRoom {
