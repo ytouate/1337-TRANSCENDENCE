@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Notification, User } from '@prisma/client';
 import { stat } from 'fs';
@@ -99,6 +100,7 @@ export class UserSettingsService {
             usersSearch = usersSearch.splice(index ,index);
         usersSearch.map((obj: any) =>{
             obj = userReturn(obj, req);
+            
             obj.friendStatus = false;
             obj.me = false;
             let status = this.checkUserStatus(sourceUser, obj);
@@ -115,11 +117,11 @@ export class UserSettingsService {
     }
     //  check status user for the user who make request 
     private checkUserStatus(user, targetUser){
-        if (user.blocked.find(obj => obj.email === targetUser.email))
+        if (user.blocked.find(obj => obj.email == targetUser.email))
             return 'blocked';
-        else if (user.blockedBy.find(obj => obj.email === targetUser.email))
+        else if (user.blockedBy.find(obj => obj.email == targetUser.email))
             return  'blocked';
-        else if (user.friends.find(obj => obj.email === targetUser.email))
+        else if (user.friends.find(obj => obj.email == targetUser.email))
             return 'friend'
         else if (user.username == targetUser.username)
             return 'me'
@@ -141,7 +143,7 @@ export class UserSettingsService {
         })
     }
     //return user by id
-    async getUser(req, id){
+    async getUser(req, id: number){
         let sourceUser = await this.prismaService.user.findUnique({
             where: {
                 email: req.user.email
@@ -152,7 +154,6 @@ export class UserSettingsService {
                 blockedBy: true,
             }
         })
-        id = Math.floor(id)
         let userToReturn: any = await this.prismaService.user.findUnique({
             where: {
                 id: id
@@ -170,7 +171,7 @@ export class UserSettingsService {
             if (status == 'friend')
                 userToReturn.friendStatus = true;
             else if (status == 'blocked')
-                throw new NotFoundException({}, 'not found');
+                throw new UnauthorizedException({}, '');
             else if (status == 'me')
                 userToReturn.me = true;
             if (userToReturn.me == false) {
@@ -180,10 +181,7 @@ export class UserSettingsService {
             delete userToReturn.blockedBy;
             return userReturn(userToReturn, req);
         }
-        return {
-            status: 404,
-            message: 'user not found'
-        }
+        throw new NotFoundException({}, 'not found');
     }
 
   async getUserByUsername(name: string) {

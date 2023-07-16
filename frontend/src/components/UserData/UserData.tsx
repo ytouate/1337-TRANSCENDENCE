@@ -11,7 +11,7 @@ async function takeAction(socket: any, action: string, username: string) {
     if (action == "add") {
         socket.emit("send_notification", {
             title: "Request",
-            description: `ytouate requested adding you`,
+            description: `new friend request from TOBEDONE`,
             username: username,
         });
     } else if (action == "block") {

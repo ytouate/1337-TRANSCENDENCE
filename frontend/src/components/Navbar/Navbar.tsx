@@ -1,9 +1,9 @@
 import {
-  Link,
-  NavLink,
-  Outlet,
-  useLoaderData,
-  useLocation,
+    Link,
+    NavLink,
+    Outlet,
+    useLoaderData,
+    useLocation,
 } from "react-router-dom";
 
 import logoImg from "../../assets/logo.png";
@@ -16,95 +16,117 @@ import { authContext } from "../../context/Context";
 import { Socket } from "socket.io-client";
 
 type NavData = {
-  profileImg: string;
-  socket: Socket;
+    profileImg: string;
+    socket: Socket;
 };
 
 export async function loader() {
-  const data = await fetch("http://localhost:3000/user", {
-    headers: {
-      Authorization: `Bearer ${Cookies.get("Token")}`,
-    },
-  });
-  return await data.json();
+    const data = await fetch("http://localhost:3000/user", {
+        headers: {
+            Authorization: `Bearer ${Cookies.get("Token")}`,
+        },
+    });
+    return await data.json();
 }
 
-function Nav(props: NavData) {
-  const user: any = useLoaderData();
-  let location = useLocation();
-  const socket: any = useContext(authContext);
-  const [notifications, setNotifications] = useState<any>([]);
-  useEffect(() => {
-    socket.on("receive_notification", (param: any) => {
-    setNotifications((prev: any) => [...prev, param]);
-  });
-  }, [socket]);
+// {user && <Notifications notifs={notifications} />}
+//           <li className="dropdown">
+//             {user && (
+//               <img
+//                 src={user.urlImage}
+//                 alt=""
+//                 onClick={toggle}
+//                 ref={buttonRef}
+//                 className="home-profile-img"
+//               />
+//             )}
+//             {isMenuDropDownOpen && (
+//               <DropDownMenup user={user} dropdownRef={dropdownRef} />
+//             )}
+//           </li>
 
-  useEffect(() => setMenuDropDownOpen(false), [location]);
-  const [isMenuDropDownOpen, setMenuDropDownOpen] = useState(false);
-  const dropdownRef: any = useRef(null);
-  const buttonRef: any = useRef(null);
-  const toggle = () => {
-    setMenuDropDownOpen(!isMenuDropDownOpen);
-  };
-  function handleClickOutside(event: any) {
-    if (
-      dropdownRef.current &&
-      buttonRef.current &&
-      !dropdownRef.current.contains(event.target) &&
-      !buttonRef.current.contains(event.target)
-    ) {
-      setMenuDropDownOpen(false);
-    }
-  }
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+function ProfileDropDown({ user }) {
+    const location = useLocation();
+    const [isMenuDropDownOpen, setMenuDropDownOpen] = useState(false);
+    const dropdownRef: any = useRef(null);
+    const buttonRef: any = useRef(null);
+    const toggle = () => {
+        setMenuDropDownOpen(!isMenuDropDownOpen);
     };
-  });
+    useEffect(() => setMenuDropDownOpen(false), [location]);
 
-  useEffect(() => {});
-  return (
-    <>
-      <nav className="navbar">
-        <div className="navbar-left">
-          <Link to="/">
-            <img className="logo" src={logoImg} alt="" />
-          </Link>
-        </div>
-        <ul className="navbar-list">
-          <li>
-            <NavLink to="/">Home</NavLink>
-          </li>
-          <li>
-            <NavLink to="chat">Chat</NavLink>
-          </li>
-          <li>
-            <NavLink to={`profile/${user.id}`}>Profile</NavLink>
-          </li>
-          {user && <Notifications notifs={notifications} />}
-          <li className="dropdown">
+    function handleClickOutside(event: any) {
+        if (
+            dropdownRef.current &&
+            buttonRef.current &&
+            !dropdownRef.current.contains(event.target) &&
+            !buttonRef.current.contains(event.target)
+        ) {
+            setMenuDropDownOpen(false);
+        }
+    }
+    useEffect(() => {
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    });
+
+    return (
+        <li className="dropdown">
             {user && (
-              <img
-                src={user.urlImage}
-                alt=""
-                onClick={toggle}
-                ref={buttonRef}
-                className="home-profile-img"
-              />
+                <img
+                    src={user.urlImage}
+                    alt=""
+                    onClick={toggle}
+                    ref={buttonRef}
+                    className="home-profile-img"
+                />
             )}
             {isMenuDropDownOpen && (
-              <DropDownMenup user={user} dropdownRef={dropdownRef} />
+                <DropDownMenup user={user} dropdownRef={dropdownRef} />
             )}
-          </li>
-        </ul>
-      </nav>
-      <div className="page">
-        <Outlet />
-      </div>
-    </>
-  );
+        </li>
+    );
+}
+function Nav(props: NavData) {
+    const user: any = useLoaderData();
+
+    const socket: any = useContext(authContext);
+    const [notifications, setNotifications] = useState<any>([]);
+    useEffect(() => {
+        socket.on("receive_notification", (param: any) => {
+            setNotifications((prev: any) => [...prev, param]);
+        });
+    }, [socket]);
+
+    useEffect(() => {});
+    return (
+        <>
+            <nav className="navbar">
+                <div className="navbar-left">
+                    <Link to="/">
+                        <img className="logo" src={logoImg} alt="" />
+                    </Link>
+                </div>
+                <ul className="navbar-list">
+                    <li>
+                        <NavLink to="/">Home</NavLink>
+                    </li>
+                    <li>
+                        <NavLink to="chat">Chat</NavLink>
+                    </li>
+                    <li>
+                        <NavLink to={`profile/${user.id}`}>Profile</NavLink>
+                    </li>
+                    <ProfileDropDown user={user} />
+                </ul>
+            </nav>
+            <div className="page">
+                <Outlet />
+            </div>
+        </>
+    );
 }
 
 export default Nav;

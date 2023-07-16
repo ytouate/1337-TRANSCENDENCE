@@ -6,9 +6,15 @@ import Achievements from "../../components/Achievements/Achievements";
 import Stats from "../../components/Stats/Stats";
 import { authContext, userContext } from "../../context/Context";
 import Cookies from "js-cookie";
-import { redirect, useLoaderData } from "react-router-dom";
+import { redirect, useLoaderData, useRouteError } from "react-router-dom";
 import { useContext } from "react";
+import NotFound from "../../components/NotFound";
 
+
+export function ErrorBoundary() {
+  let error : any = useRouteError();
+  return <NotFound message={error.message} />
+}
 export async function userLoader({ params }: any) {
   const Token = Cookies.get("Token");
   const options = {
@@ -20,7 +26,8 @@ export async function userLoader({ params }: any) {
   const res = await fetch("http://localhost:3000/users/" + params.id, options);
   if (res.ok) return await res.json();
   else {
-    if (res.status == 404) redirect('/signin');
+    console.log('here');
+    if (res.status == 404) throw new Error('Page Not Found')
     if (res.status == 401) throw new Error("Unauthorized access")
   }
 }

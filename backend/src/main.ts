@@ -22,7 +22,7 @@ async function bootstrap() {
       credentials : true
     })
 
-    app.use(csurf())
+    //app.use(csurf())
     const document = SwaggerModule.createDocument(app, config)
     SwaggerModule.setup('api', app, document)
 

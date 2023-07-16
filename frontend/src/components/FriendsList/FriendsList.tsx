@@ -61,8 +61,7 @@ export default function FriendsList() {
         fetch("http://localhost:3000/users/" + user.id, options)
             .then(res => res.json())
             .then(data => setUser(data))
-    });
-    console.log('user: ', user);
+    }, [isSearching]);
     const friendList = useFriendList(user);
     const blockedUsers = useBlockedUsers(user);
     function searchForUsers(e: any) {
