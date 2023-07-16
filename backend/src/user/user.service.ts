@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import * as bcrypt from 'bcrypt'
 
 @Injectable()
 export class UserService {
@@ -15,6 +16,8 @@ export class UserService {
         if (!room)
         {
             try {
+                let hash = await bcrypt.hash(password, 10)
+                console.log(hash)
                 await this.prismaService.chatRoom.create(
                     {
                         data : {
@@ -24,12 +27,12 @@ export class UserService {
                                 connect : { id : user.id}
                             },
                             status : status,
-                            password : password
+                            password : hash
                         }
                     }
                     )
                 await this.setAdmin({'username' : user.username , 'roomName' : roomName})
-                return {'message' : `room ${roomName} already exist`}
+                return {'message' : `room ${roomName} has created`}
             }
             catch(error) {
                 console.log(error)
@@ -157,10 +160,9 @@ export class UserService {
     {
         const {roomName , password} = param
         const room = await this.getRoomByName(roomName)
-        console.log(room.status)
         if (room.status === 'protected')
         {
-            if (password != room.password)
+            if (password !== room.password)
                 return undefined       
         }
         return true 
@@ -196,11 +198,12 @@ export class UserService {
     async   changePasswordOfProtectedRoom(param) {
         const {roomName, password} = param
         const room = await this.prismaService.chatRoom.findFirst({where : {roomName : roomName}})
+        let hash = await bcrypt.hash(password, 10)
         if (room){
             await this.prismaService.chatRoom.update({where : {
                 id : room.id
             },
-            data : { password : password }
+            data : { password : hash }
         })
         }
     }
@@ -256,5 +259,11 @@ a
     async   validateUserToCreateChat(req)
     {
         return await this.prismaService.user.findUnique({where : {email : req.user.email}})
+    }
+
+    // get admins of chatRoom
+    async   getAdminsOfUsers(roomName)
+    {
+        return await this.prismaService.chatRoom.findFirst({where : {roomName : roomName}})
     }
 }

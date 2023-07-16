@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
-import cookieParser from 'cookie-parser';
+import * as csurf from 'csurf';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
@@ -22,6 +22,7 @@ async function bootstrap() {
       credentials : true
     })
 
+    app.use(csurf())
     const document = SwaggerModule.createDocument(app, config)
     SwaggerModule.setup('api', app, document)
 
