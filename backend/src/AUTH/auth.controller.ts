@@ -23,7 +23,6 @@ export class authController {
         @Res({passthrough : true}) res,
         @Req() req) 
     {
-        
         const user = await this.authservice.createUser(req.user)
         const token = await this.authservice.signToken(user.username, user.email)
         await this.authservice.checkUserhave2fa(user)
@@ -56,7 +55,7 @@ export class authController {
 
     @Post('2fa/validateCode')
     @UseGuards(AuthGuard('jwt'))
-    async verificationCode(@Body() body, @Req() req)
+    async verificationCode2fa(@Body() body, @Req() req)
     {
         const user = await this.authservice.validateUser(req)
         if (user && user.code  == body.code)

@@ -29,7 +29,7 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
     }
 
 
-  // joining the socket of user in  specific room
+    // joining the socket of user in  specific room
     @SubscribeMessage('createRoom')
     @UseGuards(AuthGuard('websocket-jwt'))
     async handleCreationOfTheRoom(@ConnectedSocket() client : Socket , @Req() req) {
@@ -98,8 +98,7 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
     async validateUserByEmail(email, roomName) {
         const user =  await this.prisma.user.findUnique({where : {email : email}})
         const room = await this.prisma.chatRoom.findFirst({ where : {roomName : roomName} })
-        if (room.banUsers.indexOf(user.email) < 0)
-            return user
+        return room.banUsers.indexOf(user.email) < 0 ? user : undefined
     }
 
 }

@@ -1,4 +1,9 @@
-import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Notification, User } from '@prisma/client';
 import { stat } from 'fs';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -181,17 +186,17 @@ export class UserSettingsService {
         }
     }
 
-    async getUserByUsername(name: string) {
-        const user = await this.prismaService.user.findUnique({
-            where: {
-                username: name,
-            },
-        });
-        if (!user)
-            // check if user exists
-            throw new ForbiddenException('user not found');
-        return user;
-    }
+  async getUserByUsername(name: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        username: name,
+      },
+    });
+    if (!user)
+      // check if user exists
+      throw new ForbiddenException('user not found');
+    return user;
+  }
 
     async getUserById(userId: number) {
         // console.log('m here');
@@ -205,53 +210,61 @@ export class UserSettingsService {
             },
         });
 
-        // or can just return win + loss
-        const gamesPlayed = await this.prismaService.game.count({
-            where: {
-                players: {
-                    some: {
-                        id: user.id,
-                    },
-                },
-            },
-        });
+    // or can just return win + loss
+    const gamesPlayed = await this.prismaService.game.count({
+      where: {
+        players: {
+          some: {
+            id: user.id,
+          },
+        },
+      },
+    });
 
-        if (!user)
-            // check if user exists
-            throw new ForbiddenException('user not found');
-        return {
-            ...user,
-            gamesPlayed,
-        };
-    }
+    if (!user)
+      // check if user exists
+      throw new ForbiddenException('user not found');
+    return {
+      ...user,
+      gamesPlayed,
+    };
+  }
 
-    async updateUserWin(userId: number) {
-        try {
-            await this.prismaService.user.update({
-                where: {
-                    id: userId,
-                },
-                data: {
-                    win: { increment: 1 },
-                },
-            });
-        } catch (error) {
-            throw error;
-        }
+  async updateUserWin(userId: number, user: User) {
+    const win = user.win + 1;
+    const totalGames = win + user.loss;
+    const winRate = Math.floor((win / totalGames) * 100);
+    try {
+      await this.prismaService.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          win: win,
+          winRate: winRate,
+        },
+      });
+    } catch (error) {
+      throw error;
     }
+  }
 
-    async updateUserLoss(userId: number) {
-        try {
-            await this.prismaService.user.update({
-                where: {
-                    id: userId,
-                },
-                data: {
-                    loss: { increment: 1 },
-                },
-            });
-        } catch (error) {
-            throw error;
-        }
+  async updateUserLoss(userId: number, user: User) {
+    const loss = user.loss + 1;
+    const totalGames = user.win + loss;
+    const winRate = Math.floor((user.win / totalGames) * 100);
+    try {
+      await this.prismaService.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          loss: loss,
+          winRate: winRate,
+        },
+      });
+    } catch (error) {
+      throw error;
     }
+  }
 }

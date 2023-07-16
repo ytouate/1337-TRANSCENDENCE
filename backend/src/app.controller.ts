@@ -1,7 +1,5 @@
-import { Controller, Render } from "@nestjs/common";
-import { Get } from "@nestjs/common";
-import { join } from "path";
-import { createReadStream } from "fs";
+import { Controller } from "@nestjs/common";
+
 
 @Controller()
 export class appController{

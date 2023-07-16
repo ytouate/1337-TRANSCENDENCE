@@ -19,8 +19,6 @@ export interface PlayerPosition {
 }
 
 export interface GamePosition {
-    // player1: PlayerPosition;
-    // player2: PlayerPosition;
     players: PlayerPosition[];
 }
 
