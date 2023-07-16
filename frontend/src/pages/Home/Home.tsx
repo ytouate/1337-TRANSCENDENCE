@@ -5,7 +5,7 @@ import ActiveFriends from "../../components/ActiveFriends/ActiveFriends";
 import "./Home.css";
 import { userContext } from "../../context/Context";
 
-import { useLoaderData } from "react-router-dom";
+import { Navigate, redirect, useLoaderData } from "react-router-dom";
 import Cookies from "js-cookie";
 export async function loader() {
   const Token = Cookies.get("Token");
@@ -16,12 +16,13 @@ export async function loader() {
     },
   };
   const res = await fetch("http://localhost:3000/user", options);
-  return await res.json();
+  if (res.ok)
+    return await res.json();
+  return redirect('/signin');
 }
 
 function Home() {
   const user: any = useLoaderData();
-  console.log(user);
   return (
     <userContext.Provider value={user} >
       <div className="home">

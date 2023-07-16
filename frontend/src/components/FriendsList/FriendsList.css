@@ -16,6 +16,9 @@
     height: 100%;
 }
 
+.active {
+    border-bottom: 1px solid black;
+}
 .friends-list-nav {
     width: 100%;
     display: flex;

@@ -17,6 +17,7 @@ import {
   Route,
   createRoutesFromElements,
   RouterProvider,
+  Link,
 } from "react-router-dom";
 
 import Profile, {
@@ -37,7 +38,11 @@ const socket = socketIO.connect("http://localhost:3000/notification", {
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="/" loader={navLoader} element={<Navbar socket={socket} profileImg={img} />}>
+    <Route
+      path="/"
+      loader={navLoader}
+      element={<Navbar socket={socket} profileImg={img} />}
+    >
       <Route
         // errorElement={<h1>Error Rendering the home page</h1>}
         index
@@ -46,7 +51,12 @@ const router = createBrowserRouter(
       />
       <Route
         path="profile/:id"
-        errorElement={<h1>sir 9wd</h1>}
+        errorElement={
+          <>
+            <p>You blocked this user</p>
+            <Link to="/">back to home</Link>
+          </>
+        }
         loader={userLoader}
         element={<Profile />}
       />

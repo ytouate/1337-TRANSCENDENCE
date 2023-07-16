@@ -37,7 +37,7 @@ export class UserSettingsService {
                 }
             }
         })
-        this.prismaService.user.update({
+        await this.prismaService.user.update({
             where: {
                 username: userSource.username,
             },
@@ -147,6 +147,7 @@ export class UserSettingsService {
                 blockedBy: true,
             }
         })
+        id = Math.floor(id)
         let userToReturn: any = await this.prismaService.user.findUnique({
             where: {
                 id: id

@@ -1,0 +1,54 @@
+.notification-card:nth-child(1):hover {
+  border-radius: 5px 5px 0 0;
+}
+
+.notification-card:last-child:hover {
+  border-radius: 0 0 5px 5px;
+}
+
+.notification-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: rgb(100, 100, 100);
+  -webkit-transition: color 0.5s ease-in-out;
+  transition: color 0.5s ease-in-out;
+}
+
+.notification-card:hover {
+  color: black;
+}
+
+.notification-card--action {
+  width: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  border: none;
+  height: 25px;
+  padding: 5px 10px;
+  font-size: 12px;
+  margin-right: 5px;
+  cursor: pointer;
+  color: black;
+  background-color: #dedede;
+  border: 1px solid lightgray;
+  transition: font-weight 0.5s ease-in-out;
+}
+
+.notification-card--action:hover {
+  letter-spacing: 0.5px;
+  background-color: #d3cfcf;
+  transition: background-color 0.5s ease-in-out;
+  transition: letter-spacing 0.5s ease-in-out;
+}
+
+.notification-card--data {
+  font-size: 14px;
+  margin-left: 10px;
+}
+
+.notification-card--title {
+  font-weight: bold;
+}

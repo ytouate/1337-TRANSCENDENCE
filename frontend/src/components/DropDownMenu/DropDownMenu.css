@@ -1,0 +1,21 @@
+.profile-dropdown--userdata {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 20px;
+}
+
+.profile-dropdown-content {
+  display: flex;
+  flex-direction: column;
+  right: 0;
+  position: absolute;
+  list-style-type: none;
+  margin: 30px 0;
+  background-color: #f6f3eb;
+  box-shadow: gray 0px 20px 30px -10px;
+  padding: 20px;
+  border-radius: 15px;
+  width: 300px;
+}

@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 
 import logoImg from "../../assets/logo.png";
-import ModeToggler from "../ModeToggler";
+import DropDownMenup from "../DropDownMenu/DropDownMenu";
 import Notifications from "../Notifications/Notification";
 import Cookies from "js-cookie";
 import "./Navbar.css";
@@ -34,9 +34,12 @@ function Nav(props: NavData) {
   let location = useLocation();
   const socket: any = useContext(authContext);
   const [notifications, setNotifications] = useState<any>([]);
-  socket.on("receive_notification", (param: any) => {
+  useEffect(() => {
+    socket.on("receive_notification", (param: any) => {
     setNotifications((prev: any) => [...prev, param]);
   });
+  }, [socket]);
+
   useEffect(() => setMenuDropDownOpen(false), [location]);
   const [isMenuDropDownOpen, setMenuDropDownOpen] = useState(false);
   const dropdownRef: any = useRef(null);
@@ -80,11 +83,7 @@ function Nav(props: NavData) {
           <li>
             <NavLink to={`profile/${user.id}`}>Profile</NavLink>
           </li>
-          {/* <li>
-            <ModeToggler />
-          </li> */}
-          <Notifications notifs={notifications} />
-
+          {user && <Notifications notifs={notifications} />}
           <li className="dropdown">
             {user && (
               <img
@@ -95,30 +94,8 @@ function Nav(props: NavData) {
                 className="home-profile-img"
               />
             )}
-
             {isMenuDropDownOpen && (
-              <ul className="profile-dropdown-content" ref={dropdownRef}>
-                <li>
-                  <Link className="profile-dropdown--userdata" to="/">
-                    {user && (
-                      <img
-                        src={user.urlImage}
-                        className="profile-img-big"
-                        alt=""
-                      />
-                    )}
-
-                    <p>ytouate </p>
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/settings">Settings</Link>
-                </li>
-                <hr />
-                <li>
-                  <Link to={"/signin"}>Logout</Link>
-                </li>
-              </ul>
+              <DropDownMenup user={user} dropdownRef={dropdownRef} />
             )}
           </li>
         </ul>

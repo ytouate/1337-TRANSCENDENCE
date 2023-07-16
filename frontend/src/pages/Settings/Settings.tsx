@@ -76,21 +76,15 @@ export default function Settings() {
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            //   "Content-Type": "multipart/form-data",
           },
         }
       );
-      console.log(response);
     } catch (err) {
       console.log(err);
     }
-    // fetch("http://localhost:3000/profile/updatephoto", options)
-    //   .then((res) => res.json())
-    //   .then((data) => console.log(data));
   }
 
-  function changeName() {
-    console.log(newName);
+  async function changeName() {
     const token = Cookies.get("Token");
     const options = {
       method: "PUT",
@@ -100,16 +94,15 @@ export default function Settings() {
       },
       body: JSON.stringify({ username: newName }),
     };
-    fetch("http://localhost:3000/profile/updatename", options)
-      .then((res) => res.json())
-      .then((data) => console.log(data));
+    const res = await fetch("http://localhost:3000/profile/updatename", options);
+    if (!res.ok)
+      throw new Error('failed to change name');
   }
 
   function updateAvatar(e: any) {
     const selectedFile = e.target.files[0];
     setNewAvatar(selectedFile);
   }
-  console.log(newAvatar);
 
   return (
     <div className="settings">

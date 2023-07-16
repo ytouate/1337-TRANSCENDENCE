@@ -9,7 +9,6 @@ import Cookies from "js-cookie";
 import { useLoaderData } from "react-router-dom";
 
 export async function userLoader({ params }: any) {
-  console.log(params);
   const Token = Cookies.get("Token");
   const options = {
     method: "GET",
@@ -34,8 +33,7 @@ export async function loader() {
 }
 
 export default function Profile() {
-  const user = useLoaderData();
-  console.log(user);
+  const user: any = useLoaderData();
   return (
     <userContext.Provider value={user}>
       <section className="profile">

@@ -6,7 +6,7 @@ import Achievements from "../../components/Achievements/Achievements";
 import Stats from "../../components/Stats/Stats";
 import { authContext, userContext } from "../../context/Context";
 import Cookies from "js-cookie";
-import { useLoaderData } from "react-router-dom";
+import { redirect, useLoaderData } from "react-router-dom";
 import { useContext } from "react";
 
 export async function userLoader({ params }: any) {
@@ -19,12 +19,16 @@ export async function userLoader({ params }: any) {
   };
   const res = await fetch("http://localhost:3000/users/" + params.id, options);
   if (res.ok) return await res.json();
-  else throw new Error("l awakhir hh");
+  else {
+    if (res.status == 404) redirect('/signin');
+    if (res.status == 401) throw new Error("Unauthorized access")
+  }
 }
 
 export default function Profile() {
   const user: any = useLoaderData();
   const socket = useContext(authContext);
+  
   return (
     <userContext.Provider value={user}>
       <section className="profile">
@@ -35,7 +39,7 @@ export default function Profile() {
         <div className="profile--center">{user.me && <FriendList />}</div>
         <div className="profile--right">
           <Achievements />
-          <Stats />
+          <Stats wins={user.win} losses={user.loss} />
         </div>
       </section>
     </userContext.Provider>
