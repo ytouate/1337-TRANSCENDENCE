@@ -51,22 +51,27 @@ export class authController {
         await this.authservice.add2fa(user.email, req.email, 0)
         return {'status' : 200 , 'message' : 'adding 2fa success'}
     }
-
+ 
 
     @Post('2fa/validateCode')
     @UseGuards(AuthGuard('jwt'))
     async verificationCode2fa(@Body() body, @Req() req)
     {
         const user = await this.authservice.validateUser(req)
-        if (user && user.code  == body.code)
-            return user
+        console.log(user.code, body.code);
+        if (user && user.codeVerification  == body.code)
+        {
+            return await this.authservice.setIsSignedInTrue(user, true)
+        }
         return {'message' : 'incorrect code'}
     }
 
 
     @Post('logout')
+    @UseGuards(AuthGuard('jwt'))
     async logout(@Req() req) {
-        console.log(req.headers.authorization)
+        console.log(req.user)
+        await this.authservice.setIsSignedInTrue(req.user, false)
         return 'delete JWT token from client'
     }
 }

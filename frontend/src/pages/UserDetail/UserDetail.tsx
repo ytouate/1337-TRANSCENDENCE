@@ -7,6 +7,7 @@ import Stats from "../../components/Stats/Stats";
 import { userContext } from "../../context/Context";
 import Cookies from "js-cookie";
 import { useLoaderData } from "react-router-dom";
+import { useState } from "react";
 
 export async function userLoader({ params }: any) {
   const Token = Cookies.get("Token");
@@ -35,7 +36,7 @@ export async function loader() {
 export default function Profile() {
   const user: any = useLoaderData();
   return (
-    <userContext.Provider value={user}>
+    <userContext.Provider value={useState(user)}>
       <section className="profile">
         <div className="profile--left">
           <UserData />

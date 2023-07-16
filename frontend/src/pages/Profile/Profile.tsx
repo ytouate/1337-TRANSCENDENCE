@@ -7,7 +7,7 @@ import Stats from "../../components/Stats/Stats";
 import { authContext, userContext } from "../../context/Context";
 import Cookies from "js-cookie";
 import { redirect, useLoaderData, useRouteError } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import NotFound from "../../components/NotFound";
 
 
@@ -37,7 +37,7 @@ export default function Profile() {
   const socket = useContext(authContext);
   
   return (
-    <userContext.Provider value={user}>
+    <userContext.Provider value={useState(user)}>
       <section className="profile">
         <div className="profile--left">
           <UserData />

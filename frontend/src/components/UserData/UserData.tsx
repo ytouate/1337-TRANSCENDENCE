@@ -129,7 +129,7 @@ const UserButtons = ({ socket, user }: any) => {
 };
 
 export default function UserData() {
-    const user: any = useContext(userContext);
+    const [user, setUserData]: any = useContext(userContext);
     const socket: any = useContext(authContext);
 
     return (

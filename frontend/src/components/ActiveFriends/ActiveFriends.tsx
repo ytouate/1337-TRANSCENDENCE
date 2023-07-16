@@ -24,7 +24,7 @@ function useActiveFriends(user: any) {
     return activeFriends;
 }
 export default function ActiveFriends() {
-    const userFriends: any = useContext(userContext);
+    const [userFriends, setUserFriends]: any = useContext(userContext);
     const activeFriends = useActiveFriends(userFriends);
     return (
         <div className="active-friends">

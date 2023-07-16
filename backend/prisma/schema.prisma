@@ -28,6 +28,7 @@ model User {
   imageIsUpdate    Boolean        @default(false)
   optionalMail     String?
   codeVerification Int?
+  isSignedIn       Boolean        @default(false)
   friends          User[]         @relation("UserFriends")
   friendOf         User[]         @relation("UserFriends")
   blocked          User[]         @relation("blocking")

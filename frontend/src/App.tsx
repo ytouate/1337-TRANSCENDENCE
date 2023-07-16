@@ -26,6 +26,7 @@ import img from "./assets/ytouate.jpeg";
 import Chat from "./pages/Chat/Chat";
 import socketIO from "socket.io-client";
 import Cookies from "js-cookie";
+import TwoFactor from "./pages/TwoFactor/TwoFactor.js";
 
 const socket = socketIO.connect("http://localhost:3000/notification", {
     extraHeaders: {
@@ -54,6 +55,7 @@ const router = createBrowserRouter(
             />
             <Route path="chat" element={<Chat />} />
             <Route path="signin" element={<SignIn />} />
+            <Route path="twofactor" element={<TwoFactor />} />
             <Route
                 path="settings"
                 loader={settingsLoader}

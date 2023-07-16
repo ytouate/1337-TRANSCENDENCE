@@ -2,7 +2,6 @@ import "./FriendCard.css";
 import optionsIcon from "../../assets/options.svg";
 import Cookies from "js-cookie";
 import { ToastContainer, toast } from "react-toastify";
-import { useState } from "react";
 
 export async function unblock(username: string) {
     const options = {

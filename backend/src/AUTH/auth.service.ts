@@ -52,12 +52,13 @@ export class authService{
     // add two-factor Authantication
     async add2fa(firstMail , email, code)
     {
-        const  user = await this.prisma.user.updateMany(
+        const  user = await this.prisma.user.update(
             {
                 where : {email : firstMail},
                 data : { optionalMail : email , codeVerification : code}
             },
         )
+        console.log(user)
     }
 
     //validate user
@@ -103,5 +104,14 @@ export class authService{
         }
     }
 
-    // validate User with { Token }
+    // set isSignedin true
+    async   setIsSignedInTrue(user, status)
+    {
+        return await this.prisma.user.update(
+            {
+                where : {email : user.email},
+                data : {isSignedIn : status}
+            }
+        )
+    }
 }
