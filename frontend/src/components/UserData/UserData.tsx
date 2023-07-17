@@ -1,20 +1,21 @@
 import "./UserData.css";
 import { Link } from "react-router-dom";
-import { userContext } from "../../context/Context";
-import { useContext, useState } from "react";
+import {  } from "../../context/Context";
+import {  useState } from "react";
 import Cookies from "js-cookie";
 import { ToastContainer, toast } from "react-toastify";
-import { authContext } from "../../context/Context";
+import {  socketContext } from "../../context/Context";
 import { unblock, notifyUnblocked } from "../FriendCard/FriendCard";
 
-async function takeAction(socket: any, action: string, username: string) {
+async function takeAction(action: string, username: string) {
     if (action == "add") {
-        socket.emit("send_notification", {
+        socketContext.emit("send_notification", {
             title: "Request",
             description: `new friend request from TOBEDONE`,
             username: username,
         });
     } else if (action == "block") {
+        console.log(username);
         const options = {
             method: "POST",
             headers: {
@@ -60,24 +61,26 @@ const MainUserButtons = () => {
             <Link to="/settings">
                 <button className="settings-button">Settings</button>
             </Link>
-            <a onClick={(e) => {
-                Cookies.remove('Token');
-            }}>
+            <a
+                onClick={() => {
+                    Cookies.remove("Token");
+                }}
+            >
                 <button className="settings-button logout">Logout</button>
             </a>
         </>
     );
 };
 
-const MainUserFriendsButtons = ({ socket, user }: any) => {
+const MainUserFriendsButtons = ({ username }: any) => {
     return (
         <>
-            <a onClick={() => takeAction(socket, "unfriend", user.username)}>
+            <a onClick={() => takeAction("unfriend", username)}>
                 <button onClick={notfyUnfriend} className="settings-button add">
                     Unfriend
                 </button>
             </a>
-            <a onClick={() => takeAction(socket, "block", user.username)}>
+            <a onClick={() => takeAction("block", username)}>
                 <button
                     onClick={notifyBlocked}
                     className="settings-button block"
@@ -101,12 +104,12 @@ const MainUserFriendsButtons = ({ socket, user }: any) => {
     );
 };
 
-const UserButtons = ({ socket, user }: any) => {
+const UserButtons = (props: userDataType) => {
     const [isBlockButton, setBlockButton] = useState(true);
 
     return (
         <>
-            <a onClick={() => takeAction(socket, "add", user.username)}>
+            <a onClick={() => takeAction("add", props.username)}>
                 <button onClick={notfyAdd} className="settings-button add">
                     Add
                 </button>
@@ -114,8 +117,8 @@ const UserButtons = ({ socket, user }: any) => {
             <a
                 onClick={() => {
                     isBlockButton
-                        ? takeAction(socket, "block", user.username)
-                        : unblock(user.username);
+                        ? takeAction("block", props.username)
+                        : unblock(props.username);
                     setBlockButton(!isBlockButton);
                 }}
             >
@@ -130,35 +133,32 @@ const UserButtons = ({ socket, user }: any) => {
     );
 };
 
-export default function UserData() {
-    const [user, setUserData]: any = useContext(userContext);
-    // const socket: any = useContext(authContext);
-
+interface userDataType {
+    urlImage: string;
+    username: string;
+    me: boolean;
+    friendStatus: boolean;
+}
+export default function UserData(props: userDataType) {
     return (
         <>
             <div className="profile--userdata">
-                {user && (
-                    <>
-                        <img
-                            className="profile--userdata-img"
-                            src={user.urlImage}
-                            alt=""
-                        />
-                        <p className="profile--userdata-name">
-                            {user.username}
-                        </p>
-                    </>
-                )}
+                <>
+                    <img
+                        className="profile--userdata-img"
+                        src={props.urlImage}
+                        alt=""
+                    />
+                    <p className="profile--userdata-name">{props.username}</p>
+                </>
 
                 <div className="profile--userdata-buttons">
-                    {user.me ? (
+                    {props.me ? (
                         <MainUserButtons />
-                    ) : user.friendStatus ? (
-                        <h1>tobedone</h1>
+                    ) : props.friendStatus ? (
+                        <MainUserFriendsButtons username={props} />
                     ) : (
-                        // <MainUserFriendsButtons socket={socket} user={user} />
-                        <h1>tobedone</h1>
-                        // <UserButtons user={user} socket={socket} />
+                        <UserButtons {...props} />
                     )}
                 </div>
 

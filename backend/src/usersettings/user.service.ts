@@ -58,7 +58,8 @@ export class UserSettingsService {
         return userTarget;
     }
     //push user to block scalar
-    async addUserToBlocking(source, target){  
+    async addUserToBlocking(source, target){
+        console.log(target.username);
         let user = await this.prismaService.user.update({
             where: {
                 email: source.email,

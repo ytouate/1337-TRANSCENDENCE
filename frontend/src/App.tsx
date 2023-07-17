@@ -22,16 +22,10 @@ import Profile, {
 } from "./pages/Profile/Profile.jsx";
 import SignIn from "./pages/SignIn/SignIn.js";
 import Chat from "./pages/Chat/Chat";
-import socketIO from "socket.io-client";
 import Cookies from "js-cookie";
 import TwoFactor from "./pages/TwoFactor/TwoFactor.js";
 import { useState } from "react";
 
-const socket = socketIO.connect("http://localhost:3000/notification", {
-    extraHeaders: {
-        Authorization: `Bearer ${Cookies.get("Token")}`,
-    },
-});
 
 const router = createBrowserRouter(
     createRoutesFromElements(

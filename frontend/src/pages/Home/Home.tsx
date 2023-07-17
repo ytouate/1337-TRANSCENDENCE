@@ -7,8 +7,7 @@ import { authContext, userContext } from "../../context/Context";
 
 import { Navigate, redirect, useLoaderData } from "react-router-dom";
 import Cookies from "js-cookie";
-import { useContext, useEffect, useState } from "react";
-import Nav from "../../components/Navbar/Navbar";
+import { useContext, useState } from "react";
 export async function loader() {
     const Token = Cookies.get("Token");
     const options = {
@@ -30,7 +29,7 @@ export async function loader() {
 
 function Home() {
     const user: any = useLoaderData();
-    const [isSignedIn, setIsSignedIn] = useContext(authContext);
+    const [isSignedIn] = useContext(authContext);
     if (isSignedIn == false) return <Navigate to={"/signin"} />;
     return (
         <userContext.Provider value={useState(user)}>

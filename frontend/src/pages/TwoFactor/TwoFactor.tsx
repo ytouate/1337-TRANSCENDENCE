@@ -4,7 +4,6 @@ import { Navigate } from "react-router-dom";
 import { authContext, userContext } from "../../context/Context";
 
 export default function TwoFactor(props) {
-    console.log(props);
     let [code, setCode] = useState("");
     const [validated, setValidated] = useState(false);
     if (validated) return <Navigate to={'/'} />

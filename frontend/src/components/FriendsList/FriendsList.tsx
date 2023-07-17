@@ -7,10 +7,10 @@ import Cookies from "js-cookie";
 import { Link, useLoaderData } from "react-router-dom";
 import UserFriends from "../UserFriends/UserFriends";
 
-function useFriendList(user: any) {
+function useFriendList(props: any) {
     let friendList = null;
-    if (user && user.friends) {
-        friendList = user.friends.map((friend: any) => {
+    if (props.friends) {
+        friendList = props.friends.map((friend: any) => {
             return (
                 <Link to={`/profile/${friend.id}`} key={friend.id}>
                     <FriendCard
@@ -25,10 +25,10 @@ function useFriendList(user: any) {
     return friendList;
 }
 
-function useBlockedUsers(user: any) {
+function useBlockedUsers(props: any) {
     let blockedUsers = null;
-    if (user && user.blocked) {
-        blockedUsers = user.blocked.map((user: any) => {
+    if (props.blocked) {
+        blockedUsers = props.blocked.map((user: any) => {
             return (
                 <Fragment key={user.id}>
                     <FriendCard
@@ -44,7 +44,15 @@ function useBlockedUsers(user: any) {
     return blockedUsers;
 }
 
-export default function FriendsList() {
+interface friendListType {
+    id: number;
+    urlImage: string;
+    username: string;
+    blocked: any;
+    friends: any;
+
+}
+export default function FriendsList(props: friendListType) {
     const [searchPattern, setSearchPattern] = useState("");
     const [section, setSection] = useState("friends");
     const [searchedFriends, setSearchFriends] = useState([]);
@@ -58,7 +66,7 @@ export default function FriendsList() {
         },
     };
     useEffect(() => {
-        fetch("http://localhost:3000/users/" + user.id, options)
+        fetch("http://localhost:3000/users/" + props.id, options)
             .then(res => res.json())
             .then(data => setUser(data))
     }, [isSearching]);

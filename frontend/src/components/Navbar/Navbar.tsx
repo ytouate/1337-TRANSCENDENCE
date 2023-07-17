@@ -29,25 +29,9 @@ export async function loader() {
     return await data.json();
 }
 
-// {user && <Notifications notifs={notifications} />}
-//           <li className="dropdown">
-//             {user && (
-//               <img
-//                 src={user.urlImage}
-//                 alt=""
-//                 onClick={toggle}
-//                 ref={buttonRef}
-//                 className="home-profile-img"
-//               />
-//             )}
-//             {isMenuDropDownOpen && (
-//               <DropDownMenup user={user} dropdownRef={dropdownRef} />
-//             )}
-//           </li>
 
 function ProfileDropDown() {
     const [user, setUser] = useContext(userContext);
-    // const [isSignedIn, setIsSignedIn] = useContext(authContext);
     const location = useLocation();
     const [isMenuDropDownOpen, setMenuDropDownOpen] = useState(false);
     const dropdownRef: any = useRef(null);
@@ -91,18 +75,9 @@ function ProfileDropDown() {
         </li>
     );
 }
+
 function Nav() {
     const user: any = useLoaderData();
-
-    // const socket: any = useContext(authContext);
-    // const [notifications, setNotifications] = useState<any>([]);
-    // useEffect(() => {
-    //     socket.on("receive_notification", (param: any) => {
-    //         setNotifications((prev: any) => [...prev, param]);
-    //     });
-    // }, [socket]);
-
-    useEffect(() => {});
     return (
         <userContext.Provider value={useState(user)}>
             <nav className="navbar">
@@ -121,7 +96,8 @@ function Nav() {
                     <li>
                         <NavLink to={`profile/${user.id}`}>Profile</NavLink>
                     </li>
-                    <ProfileDropDown user={user} />
+                    <Notifications />
+                    <ProfileDropDown />
                 </ul>
             </nav>
             <div className="page">

@@ -2,26 +2,14 @@ import "./Notification.css";
 import bell from "../../assets/bell.svg";
 import { Fragment } from "react";
 import { NotificationCard } from "../NotificationCard/NotificationCard";
+import { socketContext } from "../../context/Context";
 
-export default function Notification(props: any) {
-    let notifications = [];
-    if (props.notifs) {
-        notifications = props.notifs.map((notif: any) => {
-            console.log(notif);
-            return (
-                <Fragment key={notif.id}>
-                    <NotificationCard
-                        notif={notif}
-                        actions={["add"]}
-                        id={notif.id}
-                        title={notif.title}
-                        description={notif.description}
-                    />
-                    <hr />
-                </Fragment>
-            );
-        });
-    }
+
+export default function Notification() {
+    let notifications: any = [];
+    socketContext.on('receive_notification', (notification) => {
+        console.log(notification);
+    })
 
     return (
         <ul className="notification-drop">

@@ -4,18 +4,12 @@ import FriendList from "../../components/FriendsList/FriendsList";
 import UserData from "../../components/UserData/UserData";
 import Achievements from "../../components/Achievements/Achievements";
 import Stats from "../../components/Stats/Stats";
-import { authContext, userContext } from "../../context/Context";
+import { authContext } from "../../context/Context";
 import Cookies from "js-cookie";
-import {
-    Navigate,
-    redirect,
-    useLoaderData,
-    useRouteError,
-} from "react-router-dom";
-import { useContext, useState } from "react";
+import { Navigate, useLoaderData, useRouteError } from "react-router-dom";
+import { useContext } from "react";
 import NotFound from "../../components/NotFound";
-import Nav from "../../components/Navbar/Navbar";
-
+import { socketContext } from "../../context/Context";
 export function ErrorBoundary() {
     let error: any = useRouteError();
     return <NotFound message={error.message} />;
@@ -42,27 +36,38 @@ export async function userLoader({ params }: any) {
 
 export default function Profile() {
     const user: any = useLoaderData();
-    console.log('profile user coming from loader: ', user);
-    const [isSignedIn, setIsSignedIn] = useContext(authContext);
+    // const socket = socketContext;
+    const [isSignedIn] = useContext(authContext);
     if (!isSignedIn) return <Navigate to={"/signin"} />;
-    if (user.optionalMail &&  user.isSignedIn == false) return <Navigate to={'/twofactor'} />
-    // const socket = useContext(authContext);
+    if (user.optionalMail && user.isSignedIn == false)
+        return <Navigate to={"/twofactor"} />;
 
     return (
-        <userContext.Provider value={useState(user)}>
-            <section className="profile">
-                <div className="profile--left">
-                    <UserData />
-                    <History />
-                </div>
-                <div className="profile--center">
-                    {user.me && <FriendList />}
-                </div>
-                <div className="profile--right">
-                    <Achievements />
-                    <Stats wins={user.win} losses={user.loss} />
-                </div>
-            </section>
-        </userContext.Provider>
+        <section className="profile">
+            <div className="profile--left">
+                <UserData
+                    urlImage={user.urlImage}
+                    username={user.username}
+                    me={user.me}
+                    friendStatus={user.friendStatus}
+                />
+                <History />
+            </div>
+            <div className="profile--center">
+                {user.me && (
+                    <FriendList
+                        blocked={user.blocked}
+                        friends={user.friends}
+                        urlImage={user.urlImage}
+                        id={user.id}
+                        username={user.username}
+                    />
+                )}
+            </div>
+            <div className="profile--right">
+                <Achievements />
+                <Stats wins={user.win} losses={user.loss} />
+            </div>
+        </section>
     );
 }
