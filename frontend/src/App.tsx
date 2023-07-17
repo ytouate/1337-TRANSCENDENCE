@@ -22,11 +22,11 @@ import Profile, {
     ErrorBoundary,
 } from "./pages/Profile/Profile.jsx";
 import SignIn from "./pages/SignIn/SignIn.js";
-import img from "./assets/ytouate.jpeg";
 import Chat from "./pages/Chat/Chat";
 import socketIO from "socket.io-client";
 import Cookies from "js-cookie";
 import TwoFactor from "./pages/TwoFactor/TwoFactor.js";
+import { useState } from "react";
 
 const socket = socketIO.connect("http://localhost:3000/notification", {
     extraHeaders: {
@@ -36,38 +36,36 @@ const socket = socketIO.connect("http://localhost:3000/notification", {
 
 const router = createBrowserRouter(
     createRoutesFromElements(
-        <Route
-            path="/"
-            loader={navLoader}
-            element={<Navbar socket={socket} profileImg={img} />}
-        >
-            <Route
-                // errorElement={<h1>Error Rendering the home page</h1>}
-                index
-                loader={homeLoader}
-                element={<Home />}
-            />
-            <Route
-                path="profile/:id"
-                errorElement={<ErrorBoundary />}
-                loader={userLoader}
-                element={<Profile />}
-            />
-            <Route path="chat" element={<Chat />} />
-            <Route path="signin" element={<SignIn />} />
-            <Route path="twofactor" element={<TwoFactor />} />
-            <Route
-                path="settings"
-                loader={settingsLoader}
-                element={<Settings />}
-            />
-        </Route>
+        <>
+                <Route path="/twofactor" element={<TwoFactor />} />
+                <Route path="signin" element={<SignIn />} />
+                <Route path="/" loader={navLoader} element={<Navbar />} >
+                <Route index loader={homeLoader} element={<Home />} />
+                <Route
+                    path="profile/:id"
+                    errorElement={<ErrorBoundary />}
+                    loader={userLoader}
+                    element={<Profile />}
+                />
+                <Route path="chat" element={<Chat />} />
+                
+                <Route
+                    path="settings"
+                    loader={settingsLoader}
+                    element={<Settings />}
+                />
+            </Route>
+        </>
     )
 );
 
 function App() {
+    let isSignedIn : any = Cookies.get('isSignedIn');
+    if (isSignedIn && isSignedIn == 'true')
+        isSignedIn = true;
+    else isSignedIn = false;
     return (
-        <authContext.Provider value={socket}>
+        <authContext.Provider value={useState(isSignedIn)}>
             <RouterProvider router={router} />
         </authContext.Provider>
     );

@@ -12,7 +12,7 @@ import Notifications from "../Notifications/Notification";
 import Cookies from "js-cookie";
 import "./Navbar.css";
 import { useContext, useEffect, useRef, useState } from "react";
-import { authContext } from "../../context/Context";
+import { userContext, authContext } from "../../context/Context";
 import { Socket } from "socket.io-client";
 
 type NavData = {
@@ -45,7 +45,9 @@ export async function loader() {
 //             )}
 //           </li>
 
-function ProfileDropDown({ user }) {
+function ProfileDropDown() {
+    const [user, setUser] = useContext(userContext);
+    const [isSignedIn, setIsSignedIn] = useContext(authContext);
     const location = useLocation();
     const [isMenuDropDownOpen, setMenuDropDownOpen] = useState(false);
     const dropdownRef: any = useRef(null);
@@ -89,20 +91,20 @@ function ProfileDropDown({ user }) {
         </li>
     );
 }
-function Nav(props: NavData) {
+function Nav() {
     const user: any = useLoaderData();
 
-    const socket: any = useContext(authContext);
-    const [notifications, setNotifications] = useState<any>([]);
-    useEffect(() => {
-        socket.on("receive_notification", (param: any) => {
-            setNotifications((prev: any) => [...prev, param]);
-        });
-    }, [socket]);
+    // const socket: any = useContext(authContext);
+    // const [notifications, setNotifications] = useState<any>([]);
+    // useEffect(() => {
+    //     socket.on("receive_notification", (param: any) => {
+    //         setNotifications((prev: any) => [...prev, param]);
+    //     });
+    // }, [socket]);
 
     useEffect(() => {});
     return (
-        <>
+        <userContext.Provider value={useState(user)}>
             <nav className="navbar">
                 <div className="navbar-left">
                     <Link to="/">
@@ -125,7 +127,7 @@ function Nav(props: NavData) {
             <div className="page">
                 <Outlet />
             </div>
-        </>
+        </userContext.Provider>
     );
 }
 

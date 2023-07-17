@@ -1,7 +1,14 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import "./DropDownMenu.css";
 import Cookies from "js-cookie";
-export default function DropDownMenup({ user, dropdownRef }: any) {
+import { useContext } from "react";
+import { authContext, userContext } from "../../context/Context";
+
+export default function DropDownMenup({ dropdownRef }: any) {
+    const [user, setUser] = useContext(userContext);
+    const [isSignedIn, setIsSignedIn] = useContext(authContext);
+    if (user.isSignedIn == false) return <Navigate to="/signin" />;
+    console.log(user);
     return (
         <ul className="profile-dropdown-content" ref={dropdownRef}>
             <li>
@@ -24,12 +31,15 @@ export default function DropDownMenup({ user, dropdownRef }: any) {
                 <a
                     onClick={(e) => {
                         fetch("http://localhost:3000/logout", {
-                            method: 'POST',
+                            method: "POST",
                             headers: {
                                 Authorization: `Bearer ${Cookies.get("Token")}`,
                             },
-
-                        }).then(() => console.log("logged out succefully"));
+                        }).then(() => {
+                            Cookies.remove('isSignedIn');
+                            Cookies.remove('Token');
+                            setIsSignedIn(false);
+                        });
                     }}
                 >
                     Logout

@@ -3,11 +3,12 @@ import GameOptions from "../../components/GameOptions/GameOptions";
 import LeaderBoardCard from "../../components/LeaderBoard/LeaderBoard";
 import ActiveFriends from "../../components/ActiveFriends/ActiveFriends";
 import "./Home.css";
-import { userContext } from "../../context/Context";
+import { authContext, userContext } from "../../context/Context";
 
 import { Navigate, redirect, useLoaderData } from "react-router-dom";
 import Cookies from "js-cookie";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import Nav from "../../components/Navbar/Navbar";
 export async function loader() {
     const Token = Cookies.get("Token");
     const options = {
@@ -19,7 +20,6 @@ export async function loader() {
     const res = await fetch("http://localhost:3000/user", options);
     if (res.ok) {
         const data = await res.json();
-        if (data.optionalMail && !data.isSignedIn) return redirect("/signin");
         return data;
     }
     return redirect("/signin");
@@ -27,8 +27,9 @@ export async function loader() {
 
 function Home() {
     const user: any = useLoaderData();
-    console.log("user: ", user);
-    if (user.isSignedIn == false) return <Navigate to='/signin' />
+    const [isSignedIn, setIsSignedIn] = useContext(authContext);
+    if (isSignedIn == false) return <Navigate to={"/signin"} />;
+    if (user.isSignedIn == false) return <Navigate to="/signin" />;
     return (
         <userContext.Provider value={useState(user)}>
             <div className="home">

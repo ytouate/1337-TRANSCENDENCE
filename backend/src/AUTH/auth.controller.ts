@@ -27,6 +27,7 @@ export class authController {
         const token = await this.authservice.signToken(user.username, user.email)
         await this.authservice.checkUserhave2fa(user)
         res.cookie('Token' , token)
+        res.cookie('isSignedIn' , true)
         res.redirect('http://localhost:5173/')
     }
 
@@ -36,7 +37,7 @@ export class authController {
     async getUser(@Req() req) {
         const user = await this.authservice.validateUser(req)
         if (user)
-            return user
+            return await this.authservice.setIsSignedInTrue(user, true)
         return {'message' : 'user not found'}
     }
  
@@ -69,9 +70,9 @@ export class authController {
 
     @Post('logout')
     @UseGuards(AuthGuard('jwt'))
-    async logout(@Req() req) {
-        console.log(req.user)
+    async logout(@Req() req, @Res() res) {
+        //res.delete('isSignedIn')
         await this.authservice.setIsSignedInTrue(req.user, false)
-        return 'delete JWT token from client'
+        return res.status(200).json({'message' : 'logout succes'})
     }
 }

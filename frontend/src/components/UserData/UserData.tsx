@@ -60,9 +60,11 @@ const MainUserButtons = () => {
             <Link to="/settings">
                 <button className="settings-button">Settings</button>
             </Link>
-            <Link to="/signin">
+            <a onClick={(e) => {
+                Cookies.remove('Token');
+            }}>
                 <button className="settings-button logout">Logout</button>
-            </Link>
+            </a>
         </>
     );
 };
@@ -130,7 +132,7 @@ const UserButtons = ({ socket, user }: any) => {
 
 export default function UserData() {
     const [user, setUserData]: any = useContext(userContext);
-    const socket: any = useContext(authContext);
+    // const socket: any = useContext(authContext);
 
     return (
         <>
@@ -152,9 +154,11 @@ export default function UserData() {
                     {user.me ? (
                         <MainUserButtons />
                     ) : user.friendStatus ? (
-                        <MainUserFriendsButtons socket={socket} user={user} />
+                        <h1>tobedone</h1>
                     ) : (
-                        <UserButtons user={user} socket={socket} />
+                        // <MainUserFriendsButtons socket={socket} user={user} />
+                        <h1>tobedone</h1>
+                        // <UserButtons user={user} socket={socket} />
                     )}
                 </div>
 

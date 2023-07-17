@@ -110,7 +110,10 @@ export class authService{
         return await this.prisma.user.update(
             {
                 where : {email : user.email},
-                data : {isSignedIn : status}
+                data : {isSignedIn : status},
+                include: {
+                    friends: true,
+                }
             }
         )
     }

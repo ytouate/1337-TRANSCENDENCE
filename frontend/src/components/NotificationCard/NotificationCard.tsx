@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import "./NotificationCard.css";
-import { authContext } from "../../context/Context";
+import {  } from "../../context/Context";
 
 function RequestTitle({ socket, id }: any) {
     return (
@@ -24,7 +24,7 @@ function acceptInvitation(socket: any, id: number) {
     });
 }
 export function NotificationCard(props: any) {
-    const socket: any = useContext(authContext);
+    // const socket: any = useContext(authContext);
     console.log('notif li wsslat: ', props.notif)
     return (
         <li className="notification-card">
@@ -34,7 +34,7 @@ export function NotificationCard(props: any) {
             </div>
             <div className=" notification-actions">
                 {props.title == "Request" && (
-                    <RequestTitle socket={socket} id={props.id} />
+                    // <RequestTitle socket={socket} id={props.id} />
                 )}
             </div>
         </li>
