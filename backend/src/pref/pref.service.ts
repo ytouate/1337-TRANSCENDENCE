@@ -20,7 +20,6 @@ export class PrefService {
 
             return pref;
         } catch (error) {
-            console.log(error);
 
             throw error;
         }

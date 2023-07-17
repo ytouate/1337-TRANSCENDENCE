@@ -5,6 +5,7 @@ import { imageLink } from "./auth.strategy42";
 import { JwtService } from "@nestjs/jwt";
 import { MailerService } from "@nestjs-modules/mailer";
 import { userReturn } from "src/utils/user.return";
+import { use } from "passport";
 
 @Injectable()
 export class authService{
@@ -21,7 +22,6 @@ export class authService{
         const user = await this.prisma.user.findUnique( {where : { email : newData.email} })
         if (!user)
         {
-            console.log('craete new user')
             let newUser = await this.prisma.user.create({
                 data : {
                     email : newData.email,
@@ -58,7 +58,6 @@ export class authService{
                 data : { optionalMail : email , codeVerification : code}
             },
         )
-        console.log(user)
     }
 
     //validate user
@@ -114,6 +113,17 @@ export class authService{
                 include: {
                     friends: true,
                 }
+            }
+        )
+    }
+
+    // disable 2fa
+    async   disable2fa(user)
+    {
+        return await this.prisma.user.update(
+            {
+                where : {email : user.email},
+                data : {optionalMail : null}
             }
         )
     }

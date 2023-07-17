@@ -20,9 +20,7 @@ export async function loader() {
     const res = await fetch("http://localhost:3000/user", options);
     if (res.ok) {
         const data = await res.json();
-        console.log(data.isSignedIn);
         if (data.optionalMail && !data.isSignedIn) {
-            console.log("here");
             return redirect("/twofactor");
         }
         return data;
@@ -33,13 +31,6 @@ export async function loader() {
 function Home() {
     const user: any = useLoaderData();
     const [isSignedIn, setIsSignedIn] = useContext(authContext);
-    // if (isSignedIn == true && user.optionalMail) {
-    //     useEffect(() => {
-    //         setIsSignedIn(false);
-    //     }, []);
-    //     <Navigate to={"/twofactor"} />;
-    //     // return
-    // }
     if (isSignedIn == false) return <Navigate to={"/signin"} />;
     return (
         <userContext.Provider value={useState(user)}>

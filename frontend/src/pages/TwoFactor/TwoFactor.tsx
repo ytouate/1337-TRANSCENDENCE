@@ -1,12 +1,14 @@
 import { useContext, useState } from "react";
 import Cookies from "js-cookie";
 import { Navigate } from "react-router-dom";
-import { authContext } from "../../context/Context";
-export default function TwoFactor() {
+import { authContext, userContext } from "../../context/Context";
+
+export default function TwoFactor(props) {
+    console.log(props);
     let [code, setCode] = useState("");
     const [validated, setValidated] = useState(false);
     if (validated) return <Navigate to={'/'} />
-    async function handleSubmit(e) {
+    async function handleSubmit(e: any) {
         e.preventDefault();
         const options = {
             method: "POST",

@@ -7,8 +7,7 @@ import { authContext, userContext } from "../../context/Context";
 export default function DropDownMenup({ dropdownRef }: any) {
     const [user, setUser] = useContext(userContext);
     const [isSignedIn, setIsSignedIn] = useContext(authContext);
-    if (user.isSignedIn == false) return <Navigate to="/signin" />;
-    console.log(user);
+    // if (user.isSignedIn == false) return <Navigate to="/signin" />;
     return (
         <ul className="profile-dropdown-content" ref={dropdownRef}>
             <li>

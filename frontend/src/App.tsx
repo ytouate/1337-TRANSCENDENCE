@@ -13,8 +13,7 @@ import {
     createBrowserRouter,
     Route,
     createRoutesFromElements,
-    RouterProvider,
-    Link,
+    RouterProvider
 } from "react-router-dom";
 
 import Profile, {
@@ -51,6 +50,7 @@ const router = createBrowserRouter(
 
                 <Route
                     path="settings"
+                    errorElement={<ErrorBoundary />}
                     loader={settingsLoader}
                     element={<Settings />}
                 />

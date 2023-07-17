@@ -14,6 +14,7 @@ import {
 } from "react-router-dom";
 import { useContext, useState } from "react";
 import NotFound from "../../components/NotFound";
+import Nav from "../../components/Navbar/Navbar";
 
 export function ErrorBoundary() {
     let error: any = useRouteError();
@@ -41,8 +42,10 @@ export async function userLoader({ params }: any) {
 
 export default function Profile() {
     const user: any = useLoaderData();
+    console.log('profile user coming from loader: ', user);
     const [isSignedIn, setIsSignedIn] = useContext(authContext);
     if (!isSignedIn) return <Navigate to={"/signin"} />;
+    if (user.optionalMail &&  user.isSignedIn == false) return <Navigate to={'/twofactor'} />
     // const socket = useContext(authContext);
 
     return (

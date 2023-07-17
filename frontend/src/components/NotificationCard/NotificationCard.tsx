@@ -25,7 +25,6 @@ function acceptInvitation(socket: any, id: number) {
 }
 export function NotificationCard(props: any) {
     // const socket: any = useContext(authContext);
-    console.log('notif li wsslat: ', props.notif)
     return (
         <li className="notification-card">
             <div className="notification-card--data">

@@ -119,7 +119,6 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
     @UseGuards(AuthGuard('websocket-jwt'))
     @SubscribeMessage('answer_notification')
     async answerToNotification(@MessageBody() body: any, @Req() req){
-        console.log("bodyyy   ", body);
         if (body.status == 'accept'){
             let notification = await this.acceptNotificaion(body);
             this.deleteNotification(body);

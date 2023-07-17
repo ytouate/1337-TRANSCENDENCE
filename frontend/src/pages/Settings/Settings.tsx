@@ -4,8 +4,11 @@ import updateAvatarIcon from "../../assets/update-avatar.svg";
 import { useState } from "react";
 import Cookies from "js-cookie";
 import { ToastContainer, toast } from "react-toastify";
-import axios from "axios";
+import { useContext } from "react";
+import { authContext } from "../../context/Context";
+import { Navigate } from "react-router-dom";
 import { useLoaderData } from "react-router-dom";
+
 export async function loader() {
     const Token = Cookies.get("Token");
     const options = {
@@ -15,16 +18,24 @@ export async function loader() {
         },
     };
     const res = await fetch("http://localhost:3000/user", options);
-    return await res.json();
+    if (res.ok) return await res.json();
+    else {
+        if (res.status == 401)
+            throw new Error("make sure you have the right access");
+    }
 }
 
 export default function Settings() {
+    const [isSignedIn, setIsSignedIn] = useContext(authContext);
+    if (isSignedIn == false) return <Navigate to={"/signin"} />;
     const [newName, setNewName] = useState("");
     const [newAvatar, setNewAvatar] = useState(null);
     const [clicked2fa, setClicked2fa] = useState(false);
     const [email2fa, setEmail2fa] = useState("");
     const token = Cookies.get("Token");
     const user: any = useLoaderData();
+    if (user.optionalMail && user.isSignedIn == false)
+        return <Navigate to={"/twofactor"} />;
 
     async function deleteAvatar() {
         fetch("http://localhost:3000/profile/deletephoto", {
@@ -48,6 +59,22 @@ export default function Settings() {
         };
         const res = await fetch("http://localhost:3000/2fa", options);
         if (!res.ok) throw new Error("could not activate 2fa");
+        Cookies.remove("isSignedIn");
+        Cookies.remove("Token");
+        setIsSignedIn(false);
+    }
+    async function disable2FA(e: any) {
+        e.preventDefault();
+        const token = Cookies.get("Token");
+        const options: any = {
+            method: "PUT",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+        const res = await fetch("http://localhost:3000/disable2fa", options);
+        if (!res.ok) throw new Error("Could not disable 2fa");
+        console.log("disabled succefully");
     }
 
     function handleClick2fa() {
@@ -89,7 +116,9 @@ export default function Settings() {
                     <button onClick={handleClick2fa} className="settings-btn">
                         enable 2FA
                     </button>
-                    <button className="settings-btn">disable 2FA</button>
+                    <button className="settings-btn" onClick={disable2FA}>
+                        disable 2FA
+                    </button>
                 </div>
                 {clicked2fa && (
                     <>

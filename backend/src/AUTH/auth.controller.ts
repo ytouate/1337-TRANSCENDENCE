@@ -1,4 +1,4 @@
-import { Controller, Post, Res, Req , UseGuards, Body} from "@nestjs/common";
+import { Controller, Post, Res, Req , UseGuards, Body, Put, Delete} from "@nestjs/common";
 import { authService } from "./auth.service";
 import { Get } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
@@ -60,7 +60,7 @@ export class authController {
     async verificationCode2fa(@Body() body, @Req() req)
     {
         const user = await this.authservice.validateUser(req)
-        console.log(user.code, body.code);
+
         if (user && user.codeVerification  == body.code)
         {
             return await this.authservice.setIsSignedInTrue(user, true)
@@ -68,6 +68,12 @@ export class authController {
         return {'message' : 'incorrect code'}
     }
 
+    @Put('disable2fa')
+    @UseGuards(AuthGuard('jwt'))
+    async disable2fa(@Req() req)
+    {
+        return await this.authservice.disable2fa(req.user)
+    }
 
     @Post('logout')
     @UseGuards(AuthGuard('jwt'))

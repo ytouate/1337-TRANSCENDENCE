@@ -15,7 +15,6 @@ export class ProfileController {
     @UseGuards(AuthGuard('jwt'))
     @Get('')
     getProfile(@Req() req){
-        console.log(req.user)
         return this.profileService.getProfile(req);
     }
     @UseInterceptors(FileInterceptor('image', {
@@ -31,7 +30,6 @@ export class ProfileController {
     @UseGuards(AuthGuard('jwt'))
     @Put('updatephoto')
     updatePhoto(@UploadedFile() file, @Req() req){
-        console.log(req.get('host'));
         return this.profileService.updatePhoto(req, file.path);
     }
     @UseGuards(AuthGuard('jwt'))

@@ -71,7 +71,6 @@ export class UserSettingsService {
                 }
             }
         })
-        console.log(user);
 
     }
     // search implimentation
@@ -197,7 +196,6 @@ export class UserSettingsService {
   }
 
     async getUserById(userId: number) {
-        // console.log('m here');
         userId = Math.floor(userId)
         const user = await this.prismaService.user.findUnique({
             where: {

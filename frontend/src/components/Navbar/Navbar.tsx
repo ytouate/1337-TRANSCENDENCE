@@ -47,7 +47,7 @@ export async function loader() {
 
 function ProfileDropDown() {
     const [user, setUser] = useContext(userContext);
-    const [isSignedIn, setIsSignedIn] = useContext(authContext);
+    // const [isSignedIn, setIsSignedIn] = useContext(authContext);
     const location = useLocation();
     const [isMenuDropDownOpen, setMenuDropDownOpen] = useState(false);
     const dropdownRef: any = useRef(null);
