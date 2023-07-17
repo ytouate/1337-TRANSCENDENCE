@@ -26,6 +26,7 @@ export class UserSettingsService {
     }
     //delete user form friend scalar
     async deleteUserFromFriend(source, target){
+        
         let  userSource= await this.prismaService.user.findFirst({
             where: {
                 email: source.email

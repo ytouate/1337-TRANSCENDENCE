@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import "./NotificationCard.css";
-import {  } from "../../context/Context";
+import { socketContext } from "../../context/Context";
 
 function RequestTitle({ socket, id }: any) {
     return (
@@ -16,15 +16,14 @@ function RequestTitle({ socket, id }: any) {
     );
 }
 
-function acceptInvitation(socket: any, id: number) {
-    socket.emit("answer_notification", {
+function acceptInvitation(id: number) {
+    socketContext.emit("answer_notification", {
         id: id,
         status: "accept",
         description: 'Invitaion accepted',
     });
 }
 export function NotificationCard(props: any) {
-    // const socket: any = useContext(authContext);
     return (
         <li className="notification-card">
             <div className="notification-card--data">

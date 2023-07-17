@@ -1,17 +1,24 @@
 import "./UserData.css";
 import { Link } from "react-router-dom";
-import {  } from "../../context/Context";
-import {  useState } from "react";
+import {} from "../../context/Context";
+import { useState } from "react";
 import Cookies from "js-cookie";
 import { ToastContainer, toast } from "react-toastify";
-import {  socketContext } from "../../context/Context";
+import { socketContext } from "../../context/Context";
 import { unblock, notifyUnblocked } from "../FriendCard/FriendCard";
 
 async function takeAction(action: string, username: string) {
+    const options = {
+        method: "GET",
+        headers: { Authorization: `Bearer ${Cookies.get("Token")}` },
+    };
+    const data = await fetch("http://localhost:3000/user", options);
+    const res = await data.json();
+    console.log(res);
     if (action == "add") {
         socketContext.emit("send_notification", {
             title: "Request",
-            description: `new friend request from TOBEDONE`,
+            description: `new friend request from ${res.username}`,
             username: username,
         });
     } else if (action == "block") {
@@ -27,6 +34,7 @@ async function takeAction(action: string, username: string) {
         const res = await fetch("http://localhost:3000/users/block", options);
         if (!res.ok) throw new Error("Could not block ");
     } else if (action == "unfriend") {
+        console.log('username: ', username);
         const options = {
             method: "DELETE",
             headers: {
@@ -72,15 +80,15 @@ const MainUserButtons = () => {
     );
 };
 
-const MainUserFriendsButtons = ({ username }: any) => {
+const MainUserFriendsButtons = (props: any) => {
     return (
         <>
-            <a onClick={() => takeAction("unfriend", username)}>
+            <a onClick={() => takeAction("unfriend", props.username)}>
                 <button onClick={notfyUnfriend} className="settings-button add">
                     Unfriend
                 </button>
             </a>
-            <a onClick={() => takeAction("block", username)}>
+            <a onClick={() => takeAction("block", props.username)}>
                 <button
                     onClick={notifyBlocked}
                     className="settings-button block"
@@ -156,7 +164,7 @@ export default function UserData(props: userDataType) {
                     {props.me ? (
                         <MainUserButtons />
                     ) : props.friendStatus ? (
-                        <MainUserFriendsButtons username={props} />
+                        <MainUserFriendsButtons {...props} />
                     ) : (
                         <UserButtons {...props} />
                     )}

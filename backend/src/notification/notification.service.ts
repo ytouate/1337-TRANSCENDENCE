@@ -124,11 +124,11 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
             this.deleteNotification(body);
             let acceptation = {
                 title: notification.title,
-                reicever: notification.reicever.username,
+                reicever: notification.reicever,
                 status: 'accepted'
             }
             for (let i = 0;i < this.socketById.get(notification.reicever.id).length;i++){
-                this.socketById.get(notification.senderId)[i].emit('receive_notification', notification);
+                this.socketById.get(notification.senderId)[i].emit('receive_notification', acceptation);
             }
         }
         else if (body.status == 'rejected') this.deleteNotification(body);
