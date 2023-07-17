@@ -37,9 +37,9 @@ const socket = socketIO.connect("http://localhost:3000/notification", {
 const router = createBrowserRouter(
     createRoutesFromElements(
         <>
-                <Route path="/twofactor" element={<TwoFactor />} />
-                <Route path="signin" element={<SignIn />} />
-                <Route path="/" loader={navLoader} element={<Navbar />} >
+            <Route path="/twofactor" element={<TwoFactor />} />
+            <Route path="signin" element={<SignIn />} />
+            <Route path="/" loader={navLoader} element={<Navbar />}>
                 <Route index loader={homeLoader} element={<Home />} />
                 <Route
                     path="profile/:id"
@@ -48,7 +48,7 @@ const router = createBrowserRouter(
                     element={<Profile />}
                 />
                 <Route path="chat" element={<Chat />} />
-                
+
                 <Route
                     path="settings"
                     loader={settingsLoader}
@@ -60,9 +60,8 @@ const router = createBrowserRouter(
 );
 
 function App() {
-    let isSignedIn : any = Cookies.get('isSignedIn');
-    if (isSignedIn && isSignedIn == 'true')
-        isSignedIn = true;
+    let isSignedIn: any = Cookies.get("isSignedIn");
+    if (isSignedIn && isSignedIn == "true") isSignedIn = true;
     else isSignedIn = false;
     return (
         <authContext.Provider value={useState(isSignedIn)}>

@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Cookies from "js-cookie";
-import { Navigate, redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
+import { authContext } from "../../context/Context";
 export default function TwoFactor() {
     let [code, setCode] = useState("");
-    let [success, setSuccess] = useState(false);
+    const [validated, setValidated] = useState(false);
+    if (validated) return <Navigate to={'/'} />
     async function handleSubmit(e) {
         e.preventDefault();
         const options = {
@@ -18,10 +20,10 @@ export default function TwoFactor() {
             "http://localhost:3000/2fa/validateCode",
             options
         );
-        console.log(res.json())
-        if (res.ok) setSuccess(true);
+        if (res.ok) setValidated(true);
+
     }
-    if (success) return <Navigate to="/" />;
+    
     return (
         <form onSubmit={handleSubmit} action="">
             Insert the Code:{" "}

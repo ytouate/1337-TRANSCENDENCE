@@ -6,6 +6,7 @@ import { redirect, Link } from "react-router-dom";
 
 function SignIn() {
     const [isSignedIn, setIsSignedIn] = useContext(authContext);
+    // const twoFaActivated = Cookies.get('2fa');
     
     return (
         <div className="signin">

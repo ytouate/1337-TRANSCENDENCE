@@ -37,20 +37,21 @@ export class authController {
     async getUser(@Req() req) {
         const user = await this.authservice.validateUser(req)
         if (user)
-            return await this.authservice.setIsSignedInTrue(user, true)
+            return user;
         return {'message' : 'user not found'}
     }
  
 
     @Post('2fa')
     @UseGuards(AuthGuard('jwt'))
-    async siginWith2fa(@Req() request , @Body() req)
+    async siginWith2fa(@Req() request , @Body() req, @Res() res)
     {
         const user = await this.authservice.validateUser(request)
         if (!user)
             return {'message' : 'unvalide user'}
         await this.authservice.add2fa(user.email, req.email, 0)
-        return {'status' : 200 , 'message' : 'adding 2fa success'}
+        res.cookie('2fa' , '2fa')
+        return res.status(200).json({'message' : 'adding 2fa success'})
     }
  
 
