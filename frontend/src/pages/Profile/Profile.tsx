@@ -9,7 +9,6 @@ import Cookies from "js-cookie";
 import { Navigate, useLoaderData, useRouteError } from "react-router-dom";
 import { useContext } from "react";
 import NotFound from "../../components/NotFound";
-import { socketContext } from "../../context/Context";
 export function ErrorBoundary() {
     let error: any = useRouteError();
     return <NotFound message={error.message} />;
@@ -36,7 +35,6 @@ export async function userLoader({ params }: any) {
 
 export default function Profile() {
     const user: any = useLoaderData();
-    // const socket = socketContext;
     const [isSignedIn] = useContext(authContext);
     if (!isSignedIn) return <Navigate to={"/signin"} />;
     if (user.optionalMail && user.isSignedIn == false)
@@ -66,7 +64,7 @@ export default function Profile() {
             </div>
             <div className="profile--right">
                 <Achievements />
-                <Stats wins={user.win} losses={user.loss} />
+                <Stats winRate={user.winRate} wins={user.win} losses={user.loss} />
             </div>
         </section>
     );

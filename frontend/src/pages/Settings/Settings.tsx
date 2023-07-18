@@ -83,7 +83,7 @@ export default function Settings() {
 
     async function changeAvatar(e: any) {}
 
-    async function changeName() {
+    async function changeName(e) {
         const token = Cookies.get("Token");
         const options = {
             method: "PUT",
@@ -98,6 +98,7 @@ export default function Settings() {
             options
         );
         if (!res.ok) throw new Error("failed to change name");
+        console.log('success')
     }
 
     function updateAvatar(e: any) {
@@ -180,7 +181,7 @@ export default function Settings() {
                     <img src={updateNameIcon} alt="" />
                     <p>update name</p>
                 </div>
-                <form className="settings--update-name">
+                <form onSubmit={changeName} className="settings--update-name">
                     <input
                         value={newName}
                         onChange={(e) => setNewName(e.target.value)}

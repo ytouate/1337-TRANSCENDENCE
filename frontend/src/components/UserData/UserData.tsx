@@ -14,7 +14,6 @@ async function takeAction(action: string, username: string) {
     };
     const data = await fetch("http://localhost:3000/user", options);
     const res = await data.json();
-    console.log(res);
     if (action == "add") {
         socketContext.emit("send_notification", {
             title: "Request",
@@ -34,7 +33,6 @@ async function takeAction(action: string, username: string) {
         const res = await fetch("http://localhost:3000/users/block", options);
         if (!res.ok) throw new Error("Could not block ");
     } else if (action == "unfriend") {
-        console.log('username: ', username);
         const options = {
             method: "DELETE",
             headers: {
@@ -62,7 +60,9 @@ const notfyAdd = () => {
 const notfyUnfriend = () => {
     toast.info("Unfriended succefully");
 };
-
+const notfyAlredySent = () => {
+    toast.warning("Request already sent");
+};
 const MainUserButtons = () => {
     return (
         <>
@@ -114,12 +114,20 @@ const MainUserFriendsButtons = (props: any) => {
 
 const UserButtons = (props: userDataType) => {
     const [isBlockButton, setBlockButton] = useState(true);
-
+    const [isAddButton, setIsAddButton] = useState(true);
     return (
         <>
-            <a onClick={() => takeAction("add", props.username)}>
-                <button onClick={notfyAdd} className="settings-button add">
-                    Add
+            <a
+                onClick={() => {
+                    takeAction("add", props.username);
+                    setIsAddButton(false);
+                }}
+            >
+                <button
+                    onClick={isAddButton ? notfyAdd : notfyAlredySent}
+                    className="settings-button add"
+                >
+                    {isAddButton ? "Add" : "Pending"}
                 </button>
             </a>
             <a

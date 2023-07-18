@@ -1,7 +1,7 @@
 import "./Notification.css";
 import bell from "../../assets/bell.svg";
 import { socketContext } from "../../context/Context";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 
 function acceptInvitation(id: number) {
     socketContext.emit("answer_notification", {
@@ -41,7 +41,6 @@ function RequestNotification(props: any) {
 }
 export default function Notification() {
     let [notifications, setNotifications] = useState<any>([]);
-
     useEffect(() => {
         socketContext.on("receive_notification", (notification: any) => {
             setNotifications((prev: any) => {

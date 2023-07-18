@@ -36,9 +36,16 @@ export class authController {
     @UseGuards(AuthGuard('jwt'))
     async getUser(@Req() req) {
         const user = await this.authservice.validateUser(req)
+        console.log(user)
         if (user)
             return user;
         return {'message' : 'user not found'}
+    }
+
+    @Get('user/leaderboard')
+    @UseGuards(AuthGuard('jwt'))
+    async getUserWithWin(@Req() req) {
+        return await this.authservice.getUserWithWinRate(req);
     }
  
 
