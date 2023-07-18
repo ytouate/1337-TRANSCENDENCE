@@ -13,8 +13,8 @@ export const socketContext = socketIO.connect(
     },
 );
 
-export const gameSocket = socketIO.connect('http://localhost:3000/game', {
-    extraHeaders: {
-        Authorization: `Bearer ${Cookies.get('Token')}`,
-    },
-});
+// export const gameSocket = socketIO.connect('http://localhost:3000/game', {
+//     extraHeaders: {
+//         Authorization: `Bearer ${Cookies.get('Token')}`,
+//     },
+// });
