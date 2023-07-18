@@ -1,4 +1,4 @@
-import { OnModuleInit, UseGuards } from "@nestjs/common";
+import { UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import {  ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Socket ,Server } from "socket.io";
@@ -8,6 +8,7 @@ import { Req } from "@nestjs/common";
 
 
 @WebSocketGateway({ namespace : 'chat' , cors : true})
+@UseGuards(AuthGuard('websocket-jwt'))
 export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
     constructor (
         private prisma: PrismaService,
@@ -21,7 +22,6 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
 
     // send message to current room
     @SubscribeMessage('sendMessage')
-    @UseGuards(AuthGuard('websocket-jwt'))
     onMessage(@ConnectedSocket() client : Socket, @MessageBody() data , @Req() req)
     {
         this.server.in(client.handshake.query.roomName).emit('onMessage', data)
@@ -31,7 +31,6 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
 
     // joining the socket of user in  specific room
     @SubscribeMessage('createRoom')
-    @UseGuards(AuthGuard('websocket-jwt'))
     async handleCreationOfTheRoom(@ConnectedSocket() client : Socket , @Req() req) {
         console.log(`client  ${client.id} connected and creat the room ${client.handshake.query.roomName}`)
         const user = await this.validateUserByEmail(req.user.email, client.handshake.query.roomName)

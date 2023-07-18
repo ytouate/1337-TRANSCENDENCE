@@ -27,6 +27,7 @@ export class authController {
         const token = await this.authservice.signToken(user.username, user.email)
         await this.authservice.checkUserhave2fa(user)
         res.cookie('Token' , token)
+        res.cookie('isSigned', true)
         res.redirect('http://localhost:5173/')
     }
 
@@ -65,8 +66,8 @@ export class authController {
 
 
     @Post('logout')
-    async logout(@Req() req) {
-        console.log(req.headers.authorization)
-        return 'delete JWT token from client'
+    async logout(@Req() req, @Res() res ) {
+        // res.cookie('isSigned', false)
+        return res.status(200).json({'message' : 'logout suc'})
     }
 }
