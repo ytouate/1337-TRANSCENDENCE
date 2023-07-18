@@ -1,12 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
-import * as csurf from 'csurf';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
-
-
-const req = require('cors')
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule , {cors : true});
@@ -22,7 +18,6 @@ async function bootstrap() {
       credentials : true
     })
 
-    //app.use(csurf())
     const document = SwaggerModule.createDocument(app, config)
     SwaggerModule.setup('api', app, document)
 

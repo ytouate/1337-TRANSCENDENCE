@@ -25,7 +25,7 @@ import {
     drawPaddle,
     drawScores,
 } from './gameUtils.ts';
-import { Ball, Button, Paddle, Preferences } from '../../interface/game.ts';
+import { Ball, Paddle, Preferences } from '../../interface/game.ts';
 import './AgainstAi.css';
 import EndGameScreen from '../../components/EndGameScreen/EndGameScreen.tsx';
 
@@ -46,7 +46,7 @@ const AgainstAi = () => {
         const newPrefs: any = {
             paddleColor: PADDLE_COLOR,
             ballColor: BALL_COLOR,
-            mapTheme: 'grey',
+            mapTheme: '#28235c',
         };
 
         preference = newPrefs;

@@ -16,7 +16,7 @@ import { PrefService } from 'src/pref/pref.service';
 import { UserSettingsService } from 'src/usersettings/user.service';
 import { AuthGuard } from '@nestjs/passport';
 
-@WebSocketGateway({ cors: true })
+@WebSocketGateway({ namespace: 'game', cors: true })
 @UseGuards(AuthGuard('websocket-jwt'))
 export class GameGateWay implements OnGatewayConnection, OnModuleInit {
     userSockets: Map<number, UserData>;
@@ -126,23 +126,30 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
 
         const event_name = gameInvite ? 'game_invite_start' : 'match_found';
 
-        const pref1 = await this.prefService.getUserPref(userData1.id);
-        const pref2 = await this.prefService.getUserPref(userData2.id);
+        // const pref1 = await this.prefService.getUserPref(userData1.id);
+        // const pref2 = await this.prefService.getUserPref(userData2.id);
+
+        const user1 = await this.userService.getUserById(userData1.id);
+        const user2 = await this.userService.getUserById(userData2.id);
 
         userData1.socket.emit(event_name, {
             gameId: game.id,
             opponent: userData2.username,
             order: 0,
-            pref: pref1,
-            pref2: pref2,
+            pref: user1.preference,
+            pref2: user2.preference,
+            urlImg1: user1.urlImage,
+            urlImg2: user2.urlImage,
         });
 
         userData2.socket.emit(event_name, {
             gameId: game.id,
             opponent: userData1.username,
             order: 1,
-            pref: pref2,
-            pref2: pref1,
+            pref: user2.preference,
+            pref2: user1.preference,
+            urlImg1: user2.urlImage,
+            urlImg2: user1.urlImage,
         });
 
         const players: PlayerPosition[] = new Array(2);
@@ -154,9 +161,10 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
             y: BOARD_HEIGHT / 2 - PADDLE_HEIGHT / 2,
             score: 0,
             order: 0,
-            pref: pref1,
-            pref2: pref2,
+            pref: user1.preference,
+            pref2: user2.preference,
         };
+
         players[1] = {
             id: userData2.id,
             username: userData2.username,
@@ -164,8 +172,8 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
             y: BOARD_HEIGHT / 2 - PADDLE_HEIGHT / 2,
             score: 0,
             order: 1,
-            pref: pref2,
-            pref2: pref1,
+            pref: user2.preference,
+            pref2: user1.preference,
         };
 
         this.gamePlayerPosition.set(game.id, { players });

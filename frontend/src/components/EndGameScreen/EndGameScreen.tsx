@@ -66,12 +66,12 @@ const EndGameScreen = ({
                     </div>
                 </div>
                 <div className='flex flex-col mt-8'>
-                    <button className='button' onClick={onHomeClick}>
+                    <button className='game-button' onClick={onHomeClick}>
                         {resetState ? 'HOME' : 'GO BACK'}
                     </button>
                     {resetState && (
                         <button
-                            className='button play-again-button'
+                            className='game-button play-again-button'
                             onClick={resetState}
                         >
                             PLAY AGAIN
