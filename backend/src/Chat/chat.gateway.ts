@@ -5,6 +5,7 @@ import { Socket ,Server } from "socket.io";
 import { PrismaService } from "src/prisma/prisma.service";
 import { UserService } from "src/user/user.service";
 import { Req } from "@nestjs/common";
+import { ExceptionsHandler } from "@nestjs/core/exceptions/exceptions-handler";
 
 
 @WebSocketGateway({ namespace : 'chat' , cors : true})
@@ -36,13 +37,13 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
         const user = await this.validateUserByEmail(req.user.email, client.handshake.query.roomName)
         if (user)
         {
-            this.user.creatRoom({
+            const room = this.user.creatRoom({
                 'roomName' : client.handshake.query.roomName ,
                 'status'   : client.handshake.query.status  ,
                 'password' : client.handshake.query.password} , user)
             this.socketId.set(user.email, client.id)
             this.server.in(client.id).socketsJoin(client.handshake.query.roomName)  
-            return `${user.username} has create the room ${client.handshake.query.roomName}`
+            return room
         }
     }
 
@@ -55,11 +56,14 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
         {
             const result = await this.user.joiningTheRoom(client.handshake.query, user);
             if (result == undefined)
-                return 'incorect password'
+                throw ExceptionsHandler
+            if (result == false)
+                throw ExceptionsHandler
             this.socketId.set(user.email, client.id)
             this.server.in(client.id).socketsJoin(client.handshake.query.roomName)
-            this.user.addUserToRoom(user, client.handshake.query.roomName)      
-            return `${user.username} has joined in ${client.handshake.query.roomName}`
+            const newUpdateChat = this.user.addUserToRoom(user, client.handshake.query.roomName)      
+            console.log(`${user.username} has joined in ${client.handshake.query.roomName}`)
+            return newUpdateChat
         }
     }
 
