@@ -1,0 +1,57 @@
+.twofactor {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.twofactor-form {
+    display: flex;
+    flex-direction: column;
+    background-color: brown;
+    width: 400px;
+    background-color: #f6f3eb;
+    gap: 10px;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+        rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+}
+
+.twofactor-form label {
+    font-weight: bold;
+    font-family: "Ubuntu";
+    letter-spacing: 0.2px;
+}
+
+.twofactor-input {
+    width: 100%;
+    height: 40px;
+    line-height: 28px;
+    padding: 0 1rem;
+    padding-left: 2.5rem;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    outline: none;
+    background-color: #f3f3f4;
+    color: #0d0c22;
+    transition: 0.3s ease;
+    border: 1px solid lightgray;
+}
+
+.twofactor-input::placeholder {
+    color: #9e9ea7;
+}
+
+.twofactor-input:focus,
+.twofactor-input:hover {
+    cursor: pointer;
+    border: 1px solid gray;
+    outline: none;
+    background-color: #fffcfc;
+}
+
+.twofactor-form button {
+    width: 100%;
+}

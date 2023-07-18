@@ -63,6 +63,7 @@ export default function Settings() {
         Cookies.remove("Token");
         setIsSignedIn(false);
     }
+
     async function disable2FA(e: any) {
         e.preventDefault();
         const token = Cookies.get("Token");
@@ -81,9 +82,22 @@ export default function Settings() {
         setClicked2fa(!clicked2fa);
     }
 
-    async function changeAvatar(e: any) {}
+    async function changeAvatar(e: any) {
+        const formData  = new FormData();
+        formData.append('image', newAvatar);
+        console.log(newAvatar);
+        const options = {
+            method: 'PUT',
+            headers: {'Authorization': `Bearer ${Cookies.get('Token')}`, 
+        },
+            body:formData
+        }
+        fetch('http://localhost:3000/profile/updatephoto', options)
+            .then(res => res.json())
+            .then(data => console.log(data));
+    }
 
-    async function changeName() {
+    async function changeName(e) {
         const token = Cookies.get("Token");
         const options = {
             method: "PUT",
@@ -98,6 +112,7 @@ export default function Settings() {
             options
         );
         if (!res.ok) throw new Error("failed to change name");
+        console.log('success')
     }
 
     function updateAvatar(e: any) {
@@ -180,7 +195,7 @@ export default function Settings() {
                     <img src={updateNameIcon} alt="" />
                     <p>update name</p>
                 </div>
-                <form className="settings--update-name">
+                <form onSubmit={changeName} className="settings--update-name">
                     <input
                         value={newName}
                         onChange={(e) => setNewName(e.target.value)}

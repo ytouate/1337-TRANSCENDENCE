@@ -19,7 +19,7 @@ export default function DropDownMenup({ dropdownRef }: any) {
                             alt=""
                         />
                     )}
-                    <p>ytouate </p>
+                    <p>{user.username} </p>
                 </Link>
             </li>
             <li>

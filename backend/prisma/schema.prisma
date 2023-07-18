@@ -70,9 +70,9 @@ model Message {
 
 model Preference {
   id          Int    @id @default(autoincrement())
-  ballColor   String @default("black")
-  paddleColor String @default("black")
-  mapTheme    String @default("galaxy_pink")
+  ballColor   String @default("white")
+  paddleColor String @default("white")
+  mapTheme    String @default("#28235c")
 
   user   User @relation(fields: [userId], references: [id])
   userId Int  @unique

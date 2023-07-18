@@ -71,8 +71,18 @@ export class authService{
                 preference : true
             },
         })
+        
         return userReturn(user, req)
     }
+
+        //validate user
+        async getUserWithWinRate(req) : Promise<any>{
+            const users =  await this.prisma.user.findMany({
+             orderBy : { winRate: 'asc'}
+            })
+            return userReturn(users, req)
+        }
+
 
     // send code verification { email } 
     async sigin2fa(code, email)
