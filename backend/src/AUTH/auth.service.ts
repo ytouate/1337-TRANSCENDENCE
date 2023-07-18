@@ -68,10 +68,10 @@ export class authService{
         const user =  await this.prisma.user.findUnique({where : {email : req.user.email} ,
             include: {
                 friends: true,
-                preference : true
+                preference : true,
+                notifications : true
             },
         })
-        
         return userReturn(user, req)
     }
 

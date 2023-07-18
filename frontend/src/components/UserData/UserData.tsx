@@ -21,7 +21,6 @@ async function takeAction(action: string, username: string) {
             username: username,
         });
     } else if (action == "block") {
-        console.log(username);
         const options = {
             method: "POST",
             headers: {

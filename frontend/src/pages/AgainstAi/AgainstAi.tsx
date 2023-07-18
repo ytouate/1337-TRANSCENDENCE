@@ -39,7 +39,6 @@ const AgainstAi = () => {
     const user: any = useLoaderData();
 
     let { preference } = user;
-    console.log(user);
 
     if (!preference) {
         // Create a new prefs object with default values
@@ -171,7 +170,6 @@ const AgainstAi = () => {
     };
 
     useEffect(() => {
-        console.log('start');
         const canvas = canvasRef.current;
         if (!canvas) return;
 

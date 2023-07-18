@@ -19,7 +19,8 @@
 }
 
 .chat-toggler {
-    background-color: yellow;
+    border-radius: 5px;
+    background-color: #a49f91;
     border-radius: 5px;
 }
 

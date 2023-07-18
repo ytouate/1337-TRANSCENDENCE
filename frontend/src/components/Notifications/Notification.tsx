@@ -1,12 +1,20 @@
 import "./Notification.css";
 import bell from "../../assets/bell.svg";
-import { socketContext } from "../../context/Context";
-import { Fragment, useState, useEffect } from "react";
-
+import { socketContext, userContext } from "../../context/Context";
+import { Fragment, useState, useEffect, useContext } from "react";
+import { containsClass } from "@syncfusion/ej2-base";
+import Cookies from "js-cookie";
 function acceptInvitation(id: number) {
     socketContext.emit("answer_notification", {
         id: id,
         status: "accept",
+        description: "Invitaion accepted",
+    });
+}
+function rejectInvitation(id: number) {
+    socketContext.emit("answer_notification", {
+        id: id,
+        status: "reject",
         description: "Invitaion accepted",
     });
 }
@@ -30,7 +38,12 @@ function RequestNotification(props: any) {
                         >
                             Accept
                         </button>
-                        <button className="notification-card--action">
+                        <button
+                            onClick={() => {
+                                rejectInvitation(props.id);
+                            }}
+                            className="notification-card--action"
+                        >
                             Reject
                         </button>
                     </>
@@ -39,16 +52,10 @@ function RequestNotification(props: any) {
         </li>
     );
 }
-export default function Notification() {
-    let [notifications, setNotifications] = useState<any>([]);
-    useEffect(() => {
-        socketContext.on("receive_notification", (notification: any) => {
-            setNotifications((prev: any) => {
-                return [...prev, notification];
-            });
-        });
-    }, []);
 
+export default function Notification() {
+    const [user, setUser] = useContext(userContext);
+    const [notifications, setNotifications] = useState<any>(user.notifications);
     return (
         <ul className="notification-drop">
             <li className="item">
@@ -60,7 +67,6 @@ export default function Notification() {
                         </span>
                         <ul className="notification-content">
                             {notifications.map((notification: any) => {
-                                console.log(notification);
                                 return (
                                     <Fragment key={notification.id}>
                                         <RequestNotification

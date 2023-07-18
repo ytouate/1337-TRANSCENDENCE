@@ -78,6 +78,11 @@ function ProfileDropDown() {
 
 function Nav() {
     const user: any = useLoaderData();
+    const [notifs, setNotifs] = useState([]);
+
+    useEffect(() => {
+        setNotifs(user.notifications)
+    }, [user.notifications]);
     return (
         <userContext.Provider value={useState(user)}>
             <nav className="navbar">

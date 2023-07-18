@@ -153,6 +153,7 @@ export class UserSettingsService {
                 friends: true,
                 blocked: true,
                 blockedBy: true,
+               
             }
         })
         let userToReturn: any = await this.prismaService.user.findUnique({
@@ -163,6 +164,7 @@ export class UserSettingsService {
                 friends: true,
                 blocked: true,
                 blockedBy: true,
+                notifications: true,
             }
         });
         if (userToReturn){
@@ -180,6 +182,7 @@ export class UserSettingsService {
                 delete userToReturn.blockedBy;
             }
             delete userToReturn.blockedBy;
+            console.log(userToReturn.notifications)
             return userReturn(userToReturn, req);
         }
         throw new NotFoundException({}, 'not found');

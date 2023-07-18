@@ -61,6 +61,7 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
             },
         })
         notif.sender = userReturn(sender, req);
+        console.log(this.socketById.get(notif.reiceverId));
         if (this.socketById.has(notif.reiceverId)){
             for (let i = 0;i < this.socketById.get(notif.reiceverId).length;i++){
                 this.socketById.get(notif.reiceverId)[i].emit('receive_notification', notif);
@@ -120,6 +121,7 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
     @UseGuards(AuthGuard('websocket-jwt'))
     @SubscribeMessage('answer_notification')
     async answerToNotification(@MessageBody() body: any, @Req() req){
+        console.log(body);
         if (body.status == 'accept'){
             let notification = await this.acceptNotificaion(body);
             this.deleteNotification(body);
@@ -132,7 +134,7 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
                 this.socketById.get(notification.senderId)[i].emit('receive_notification', acceptation);
             }
         }
-        else if (body.status == 'rejected') this.deleteNotification(body);
+        else if (body.status == 'reject') this.deleteNotification(body);
     }
     // delete notifiation from database
     deleteNotification(messageBody){

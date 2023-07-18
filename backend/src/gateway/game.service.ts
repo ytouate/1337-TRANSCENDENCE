@@ -44,7 +44,7 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
 
     // called when a client is connected
     async handleConnection(@ConnectedSocket() client: Socket) {
-        this.addClient(client);
+        // this.addClient(client);
     }
 
     getUserIdBySocket(socket: Socket): number | undefined {

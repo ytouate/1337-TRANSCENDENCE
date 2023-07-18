@@ -45,7 +45,6 @@ function LeaderBoard() {
             </Fragment>
         );
     });
-    console.log('arr', users);
     return (
         <div className="leaderboard">
             <div className="leaderboard--header">

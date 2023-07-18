@@ -75,7 +75,6 @@ export default function Settings() {
         };
         const res = await fetch("http://localhost:3000/disable2fa", options);
         if (!res.ok) throw new Error("Could not disable 2fa");
-        console.log("disabled succefully");
     }
 
     function handleClick2fa() {
@@ -85,7 +84,6 @@ export default function Settings() {
     async function changeAvatar(e: any) {
         const formData  = new FormData();
         formData.append('image', newAvatar);
-        console.log(newAvatar);
         const options = {
             method: 'PUT',
             headers: {'Authorization': `Bearer ${Cookies.get('Token')}`, 
@@ -112,7 +110,6 @@ export default function Settings() {
             options
         );
         if (!res.ok) throw new Error("failed to change name");
-        console.log('success')
     }
 
     function updateAvatar(e: any) {
