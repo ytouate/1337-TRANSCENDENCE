@@ -1,4 +1,4 @@
-import { OnModuleInit } from '@nestjs/common';
+import { OnModuleInit, UseGuards } from '@nestjs/common';
 import {
     ConnectedSocket,
     MessageBody,
@@ -14,8 +14,10 @@ import { Game } from './gamelogic/Game';
 import { GameService } from 'src/game/game.service';
 import { PrefService } from 'src/pref/pref.service';
 import { UserSettingsService } from 'src/usersettings/user.service';
+import { AuthGuard } from '@nestjs/passport';
 
 @WebSocketGateway({ cors: true })
+@UseGuards(AuthGuard('websocket-jwt'))
 export class GameGateWay implements OnGatewayConnection, OnModuleInit {
     userSockets: Map<number, UserData>;
     queue: number[];
