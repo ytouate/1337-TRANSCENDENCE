@@ -1,4 +1,4 @@
-import { Controller, Post, Res, Req , UseGuards, Body, Put, Delete} from "@nestjs/common";
+import { Controller, Post, Res, Req , UseGuards, Body, Put, Delete, ConsoleLogger} from "@nestjs/common";
 import { authService } from "./auth.service";
 import { Get } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
@@ -23,7 +23,9 @@ export class authController {
         @Res({passthrough : true}) res,
         @Req() req) 
     {
+
         const user = await this.authservice.createUser(req.user)
+        console.log('mik',user)
         const token = await this.authservice.signToken(user.username, user.email)
         await this.authservice.checkUserhave2fa(user)
         res.cookie('Token' , token)
@@ -36,7 +38,6 @@ export class authController {
     @UseGuards(AuthGuard('jwt'))
     async getUser(@Req() req) {
         const user = await this.authservice.validateUser(req)
-        console.log(user)
         if (user)
             return user;
         return {'message' : 'user not found'}

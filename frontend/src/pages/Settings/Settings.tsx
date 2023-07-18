@@ -63,6 +63,7 @@ export default function Settings() {
         Cookies.remove("Token");
         setIsSignedIn(false);
     }
+
     async function disable2FA(e: any) {
         e.preventDefault();
         const token = Cookies.get("Token");
@@ -81,7 +82,20 @@ export default function Settings() {
         setClicked2fa(!clicked2fa);
     }
 
-    async function changeAvatar(e: any) {}
+    async function changeAvatar(e: any) {
+        const formData  = new FormData();
+        formData.append('image', newAvatar);
+        console.log(newAvatar);
+        const options = {
+            method: 'PUT',
+            headers: {'Authorization': `Bearer ${Cookies.get('Token')}`, 
+        },
+            body:formData
+        }
+        fetch('http://localhost:3000/profile/updatephoto', options)
+            .then(res => res.json())
+            .then(data => console.log(data));
+    }
 
     async function changeName(e) {
         const token = Cookies.get("Token");

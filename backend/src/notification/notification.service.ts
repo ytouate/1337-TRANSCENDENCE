@@ -21,7 +21,7 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
    // make user offline and delete socket from map
     async changeActivityStatusToOffline(client: Socket){
         const userObj: any = this.jwtService.verify(client.handshake.headers.authorization.slice(7));
-        console.log(userObj)
+        console.log("user ", userObj)
         const user = await this.prismaServie.user.update({
             where: {
                 email: userObj.email,
