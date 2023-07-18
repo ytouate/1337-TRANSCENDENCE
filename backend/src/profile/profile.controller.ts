@@ -47,4 +47,8 @@ export class ProfileController {
     getPhotoProfile(@Req() req, @Res({ passthrough: true }) res, @Param('username') username): Promise<StreamableFile> {
         return this.profileService.getPhotoProfile(req, res, username);
     }
+    @Get('deletenotification')
+    getNotification(@Req() req){
+        return this.profileService.deleteNotification(req.user, req.body);
+    }
 }

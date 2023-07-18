@@ -15,6 +15,9 @@ export class ProfileService{
     async getProfile(req) {
         const user: User = await this.prismaService.user.findUnique({where : {
             email: req.user.email,
+        },
+        include: {
+          notifications: true,
         }})
         if (user){
           return userReturn(user, req)
@@ -73,4 +76,21 @@ export class ProfileService{
         return new StreamableFile(file);
     }
     }
+    async deleteNotification(user, notifications){
+      await this.prismaService.notification.delete({
+        where:{
+          id: notifications.id,
+        }
+      })
+      const toReturn = await this.prismaService.user.findUnique({
+        where: {
+          email: user.email,
+        },
+        include: {
+          notifications: true
+        }
+      });
+      return user.notification;
+    }
+    
 }
