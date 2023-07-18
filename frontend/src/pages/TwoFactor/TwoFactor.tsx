@@ -22,7 +22,7 @@ export default function TwoFactor() {
                 if (data.isSignedIn) navigator("/");
             });
     }, []);
-
+    
     let [code, setCode] = useState("");
     const [validated, setValidated] = useState(false);
     if (validated) return <Navigate to={"/"} />;
