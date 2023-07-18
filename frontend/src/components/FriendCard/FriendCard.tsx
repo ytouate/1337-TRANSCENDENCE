@@ -17,7 +17,12 @@ export async function unblock(username: string) {
     if (!res.ok) throw new Error("failed to unblock");
 }
 export const notifyUnblocked = () => toast("unblocked succefully");
-function FriendCard(props: any) {
+interface friendCardType {
+    img: string;
+    name: string;
+    status: string | null;
+}
+function FriendCard(props: friendCardType) {
     return (
         <>
             <div className="friend-card">
