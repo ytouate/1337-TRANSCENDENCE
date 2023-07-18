@@ -1,5 +1,5 @@
 export function userReturn(user: any, req: any) {
-  if (user.imageIsUpdate && user.urlImage)
+  if (user?.imageIsUpdate && user?.urlImage)
     user.urlImage =
       req.protocol +
       '://' +

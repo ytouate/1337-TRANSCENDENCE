@@ -23,7 +23,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    position: relative; 
+    position: relative;
 }
 
 .player-image-container {
@@ -58,7 +58,7 @@
     color: white;
 }
 
-.button {
+.game-button {
     background-color: #4285f4;
     color: white;
     font-weight: bold;
@@ -68,7 +68,7 @@
     border-radius: 0.25rem;
 }
 
-.button:hover {
+.game-button:hover {
     background-color: #1c7cd6;
 }
 
@@ -79,7 +79,6 @@
 .play-again-button:hover {
     background-color: #1d8c42;
 }
-
 
 @media screen and (max-width: 768px) {
     .players-wrapper {
@@ -96,7 +95,7 @@
         margin: 1rem 0;
     }
 
-    .button {
+    .game-button {
         padding: 1.5rem 3rem;
     }
 
