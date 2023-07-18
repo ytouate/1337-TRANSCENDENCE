@@ -1,4 +1,4 @@
-import { Controller, Post, Res, Req , UseGuards, Body} from "@nestjs/common";
+import { Controller, Post, Res, Req , UseGuards, Body, Put, Delete} from "@nestjs/common";
 import { authService } from "./auth.service";
 import { Get } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
@@ -27,7 +27,7 @@ export class authController {
         const token = await this.authservice.signToken(user.username, user.email)
         await this.authservice.checkUserhave2fa(user)
         res.cookie('Token' , token)
-        res.cookie('isSigned', true)
+        res.cookie('isSignedIn' , true)
         res.redirect('http://localhost:5173/')
     }
 
@@ -36,38 +36,57 @@ export class authController {
     @UseGuards(AuthGuard('jwt'))
     async getUser(@Req() req) {
         const user = await this.authservice.validateUser(req)
+        console.log(user)
         if (user)
-            return user
+            return user;
         return {'message' : 'user not found'}
+    }
+
+    @Get('user/leaderboard')
+    @UseGuards(AuthGuard('jwt'))
+    async getUserWithWin(@Req() req) {
+        return await this.authservice.getUserWithWinRate(req);
     }
  
 
     @Post('2fa')
     @UseGuards(AuthGuard('jwt'))
-    async siginWith2fa(@Req() request , @Body() req)
+    async siginWith2fa(@Req() request , @Body() req, @Res() res)
     {
         const user = await this.authservice.validateUser(request)
         if (!user)
             return {'message' : 'unvalide user'}
         await this.authservice.add2fa(user.email, req.email, 0)
-        return {'status' : 200 , 'message' : 'adding 2fa success'}
+        res.cookie('2fa' , '2fa')
+        return res.status(200).json({'message' : 'adding 2fa success'})
     }
-
+ 
 
     @Post('2fa/validateCode')
     @UseGuards(AuthGuard('jwt'))
     async verificationCode2fa(@Body() body, @Req() req)
     {
         const user = await this.authservice.validateUser(req)
-        if (user && user.code  == body.code)
-            return user
+
+        if (user && user.codeVerification  == body.code)
+        {
+            return await this.authservice.setIsSignedInTrue(user, true)
+        }
         return {'message' : 'incorrect code'}
     }
 
+    @Put('disable2fa')
+    @UseGuards(AuthGuard('jwt'))
+    async disable2fa(@Req() req)
+    {
+        return await this.authservice.disable2fa(req.user)
+    }
 
     @Post('logout')
-    async logout(@Req() req, @Res() res ) {
-        // res.cookie('isSigned', false)
-        return res.status(200).json({'message' : 'logout suc'})
+    @UseGuards(AuthGuard('jwt'))
+    async logout(@Req() req, @Res() res) {
+        //res.delete('isSignedIn')
+        await this.authservice.setIsSignedInTrue(req.user, false)
+        return res.status(200).json({'message' : 'logout succes'})
     }
 }

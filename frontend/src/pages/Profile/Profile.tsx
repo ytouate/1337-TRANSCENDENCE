@@ -4,40 +4,68 @@ import FriendList from "../../components/FriendsList/FriendsList";
 import UserData from "../../components/UserData/UserData";
 import Achievements from "../../components/Achievements/Achievements";
 import Stats from "../../components/Stats/Stats";
-import { authContext, userContext } from "../../context/Context";
+import { authContext } from "../../context/Context";
 import Cookies from "js-cookie";
-import { useLoaderData } from "react-router-dom";
+import { Navigate, useLoaderData, useRouteError } from "react-router-dom";
 import { useContext } from "react";
+import NotFound from "../../components/NotFound";
+export function ErrorBoundary() {
+    let error: any = useRouteError();
+    return <NotFound message={error.message} />;
+}
 
 export async function userLoader({ params }: any) {
-  const Token = Cookies.get("Token");
-  const options = {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${Token}`,
-    },
-  };
-  const res = await fetch("http://localhost:3000/users/" + params.id, options);
-  if (res.ok) return await res.json();
-  else throw new Error("l awakhir hh");
+    const Token = Cookies.get("Token");
+    const options = {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${Token}`,
+        },
+    };
+    const res = await fetch(
+        "http://localhost:3000/users/" + params.id,
+        options
+    );
+    if (res.ok) return await res.json();
+    else {
+        if (res.status == 404) throw new Error("Page Not Found");
+        if (res.status == 401) throw new Error("Unauthorized access");
+    }
 }
 
 export default function Profile() {
-  const user: any = useLoaderData();
-  const socket = useContext(authContext);
-  return (
-    <userContext.Provider value={user}>
-      <section className="profile">
-        <div className="profile--left">
-          <UserData />
-          <History />
-        </div>
-        <div className="profile--center">{user.me && <FriendList />}</div>
-        <div className="profile--right">
-          <Achievements />
-          <Stats />
-        </div>
-      </section>
-    </userContext.Provider>
-  );
+    const user: any = useLoaderData();
+    const [isSignedIn] = useContext(authContext);
+    if (!isSignedIn) return <Navigate to={"/signin"} />;
+    if (user.optionalMail && user.isSignedIn == false)
+        return <Navigate to={"/twofactor"} />;
+
+    return (
+        <section className="profile">
+            <div className="profile--left">
+                <UserData
+                    urlImage={user.urlImage}
+                    username={user.username}
+                    me={user.me}
+                    friendStatus={user.friendStatus}
+                />
+                <History />
+            </div>
+            <div className="profile--center">
+                {user.me && (
+                    <FriendList
+                        blocked={user.blocked}
+                        friends={user.friends}
+                        urlImage={user.urlImage}
+                        id={user.id}
+                        username={user.username}
+                    />
+                )}
+            </div>
+            <div className="profile--right">
+                <Achievements />
+                <Stats winRate={user.winRate} wins={user.win} losses={user.loss} />
+            </div>
+        </section>
+    );
 }

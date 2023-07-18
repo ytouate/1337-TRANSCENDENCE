@@ -717,36 +717,8 @@ input[type="file"]::file-selector-button:hover {
     overflow: auto;
 }
 
-.message-sender {
-    height: 10%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
 
-.message-sender > input {
-    line-height: 28px;
-    border: 2px solid transparent;
-    background-color: #f3f3f4;
-    color: #0d0c22;
-    transition: 0.3s ease;
-    width: 400px;
-    height: 55px;
-    border-radius: 38px;
-    outline: none;
-    padding-left: 20px;
-    padding-right: 50px;
-    font-weight: 600;
-    border: 3px solid #28235c;
-}
 
-.send-button > img {
-    width: 20px;
-    cursor: pointer;
-}
 
-.send-button {
-    position: relative;
-    right: 40px;
-}
+
 

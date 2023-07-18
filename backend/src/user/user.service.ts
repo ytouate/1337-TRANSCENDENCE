@@ -17,7 +17,6 @@ export class UserService {
         {
             try {
                 let hash = await bcrypt.hash(password, 10)
-                console.log(hash)
                 await this.prismaService.chatRoom.create(
                     {
                         data : {
@@ -35,7 +34,6 @@ export class UserService {
                 return {'message' : `room ${roomName} has created`}
             }
             catch(error) {
-                console.log(error)
             }
             finally { this.prismaService.$disconnect() }
         }
@@ -122,7 +120,6 @@ export class UserService {
     // add data in message table
     async   addDataInMessageTable(data , id, user) {
         const userFind = await this.prismaService.user.findUnique({where : {email : user.email}})
-        console.log(data)
         const message = await this.prismaService.message.create({
             data : {
                 data : data,

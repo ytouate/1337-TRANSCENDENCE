@@ -5,6 +5,7 @@ import { imageLink } from "./auth.strategy42";
 import { JwtService } from "@nestjs/jwt";
 import { MailerService } from "@nestjs-modules/mailer";
 import { userReturn } from "src/utils/user.return";
+import { use } from "passport";
 
 @Injectable()
 export class authService{
@@ -21,12 +22,14 @@ export class authService{
         const user = await this.prisma.user.findUnique( {where : { email : newData.email} })
         if (!user)
         {
-            console.log('craete new user')
             let newUser = await this.prisma.user.create({
                 data : {
                     email : newData.email,
                     username : newData.username,
                     urlImage : imageLink,
+                    preference: {
+                        create: {},
+                    },
                 } 
             })
             const payload = {
@@ -52,7 +55,7 @@ export class authService{
     // add two-factor Authantication
     async add2fa(firstMail , email, code)
     {
-        const  user = await this.prisma.user.updateMany(
+        const  user = await this.prisma.user.update(
             {
                 where : {email : firstMail},
                 data : { optionalMail : email , codeVerification : code}
@@ -64,11 +67,21 @@ export class authService{
     async validateUser(req) : Promise<any>{
         const user =  await this.prisma.user.findUnique({where : {email : req.user.email} ,
             include: {
-                friends: true
+                friends: true,
+                preference : true
             },
         })
         return userReturn(user, req)
     }
+
+        //validate user
+        async getUserWithWinRate(req) : Promise<any>{
+            const users =  await this.prisma.user.findMany({
+             orderBy : { winRate: 'asc'}
+            })
+            return userReturn(users, req)
+        }
+
 
     // send code verification { email } 
     async sigin2fa(code, email)
@@ -103,5 +116,29 @@ export class authService{
         }
     }
 
-    // validate User with { Token }
+    // set isSignedin true
+    async   setIsSignedInTrue(user, status)
+    {
+        return await this.prisma.user.update(
+            {
+                where : {email : user.email},
+                data : {isSignedIn : status},
+                include: {
+                    friends: true,
+                    preference: true,
+                }
+            }
+        )
+    }
+
+    // disable 2fa
+    async   disable2fa(user)
+    {
+        return await this.prisma.user.update(
+            {
+                where : {email : user.email},
+                data : {optionalMail : null}
+            }
+        )
+    }
 }

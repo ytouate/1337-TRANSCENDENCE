@@ -21,7 +21,6 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config)
     SwaggerModule.setup('api', app, document)
 
-    console.log(__dirname)
     app.useStaticAssets(join(__dirname, 'Chat', 'static'));
     app.setBaseViewsDir(join(__dirname, 'Chat', 'views'));
     app.setViewEngine('ejs');

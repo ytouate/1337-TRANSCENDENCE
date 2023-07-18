@@ -1,10 +1,10 @@
 
 import {Link} from 'react-router-dom'
 
-function NotFound() {
+function NotFound({message}: any) {
     return ( 
         <div className="not-found">
-            <h2>Page Not Found</h2>
+            <h3>{message}</h3>
             <Link className='back-link' to='/'>Let's go back</Link>
         </div>
     );

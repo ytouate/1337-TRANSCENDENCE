@@ -13,7 +13,6 @@ export class ProfileService{
     constructor(private prismaService: PrismaService){
 }
     async getProfile(req) {
-        console.log(req.user)
         const user: User = await this.prismaService.user.findUnique({where : {
             email: req.user.email,
         }})
