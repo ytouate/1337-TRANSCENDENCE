@@ -27,6 +27,9 @@ export class authService{
                     email : newData.email,
                     username : newData.username,
                     urlImage : imageLink,
+                    preference: {
+                        create: {},
+                    },
                 } 
             })
             const payload = {
@@ -122,6 +125,7 @@ export class authService{
                 data : {isSignedIn : status},
                 include: {
                     friends: true,
+                    preference: true,
                 }
             }
         )
