@@ -234,7 +234,7 @@ const AgainstAi = () => {
             paddleMargin = canvas.width * PADDLE_MARGIN_RATIO;
             paddleWidth = canvas.height * PADDLE_WIDTH_RATIO;
             paddleHeight = canvas.height * PADDLE_HEIGHT_RATIO;
-            ball.size = Math.min(canvas.width, canvas.height) * BALL_SIZE_RATIO;
+            ball.size = canvas.height * BALL_SIZE_RATIO;
 
             ball.x = (ball.x / prevCanvasWidth) * canvas.width;
             ball.y = (ball.y / prevCanvasHeight) * canvas.height;
@@ -243,9 +243,10 @@ const AgainstAi = () => {
             prevCanvasHeight = canvas.height;
 
             paddle1.x = paddleMargin;
-            paddle1.y = canvas.height / 2 - paddleHeight / 2;
             paddle2.x = canvas.width - paddleWidth - paddleMargin;
-            paddle2.y = canvas.height / 2 - paddleHeight / 2;
+            const heightRatio = canvas.height / prevCanvasHeight;
+            paddle1.y *= heightRatio;
+            paddle2.y *= heightRatio;
             if (gameOver) drawGameOver(context);
         };
 
