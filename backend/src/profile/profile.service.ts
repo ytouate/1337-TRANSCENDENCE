@@ -1,4 +1,4 @@
-import { Injectable, StreamableFile } from '@nestjs/common';
+import { BadRequestException, Injectable, StreamableFile } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {User} from 'prisma'
 import { createReadStream } from 'fs';
@@ -51,6 +51,13 @@ export class ProfileService{
         }
     }
     async updateName(newUserame, req) {
+        let userToCheck = await this.prismaService.user.findFirst({
+          where: {
+            username: newUserame,
+          }
+        })
+        if (userToCheck)
+          throw new BadRequestException();
         const updateUser = await this.prismaService.user.update({
             where: {
               email: req.user.email,
