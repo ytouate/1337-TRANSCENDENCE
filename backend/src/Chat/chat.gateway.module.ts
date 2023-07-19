@@ -8,6 +8,6 @@ import { UserService } from "src/user/user.service";
 
 @Module({
     imports : [ UserModule,PrismaModule],
-    providers : [UserService, PrismaService, chatGateway]
+    providers : [UserService, PrismaService]
 })
 export class chatModule{}
