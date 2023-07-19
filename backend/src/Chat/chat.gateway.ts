@@ -1,13 +1,15 @@
-import { OnModuleInit, UseGuards } from "@nestjs/common";
+import { UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import {  ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Socket ,Server } from "socket.io";
 import { PrismaService } from "src/prisma/prisma.service";
 import { UserService } from "src/user/user.service";
 import { Req } from "@nestjs/common";
+import { ExceptionsHandler } from "@nestjs/core/exceptions/exceptions-handler";
 
 
 @WebSocketGateway({ namespace : 'chat' , cors : true})
+@UseGuards(AuthGuard('websocket-jwt'))
 export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
     constructor (
         private prisma: PrismaService,
@@ -21,7 +23,6 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
 
     // send message to current room
     @SubscribeMessage('sendMessage')
-    @UseGuards(AuthGuard('websocket-jwt'))
     onMessage(@ConnectedSocket() client : Socket, @MessageBody() data , @Req() req)
     {
         this.server.in(client.handshake.query.roomName).emit('onMessage', data)
@@ -31,19 +32,18 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
 
     // joining the socket of user in  specific room
     @SubscribeMessage('createRoom')
-    @UseGuards(AuthGuard('websocket-jwt'))
     async handleCreationOfTheRoom(@ConnectedSocket() client : Socket , @Req() req) {
         console.log(`client  ${client.id} connected and creat the room ${client.handshake.query.roomName}`)
         const user = await this.validateUserByEmail(req.user.email, client.handshake.query.roomName)
         if (user)
         {
-            this.user.creatRoom({
+            const room = this.user.creatRoom({
                 'roomName' : client.handshake.query.roomName ,
                 'status'   : client.handshake.query.status  ,
                 'password' : client.handshake.query.password} , user)
             this.socketId.set(user.email, client.id)
             this.server.in(client.id).socketsJoin(client.handshake.query.roomName)  
-            return `${user.username} has create the room ${client.handshake.query.roomName}`
+            return room
         }
     }
 
@@ -56,11 +56,14 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
         {
             const result = await this.user.joiningTheRoom(client.handshake.query, user);
             if (result == undefined)
-                return 'incorect password'
+                throw ExceptionsHandler
+            if (result == false)
+                throw ExceptionsHandler
             this.socketId.set(user.email, client.id)
             this.server.in(client.id).socketsJoin(client.handshake.query.roomName)
-            this.user.addUserToRoom(user, client.handshake.query.roomName)      
-            return `${user.username} has joined in ${client.handshake.query.roomName}`
+            const newUpdateChat = this.user.addUserToRoom(user, client.handshake.query.roomName)      
+            console.log(`${user.username} has joined in ${client.handshake.query.roomName}`)
+            return newUpdateChat
         }
     }
 

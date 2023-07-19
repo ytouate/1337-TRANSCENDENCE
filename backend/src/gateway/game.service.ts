@@ -47,9 +47,6 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
 
     // called when a client is connected
     async handleConnection(@ConnectedSocket() client: Socket) {
-        // console.log(client.user);
-        // console.log(client.handshake);
-        // console.log({ a: client.handshake.headers });
         const payload = await this.jwtSerive.verifyAsync(
             client.handshake.headers.authorization.slice(7),
         );
@@ -86,8 +83,6 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
 
     // add client to the userSockets
     async addClient(client: Socket, username: string) {
-        // console.log({ username });
-
         const user = await this.userService.getUserByUsername(username);
 
         if (!user) return;

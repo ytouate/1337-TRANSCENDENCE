@@ -1,4 +1,4 @@
-import { Injectable, StreamableFile } from '@nestjs/common';
+import { BadRequestException, Injectable, StreamableFile } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {User} from 'prisma'
 import { createReadStream } from 'fs';
@@ -15,6 +15,9 @@ export class ProfileService{
     async getProfile(req) {
         const user: User = await this.prismaService.user.findUnique({where : {
             email: req.user.email,
+        },
+        include: {
+          notifications: true,
         }})
         if (user){
           return userReturn(user, req)
@@ -48,6 +51,13 @@ export class ProfileService{
         }
     }
     async updateName(newUserame, req) {
+        let userToCheck = await this.prismaService.user.findFirst({
+          where: {
+            username: newUserame,
+          }
+        })
+        if (userToCheck)
+          throw new BadRequestException();
         const updateUser = await this.prismaService.user.update({
             where: {
               email: req.user.email,
@@ -73,4 +83,21 @@ export class ProfileService{
         return new StreamableFile(file);
     }
     }
+    async deleteNotification(user, notifications){
+      await this.prismaService.notification.delete({
+        where:{
+          id: notifications.id,
+        }
+      })
+      const toReturn = await this.prismaService.user.findUnique({
+        where: {
+          email: user.email,
+        },
+        include: {
+          notifications: true
+        }
+      });
+      return user.notification;
+    }
+    
 }

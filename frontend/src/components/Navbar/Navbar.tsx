@@ -78,6 +78,7 @@ function ProfileDropDown() {
 
 function Nav() {
     const user: any = useLoaderData();
+    
     return (
         <userContext.Provider value={useState(user)}>
             <nav className="navbar">

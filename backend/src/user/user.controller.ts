@@ -1,7 +1,6 @@
-import { Controller, Post , Get, Req, Query, UseGuards, Param, SetMetadata} from '@nestjs/common';
+import { Controller, Post , Get, Query, UseGuards, Put} from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
-import { authService } from 'src/AUTH/auth.service';
 
 
 @Controller('user')
@@ -13,11 +12,9 @@ export class UserController {
         ){}
 
     @Post('addAdmin')
-    
-    async setAdmin(@Query() Param) {
-        
-        await this.userService.setAdmin(Param)
-        return {'message' : `the user ${Param.username} has moved from member to admin`}
+    async setAdmin(@Query() Param) { 
+        console.log(`the user ${Param.username} has moved from member to admin`)
+        return await this.userService.setAdmin(Param)
     }
 
     @Post('muteUser')
@@ -28,8 +25,8 @@ export class UserController {
 
     @Post('changePassword')
     async   changePassword(@Query() Param) {
-        await   this.userService.changePasswordOfProtectedRoom(Param)
-        return {'meesage' : 'the password has changed'}
+        console.log({'meesage' : 'the password has changed'}) 
+        return await   this.userService.changePasswordOfProtectedRoom(Param)
     }
 
     @Get('getRoom')
