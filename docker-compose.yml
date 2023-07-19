@@ -3,11 +3,12 @@ services:
   dev-db:
     image: postgres:13
     ports:
-      - 5434:5432
+      - 5432:5432
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123
       POSTGRES_DB: nest
+    restart: always
   # backend:
     # build: 
       # context: ./backend
@@ -17,5 +18,16 @@ services:
       # - 3000:3000
     # depends_on:
       # - dev-db
+    # restart: always
+  # frontend:
+    # build: 
+      # context: ./frontend
+    # volumes:
+      # - ./frontend:/app
+    # ports:
+      # - 5173:5173
+    # depends_on:
+      # - dev-db
+    # restart: always
 networks:
   default:
