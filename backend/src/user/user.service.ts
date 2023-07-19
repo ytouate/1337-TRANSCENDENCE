@@ -2,6 +2,7 @@ import { Injectable, NotAcceptableException, NotFoundException, UnauthorizedExce
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt'
 import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
+import { userReturn } from 'src/utils/user.return';
 
 @Injectable()
 export class UserService {
@@ -141,9 +142,9 @@ export class UserService {
 
 
     //add data in Room { messages}
-    async   putDataInDatabase(name, data, user) {
+    async   putDataInDatabase(name, data, req) {
         const room = await this.prismaService.chatRoom.findFirst({where : {roomName : name}})
-        const message = await this.addDataInMessageTable(data, room.id, user)
+        let message : any = await this.addDataInMessageTable(data, room.id, req.user)
         await this.prismaService.chatRoom.update({
             where : 
             {
@@ -157,6 +158,10 @@ export class UserService {
                 }
             }
         })
+        let sender = await this.prismaService.user.findUnique({where : {id : message.userId}})
+        message.sender = userReturn(sender, req);
+        console.log(message)
+        return message
     }
 
     //check user  if have order to join the rrom

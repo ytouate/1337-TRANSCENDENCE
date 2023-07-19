@@ -6,12 +6,14 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { UserService } from "src/user/user.service";
 import { Req } from "@nestjs/common";
 import { ExceptionsHandler } from "@nestjs/core/exceptions/exceptions-handler";
+import { JwtService } from "@nestjs/jwt";
 
 @WebSocketGateway({ namespace : 'chat' , cors : true})
 export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
     constructor (
         private prisma: PrismaService,
-        private user: UserService
+        private user: UserService,
+        private jwt: JwtService
         ) {}
 
     @WebSocketServer()
@@ -22,28 +24,32 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
     // send message to current room
     @SubscribeMessage('sendMessage')
     @UseGuards(AuthGuard('websocket-jwt'))
-    onMessage(@ConnectedSocket() client : Socket, @MessageBody() data , @Req() req)
+    async onMessage(@ConnectedSocket() client : Socket, @MessageBody() data , @Req() req)
     {
-        this.server.in(client.handshake.query.roomName).emit('onMessage', data)
-        this.user.putDataInDatabase(client.handshake.query.roomName, data, req.user)
+        console.log(data.roomName)
+        const message = await this.user.putDataInDatabase(data.roomName, data.message, req)
+        this.server.in(data.roomName).emit('onMessage', message)
     }
 
     // joining the socket of user in  specific room
     @SubscribeMessage('createRoom')
     @UseGuards(AuthGuard('websocket-jwt'))
-    async handleCreationOfTheRoom(@ConnectedSocket() client : Socket , @Req() req) {
-        console.log(`client  ${client.id} connected and creat the room ${client.handshake.query.roomName}`)
-        const user = await this.validateUserByEmail(req.user.email, client.handshake.query.roomName, 0)
+    async handleCreationOfTheRoom(@ConnectedSocket() client : Socket , @Req() req, @MessageBody() Body) {
+        console.log(`client  ${client.id} connected and creat the room ${Body.roomName}`)
+        const user = await this.validateUserByEmail(req.user.email, Body.roomName, 0)
         if (user)
         {
-            const {roomName , status, password} = client.handshake.query
+            const {roomName , status, password} = Body
             const room = this.user.creatRoom({
                 'roomName' : roomName ,
                 'status'   : status ,
                 'password' : password} , user)
-            this.socketId.set(user.email, client.id)
-            this.server.in(client.id).socketsJoin(client.handshake.query.roomName)
-            console.log(room)
+            this.server.in(client.id).socketsJoin(Body.roomName)
+            if (Body.username)
+            {
+                let id = this.socketId.get(Body.username)
+                this.server.in(id).socketsJoin(Body.roomName)
+            }
             return room
         }
     }
@@ -61,7 +67,6 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
                 throw new UnauthorizedException({}, '')
             if (result == false)
                 throw new UnauthorizedException({}, '')
-            this.socketId.set(user.email, client.id)
             this.server.in(client.id).socketsJoin(client.handshake.query.roomName)
             const newUpdateChat = this.user.addUserToRoom(user, client.handshake.query.roomName)      
             console.log(`${user.username} has joined in ${client.handshake.query.roomName}`)
@@ -86,12 +91,16 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
     }
 
     // if the user connect to the event
-    async  handleConnection(client: Socket, ...args: any[]) {
+    async  handleConnection(@ConnectedSocket() client: Socket, ...args: any[]) {
+        const payload = await this.jwt.verifyAsync(client.handshake.headers.authorization.slice(7))
+        this.socketId.set(payload.username, client.id)
         console.log(`client ${client.id} has connected`)
     }
 
     // if the user disconnect to the event
     async handleDisconnect(client: any) {
+        const payload = await this.jwt.verifyAsync(client.handshake.headers.authorization.slice(7))
+        this.socketId.delete(payload.username)
         console.log(`client ${client.id} has disconnect`)    
     }
 

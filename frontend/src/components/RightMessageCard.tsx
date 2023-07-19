@@ -1,5 +1,5 @@
 import img from "../assets/ytouate.jpeg";
-
+import { useRef, useEffect } from "react";
 
 type MessageData = {
     message: string;
@@ -7,8 +7,12 @@ type MessageData = {
     sender: string;
 }
 function RightMessageCard(props: MessageData) {
+    const ref = useRef();
+    useEffect(() => {
+        ref.current?.scrollIntoView({ behaviour: "smooth" });
+    }, [props.message]);
     return (
-        <div className="right-message-card">
+        <div ref={ref} className="right-message-card">
             <div className="right-message-card--container">
                 <div className="right-message-card--data">
                     <p className="right-message-card--sender-name">{props.sender}</p>
