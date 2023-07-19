@@ -3,10 +3,13 @@ import RightMessageCard from "../../components/RightMessageCard";
 import FriendCard from "../../components/FriendCard/FriendCard";
 import "./Chat.css";
 import { authContext } from "../../context/Context";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Navigate, useLoaderData } from "react-router-dom";
 import ytouate from "../../assets/ytouate.jpeg";
 import Cookies from "js-cookie";
+import io from "socket.io-client";
+import { nanoid } from "nanoid";
+
 export function CurrentChattingUser() {
     return (
         <div className="chatting-user">
@@ -19,29 +22,46 @@ export function CurrentChattingUser() {
     );
 }
 
-export function SideBar() {
+export function SideBar(props: any) {
+    const friendsList = props.friends.map((friend: any) => {
+        return (
+            <FriendCard
+                addOption={false}
+                key={friend.id}
+                img={friend.urlImage}
+                name={friend.username}
+                lastmsg={friend.activitystatus ? "Online" : "Ofline"}
+            />
+        );
+    });
     return (
         <div className="chat-users">
             <div className="chat-users-header">
                 <p>Friends</p>
             </div>
             <div className="chat-users-content">
-                <FriendCard img={ytouate} name={"ytouate"} lastmsg={"online"} />
-                <FriendCard img={ytouate} name={"ytouate"} lastmsg={"online"} />
-                <FriendCard img={ytouate} name={"ytouate"} lastmsg={"online"} />
-                <FriendCard img={ytouate} name={"ytouate"} lastmsg={"online"} />
+                {friendsList}
+                {friendsList}
+                {friendsList}
+                {friendsList}
+                {friendsList}
+                {friendsList}
+                {friendsList}
+                {friendsList}
+                {friendsList}
+                {friendsList}
+                {friendsList}
+                {friendsList}
             </div>
         </div>
     );
 }
-import io from "socket.io-client";
-import { nanoid } from "nanoid";
 
 export default function Chat() {
     const user: any = useLoaderData();
-    const [isSignedIn, setIsSignedIn] = useContext(authContext);
+    const [isSignedIn] = useContext(authContext);
     const [message, setMessage] = useState("");
-    const [allMessages, setAllMessages] = useState([]);
+    const [allMessages, setAllMessages] = useState<any>([]);
 
     function sendMessage(e: any) {
         e.preventDefault();
@@ -70,22 +90,29 @@ export default function Chat() {
     });
 
     useEffect(() => {
-        console.log("component rendered");
         createRoom();
         chatSocket.on("onMessage", (msg: any) => {
             if (user.id == msg.sender.id) {
-                setAllMessages((prev) => [
+                setAllMessages((prev: any) => [
                     ...prev,
                     <RightMessageCard
+                        img={msg.sender.urlImage}
+                        sender={msg.sender.username}
                         message={msg.data}
                         key={nanoid()}
-                        time={new Date()}
+                        time={msg.time}
                     />,
                 ]);
             } else {
-                setAllMessages((prev) => [
+                setAllMessages((prev: any) => [
                     ...prev,
-                    <LeftMessageCard key={nanoid()} message={msg.data} />,
+                    <LeftMessageCard
+                        key={nanoid()}
+                        sender={msg.sender.username}
+                        img={msg.sender.urlImage}
+                        time={msg.time}
+                        message={msg.data}
+                    />,
                 ]);
             }
         });
@@ -96,7 +123,7 @@ export default function Chat() {
         <div className="chat-wrapper">
             <div className="chat">
                 <div className="chat-toggler"></div>
-                <SideBar />
+                <SideBar friends={user.friends} />
                 <div className="chat-body">
                     <div className="chat-body-header">
                         <CurrentChattingUser />

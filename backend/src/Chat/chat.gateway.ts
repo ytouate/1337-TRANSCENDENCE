@@ -31,7 +31,6 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
         this.server.in(data.roomName).emit('onMessage', message)
     }
 
-    // joining the socket of user in  specific room
     @SubscribeMessage('createRoom')
     @UseGuards(AuthGuard('websocket-jwt'))
     async handleCreationOfTheRoom(@ConnectedSocket() client : Socket , @Req() req, @MessageBody() Body) {
