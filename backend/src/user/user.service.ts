@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotAcceptableException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt'
+import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 
 @Injectable()
 export class UserService {
@@ -31,7 +32,7 @@ export class UserService {
                     }
                     )
                 await this.setAdmin({'username' : user.username , 'roomName' : roomName})
-                return {'message' : `room ${roomName} has created`}
+                return room
             }
             catch(error) {
             }
@@ -45,7 +46,7 @@ export class UserService {
         let room = await this.prismaService.chatRoom.findFirst({where : {roomName : name}})
         if (!await this.avoidDuplicate(user, name))
         {
-            await this.prismaService.chatRoom.update({
+            return await this.prismaService.chatRoom.update({
                 where : { id : room.id},
                 data :
                 { 
@@ -59,13 +60,14 @@ export class UserService {
                 }
             })
         }
+        throw NotAcceptableException
     }
 
     // delete user from current room
     async deleteUserFromRoom(user, name) {
         const room = await this.prismaService.chatRoom.findFirst({where : {roomName : name} , include : {users : true}})
         try {
-            await this.prismaService.chatRoom.update({
+            const update = await this.prismaService.chatRoom.update({
                 where : {id : room.id},
                 data : {
                     users :
@@ -77,23 +79,25 @@ export class UserService {
                     }
                 }
             })
-            return {'message' : `user has deleted from ${name}`}
+            console.log({'message' : `user has deleted from ${name}`})
+            return update
         }
-        catch(error) { return {'message' : error} }
+        catch(error) { throw ExceptionsHandler }
     }
 
     // show all available rooms
     async getAllRooms() {
-        return await this.prismaService.chatRoom.findMany({include : {users : true , messages : true}})
+        return await this.prismaService.chatRoom.findMany({where : {status : 'public'} , include : {users : true , messages : true } , })
     }
 
     // get a specific room by name
     async getRoomByName(name) {
-        return await this.prismaService.chatRoom.findFirst(
+        const room = await this.prismaService.chatRoom.findFirst(
             {
                 where : 
                 { 
-                    roomName : name
+                    roomName : name,
+                    status : 'public'
                 },
                 include :
                 {
@@ -102,6 +106,9 @@ export class UserService {
                 }
             }
         )
+        if (room.status == 'private')
+            throw UnauthorizedException
+        return room
     }
 
 
@@ -162,6 +169,8 @@ export class UserService {
             if (password !== room.password)
                 return undefined       
         }
+        if (room.status === 'private')
+            return false
         return true 
     }  
 

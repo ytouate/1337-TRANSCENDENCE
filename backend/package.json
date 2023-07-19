@@ -45,6 +45,7 @@
     "express-session": "^1.17.3",
     "handlebars": "^4.7.7",
     "luxon": "^3.3.0",
+    "messagebird": "^4.0.1",
     "mime-types": "^2.1.35",
     "passport": "^0.6.0",
     "passport-42": "^1.2.6",

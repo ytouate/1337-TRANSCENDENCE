@@ -1,7 +1,6 @@
-import { Controller, Post , Get, Req, Query, UseGuards, Param, SetMetadata} from '@nestjs/common';
+import { Controller, Post , Get, Query, UseGuards} from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
-import { authService } from 'src/AUTH/auth.service';
 
 
 @Controller('user')

@@ -2,8 +2,8 @@ import "./Notification.css";
 import bell from "../../assets/bell.svg";
 import { socketContext, userContext } from "../../context/Context";
 import { Fragment, useState, useEffect, useContext } from "react";
-import { containsClass } from "@syncfusion/ej2-base";
-import Cookies from "js-cookie";
+import { nanoid } from "nanoid";
+
 function acceptInvitation(id: number) {
     socketContext.emit("answer_notification", {
         id: id,
@@ -14,13 +14,15 @@ function acceptInvitation(id: number) {
 function rejectInvitation(id: number) {
     socketContext.emit("answer_notification", {
         id: id,
-        status: "reject",
+        status: "accept",
         description: "Invitaion accepted",
     });
 }
+
 function RequestNotification(props: any) {
+    console.log("here id", props.id);
     return (
-        <li className="notification-card">
+        <li key={props.id} className="notification-card">
             <div className="notification-card--data">
                 <p className="notification-card--title">{props.title}</p>
                 <p>
@@ -33,15 +35,16 @@ function RequestNotification(props: any) {
                 {props.title == "Request" && !props.status && (
                     <>
                         <button
-                            onClick={() => acceptInvitation(props.id)}
+                            onClick={() => {
+                                acceptInvitation(props.id);
+                                props.setUser(...props.user);
+                            }}
                             className="notification-card--action"
                         >
                             Accept
                         </button>
                         <button
-                            onClick={() => {
-                                rejectInvitation(props.id);
-                            }}
+                            // onClick={() => rejectInvitation(props.id)}
                             className="notification-card--action"
                         >
                             Reject
@@ -52,10 +55,32 @@ function RequestNotification(props: any) {
         </li>
     );
 }
-
 export default function Notification() {
     const [user, setUser] = useContext(userContext);
-    const [notifications, setNotifications] = useState<any>(user.notifications);
+    console.log(user);
+    let [notifications, setNotifications] = useState<any>(user.notifications);
+    useEffect(() => {
+        socketContext.on("receive_notification", (notification: any) => {
+            console.log(notification);
+            setNotifications((prev: any) => {
+                return [...prev, notification];
+            });
+        });
+    }, [user]);
+    console.log("notfications: ", notifications);
+    const notifList = notifications.map((notification: any) => {
+        console.log("hre: ", notification);
+
+        return (
+            <Fragment key={nanoid()}>
+                <RequestNotification
+                    {...notification}
+                    user={user}
+                    setUser={setUser}
+                />
+            </Fragment>
+        );
+    });
     return (
         <ul className="notification-drop">
             <li className="item">
@@ -65,21 +90,11 @@ export default function Notification() {
                         <span className="btn__badge">
                             {notifications.length}
                         </span>
-                        <ul className="notification-content">
-                            {notifications.map((notification: any) => {
-                                return (
-                                    <Fragment key={notification.id}>
-                                        <RequestNotification
-                                            {...notification}
-                                        />
-                                    </Fragment>
-                                );
-                            })}
-                        </ul>
+                        <ul className="notification-content">{notifList}</ul>
                     </>
                 ) : (
                     <ul className="notification-content">
-                        <li>Not notif to show</li>
+                        <li key={"lkher"}>Not notif to show</li>
                     </ul>
                 )}
             </li>
