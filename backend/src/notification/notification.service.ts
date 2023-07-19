@@ -34,7 +34,6 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
     }
     //get socket from connecting clients
     handleConnection(client: Socket) {
-        // console.log(client);
         this.pushClientInMap(client);
     }
 
@@ -93,7 +92,6 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
     }
     //push the client socket in map
     async pushClientInMap(client: Socket){
-        try{
             const userObj: any = this.jwtService.verify(client.handshake.headers.authorization.slice(7));
             const user: User = await this.prismaServie.user.findFirst({
                 where: {
@@ -112,10 +110,6 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
                     activitystatus: true,
                 }
             })
-        }
-        catch(erro){
-            client.disconnect();
-        }
     }
     //accept or reject friend request and send acceptation
     @UseGuards(AuthGuard('websocket-jwt'))
@@ -130,27 +124,35 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
                 reicever: notification.reicever,
                 status: 'accepted'
             }
-            for (let i = 0;i < this.socketById.get(notification.reicever.id).length;i++){
+            for (let i = 0;i < this.socketById?.get(notification.reicever.id)?.length;i++){
                 this.socketById.get(notification.senderId)[i].emit('receive_notification', acceptation);
             }
         }
         else if (body.status == 'reject') this.deleteNotification(body);
     }
     // delete notifiation from database
-    deleteNotification(messageBody){
+    async deleteNotification(messageBody){
         try{
-        this.prismaServie.notification.delete({
+            let notif = await this.prismaServie.notification.findFirst({
             where : {
                 id: messageBody.id,
             }
-        })}
+        })
+        console.log(notif);
+        await this.prismaServie.notification.deleteMany({
+            where: {
+                senderId: notif.senderId,
+                reiceverId: notif.reiceverId,
+                title: notif.title,
+            }
+        })
+    }
         catch(error){
             throw new InternalServerErrorException();
         }
     }
     //accept notification
     async acceptNotificaion(messageBody){
-        try{
             let notification = await this.prismaServie.notification.findUnique({
                 where:{
                     id: messageBody.id,
@@ -184,9 +186,6 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
                 }
             })
             return notification;
-        }
-        catch(error){
-            throw new InternalServerErrorException();
         }
     }
 }

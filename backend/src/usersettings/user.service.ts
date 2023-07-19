@@ -182,7 +182,7 @@ export class UserSettingsService {
                 delete userToReturn.blockedBy;
             }
             delete userToReturn.blockedBy;
-            console.log(userToReturn.notifications)
+            console.log(userToReturn);
             return userReturn(userToReturn, req);
         }
         throw new NotFoundException({}, 'not found');

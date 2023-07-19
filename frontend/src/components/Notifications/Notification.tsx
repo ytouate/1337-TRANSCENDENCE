@@ -2,7 +2,7 @@ import "./Notification.css";
 import bell from "../../assets/bell.svg";
 import { socketContext, userContext } from "../../context/Context";
 import { Fragment, useState, useEffect, useContext } from "react";
-import { nanoid } from "nanoid";
+import {nanoid} from 'nanoid'
 
 function acceptInvitation(id: number) {
     socketContext.emit("answer_notification", {
@@ -37,7 +37,7 @@ function RequestNotification(props: any) {
                         <button
                             onClick={() => {
                                 acceptInvitation(props.id);
-                                props.setUser(...props.user);
+                                // props.setUser(...props.user);
                             }}
                             className="notification-card--action"
                         >
@@ -72,7 +72,11 @@ export default function Notification() {
         console.log("hre: ", notification);
 
         return (
-            <Fragment key={nanoid()}>
+            <Fragment
+                key={
+                    nanoid()
+                }
+            >
                 <RequestNotification
                     {...notification}
                     user={user}
