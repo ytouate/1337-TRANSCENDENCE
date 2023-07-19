@@ -174,7 +174,7 @@ export class UserSettingsService {
             if (status == 'friend')
                 userToReturn.friendStatus = true;
             else if (status == 'blocked')
-                throw new UnauthorizedException({}, '');
+                throw new UnauthorizedException({}, '')
             else if (status == 'me')
                 userToReturn.me = true;
             if (userToReturn.me == false) {
