@@ -188,7 +188,7 @@ export class UserService {
         const room = await this.getRoomByName(param.roomName)
         if (room.admins.indexOf(member.email) < 0)
         {
-            await this.prismaService.chatRoom.update(
+            return await this.prismaService.chatRoom.update(
             {
                 where : {id : room.id} , 
                 data : {
@@ -207,15 +207,21 @@ export class UserService {
         const room = await this.getRoomByName(roomName)
         let hash = await bcrypt.hash(password, 10)
         if (room){
-            return await this.prismaService.chatRoom.update({where : {
-                id : room.id
-            },
-            data : { password : hash }
-        })
+            return await this.prismaService.chatRoom.update(
+            {
+                where :
+                {
+                    id : room.id
+                },
+                data : 
+                {
+                    password : hash
+                }
+            })
         }
         throw ExceptionsHandler
     }
-a
+
 
     // ban users
     async   banUser(param) {
@@ -224,7 +230,7 @@ a
         const room = await this.getRoomByName(roomName)
         if (room.banUsers.indexOf(member.email) < 0)
         {
-            await this.prismaService.chatRoom.update(
+            return await this.prismaService.chatRoom.update(
                 {
                     where : {id : room.id} , 
                     data : 
@@ -247,7 +253,7 @@ a
         const room = await this.getRoomByName(roomName)
         if (room.muteUsers.indexOf(member.email) < 0)
         {
-            await this.prismaService.chatRoom.update(
+            return await this.prismaService.chatRoom.update(
                 {
                     where : {id : room.id} , 
                     data : 
