@@ -1,4 +1,4 @@
-import { UseGuards } from "@nestjs/common";
+import { UnauthorizedException, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import {  ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Socket ,Server } from "socket.io";
@@ -7,9 +7,7 @@ import { UserService } from "src/user/user.service";
 import { Req } from "@nestjs/common";
 import { ExceptionsHandler } from "@nestjs/core/exceptions/exceptions-handler";
 
-
 @WebSocketGateway({ namespace : 'chat' , cors : true})
-@UseGuards(AuthGuard('websocket-jwt'))
 export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
     constructor (
         private prisma: PrismaService,
@@ -23,42 +21,46 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
 
     // send message to current room
     @SubscribeMessage('sendMessage')
+    @UseGuards(AuthGuard('websocket-jwt'))
     onMessage(@ConnectedSocket() client : Socket, @MessageBody() data , @Req() req)
     {
         this.server.in(client.handshake.query.roomName).emit('onMessage', data)
         this.user.putDataInDatabase(client.handshake.query.roomName, data, req.user)
     }
 
-
     // joining the socket of user in  specific room
     @SubscribeMessage('createRoom')
+    @UseGuards(AuthGuard('websocket-jwt'))
     async handleCreationOfTheRoom(@ConnectedSocket() client : Socket , @Req() req) {
         console.log(`client  ${client.id} connected and creat the room ${client.handshake.query.roomName}`)
-        const user = await this.validateUserByEmail(req.user.email, client.handshake.query.roomName)
+        const user = await this.validateUserByEmail(req.user.email, client.handshake.query.roomName, 0)
         if (user)
         {
+            const {roomName , status, password} = client.handshake.query
             const room = this.user.creatRoom({
-                'roomName' : client.handshake.query.roomName ,
-                'status'   : client.handshake.query.status  ,
-                'password' : client.handshake.query.password} , user)
+                'roomName' : roomName ,
+                'status'   : status ,
+                'password' : password} , user)
             this.socketId.set(user.email, client.id)
-            this.server.in(client.id).socketsJoin(client.handshake.query.roomName)  
+            this.server.in(client.id).socketsJoin(client.handshake.query.roomName)
+            console.log(room)
             return room
         }
     }
 
     // joining the socket of user in  specific room
     @SubscribeMessage('joinRoom')
+    @UseGuards(AuthGuard('websocket-jwt'))
     async handleJoiningTheRoom(@ConnectedSocket() client : Socket , @Req() req) {
         console.log(`client  ${client.id} connected and joining the room ${client.handshake.query.roomName}`)
-        const user = await this.validateUserByEmail(req.user.email, client.handshake.query.roomName)
+        const user = await this.validateUserByEmail(req.user.email, client.handshake.query.roomName, 1)
         if (user)
         {
-            const result = await this.user.joiningTheRoom(client.handshake.query, user);
+            const result = await this.user.joiningTheRoom(client.handshake.query);
             if (result == undefined)
-                throw ExceptionsHandler
+                throw new UnauthorizedException({}, '')
             if (result == false)
-                throw ExceptionsHandler
+                throw new UnauthorizedException({}, '')
             this.socketId.set(user.email, client.id)
             this.server.in(client.id).socketsJoin(client.handshake.query.roomName)
             const newUpdateChat = this.user.addUserToRoom(user, client.handshake.query.roomName)      
@@ -70,6 +72,7 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
 
     // leave the socket from room
     @SubscribeMessage('leaveRoom')
+    @UseGuards(AuthGuard('websocket-jwt'))
     async leaveRoomHandler(@ConnectedSocket() client: Socket, @Req() req) {
         const user = await this.validateUserByUsername(client.handshake.query.username)
         if (user)
@@ -98,10 +101,12 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
     }
 
     //check the user if exist 
-    async validateUserByEmail(email, roomName) {
+    async validateUserByEmail(email, roomName, num) {
         const user =  await this.prisma.user.findUnique({where : {email : email}})
         const room = await this.prisma.chatRoom.findFirst({ where : {roomName : roomName} })
-        return room.banUsers.indexOf(user.email) < 0 ? user : undefined
+        if (num == 0)
+            return user
+        return room?.banUsers?.indexOf(user.email) < 0 ? user : undefined
     }
 
 }
