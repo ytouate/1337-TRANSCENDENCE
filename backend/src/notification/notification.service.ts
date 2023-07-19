@@ -5,7 +5,7 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Notification, User } from '@prisma/client';
 import { Server, Socket } from 'socket.io';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { userReturn } from 'src/utils/user.return';
+import { userReturn, userReturnToGatway } from 'src/utils/user.return';
 
 
 @WebSocketGateway({namespace: 'notification', cors: true})
@@ -60,8 +60,7 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
                 id: notif.senderId,
             },
         })
-        notif.sender = userReturn(sender, req);
-        console.log(this.socketById.get(notif.reiceverId));
+        notif.sender = userReturnToGatway(sender, req);
         if (this.socketById.has(notif.reiceverId)){
             for (let i = 0;i < this.socketById.get(notif.reiceverId).length;i++){
                 this.socketById.get(notif.reiceverId)[i].emit('receive_notification', notif);
