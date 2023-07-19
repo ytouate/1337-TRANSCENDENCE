@@ -132,16 +132,25 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
                 this.socketById.get(notification.senderId)[i].emit('receive_notification', acceptation);
             }
         }
-        else if (body.status == 'rejected') this.deleteNotification(body);
+        else if (body.status == 'reject') this.deleteNotification(body);
     }
     // delete notifiation from database
-    deleteNotification(messageBody){
+    async deleteNotification(messageBody){
         try{
-        this.prismaServie.notification.delete({
+            let notif = await this.prismaServie.notification.findFirst({
             where : {
                 id: messageBody.id,
             }
-        })}
+        })
+        console.log(notif);
+        await this.prismaServie.notification.deleteMany({
+            where: {
+                senderId: notif.senderId,
+                reiceverId: notif.reiceverId,
+                title: notif.title,
+            }
+        })
+    }
         catch(error){
             throw new InternalServerErrorException();
         }

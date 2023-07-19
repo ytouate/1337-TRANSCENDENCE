@@ -163,6 +163,7 @@ export class UserSettingsService {
                 friends: true,
                 blocked: true,
                 blockedBy: true,
+                notifications: true,
             }
         });
         if (userToReturn){
@@ -180,6 +181,7 @@ export class UserSettingsService {
                 delete userToReturn.blockedBy;
             }
             delete userToReturn.blockedBy;
+            console.log(userToReturn);
             return userReturn(userToReturn, req);
         }
         throw new NotFoundException({}, 'not found');
