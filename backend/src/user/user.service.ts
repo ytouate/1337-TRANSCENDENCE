@@ -87,7 +87,7 @@ export class UserService {
 
     // show all available rooms
     async getAllRooms() {
-        return await this.prismaService.chatRoom.findMany({where : {status : 'public'} , include : {users : true , messages : true } , })
+        return await this.prismaService.chatRoom.findMany({where : {status : 'public'} , include : {users : true , messages : true } })
     }
 
     // get a specific room by name
@@ -204,15 +204,16 @@ export class UserService {
     //change password of protected room
     async   changePasswordOfProtectedRoom(param) {
         const {roomName, password} = param
-        const room = await this.getRoomByName(param.roomName)
+        const room = await this.getRoomByName(roomName)
         let hash = await bcrypt.hash(password, 10)
         if (room){
-            await this.prismaService.chatRoom.update({where : {
+            return await this.prismaService.chatRoom.update({where : {
                 id : room.id
             },
             data : { password : hash }
         })
         }
+        throw ExceptionsHandler
     }
 a
 
