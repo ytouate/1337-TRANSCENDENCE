@@ -15,11 +15,13 @@ async function takeAction(action: string, username: string) {
     const data = await fetch("http://localhost:3000/user", options);
     const res = await data.json();
     if (action == "add") {
-        socketContext.emit("send_notification", {
-            title: "Request",
-            description: `new friend request from ${res.username}`,
-            username: username,
-        });
+        if (socketContext) {
+            socketContext.emit("send_notification", {
+                title: "Request",
+                description: `new friend request from ${res.username}`,
+                username: username,
+            });
+        }
     } else if (action == "block") {
         const options = {
             method: "POST",

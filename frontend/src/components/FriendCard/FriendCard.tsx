@@ -20,7 +20,7 @@ export const notifyUnblocked = () => toast("unblocked succefully");
 interface friendCardType {
     img: string;
     name: string;
-    status: string | null;
+    lastmsg: string | null;
 }
 function FriendCard(props: friendCardType) {
     return (
@@ -34,7 +34,7 @@ function FriendCard(props: friendCardType) {
                     />
                     <div className="friend-card--data">
                         <p className="friend-card--username">{props.name}</p>
-                        <p className="friend-card--status">{props.status}</p>
+                        <p className="friend-card--status">{props.lastmsg}</p>
                     </div>
                 </div>
                 {props.addOption && (

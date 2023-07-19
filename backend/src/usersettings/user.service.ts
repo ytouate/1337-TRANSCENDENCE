@@ -175,14 +175,17 @@ export class UserSettingsService {
                 userToReturn.friendStatus = true;
             else if (status == 'blocked')
                 throw new UnauthorizedException({}, '');
-            else if (status == 'me')
+            else if (status == 'me'){
+                userToReturn.friends = userToReturn.friends.map(friend => userReturn(friend, req));
+                userToReturn.blocked = userToReturn.blocked.map(friend => userReturn(friend, req));
                 userToReturn.me = true;
+            }
             if (userToReturn.me == false) {
                 delete userToReturn.friends;
                 delete userToReturn.blockedBy;
             }
             delete userToReturn.blockedBy;
-            console.log(userToReturn);
+           
             return userReturn(userToReturn, req);
         }
         throw new NotFoundException({}, 'not found');
