@@ -5,10 +5,9 @@ import { Socket ,Server } from "socket.io";
 import { PrismaService } from "src/prisma/prisma.service";
 import { UserService } from "src/user/user.service";
 import { Req } from "@nestjs/common";
-import { ExceptionsHandler } from "@nestjs/core/exceptions/exceptions-handler";
 import { JwtService } from "@nestjs/jwt";
 
-@WebSocketGateway({ namespace : 'chat' , cors : true})
+@WebSocketGateway({ namespace : 'chat' , cors: {origin : '*'} })
 export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
     constructor (
         private prisma: PrismaService,
@@ -24,9 +23,8 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
     // send message to current room
     @SubscribeMessage('sendMessage')
     @UseGuards(AuthGuard('websocket-jwt'))
-    async onMessage(@ConnectedSocket() client : Socket, @MessageBody() data , @Req() req)
+    async onMessage(@MessageBody() data , @Req() req)
     {
-        console.log(data.roomName)
         const message = await this.user.putDataInDatabase(data.roomName, data.message, req)
         this.server.in(data.roomName).emit('onMessage', message)
     }

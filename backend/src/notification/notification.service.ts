@@ -8,7 +8,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { userReturn, userReturnToGatway } from 'src/utils/user.return';
 
 
-@WebSocketGateway({namespace: 'notification', cors: true})
+@WebSocketGateway({namespace: 'notification', cors: {origin : '*'}})
 export class NotificationService implements OnGatewayConnection, OnGatewayDisconnect{
     socketById: Map<number, Socket[]> ;
     constructor(private jwtService: JwtService, private prismaServie: PrismaService){

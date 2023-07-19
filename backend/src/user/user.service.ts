@@ -1,7 +1,6 @@
-import { Injectable, NotAcceptableException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt'
-import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 import { userReturn } from 'src/utils/user.return';
 
 @Injectable()
@@ -160,7 +159,6 @@ export class UserService {
         })
         let sender = await this.prismaService.user.findUnique({where : {id : message.userId}})
         message.sender = userReturn(sender, req);
-        console.log(message)
         return message
     }
 
