@@ -60,7 +60,7 @@ export class UserService {
                 }
             })
         }
-        throw NotAcceptableException
+        return room
     }
 
     // delete user from current room
@@ -158,7 +158,6 @@ export class UserService {
             }
         })
     }
-
 
     //check user  if have order to join the rrom
     async   joiningTheRoom(param, user)
