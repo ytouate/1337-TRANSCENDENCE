@@ -1,17 +1,14 @@
 import { Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
 import { PrismaService } from "src/prisma/prisma.service";
 import { imageLink } from "./auth.strategy42";
 import { JwtService } from "@nestjs/jwt";
 import { MailerService } from "@nestjs-modules/mailer";
 import { userReturn } from "src/utils/user.return";
-import { use } from "passport";
 
 @Injectable()
 export class authService{
     constructor( 
         private prisma:PrismaService,
-        private configservice:ConfigService,
         private jwt:JwtService,
         private mail:MailerService
     ){}
@@ -32,10 +29,6 @@ export class authService{
                     },
                 } 
             })
-            const payload = {
-                email : newData.email,
-                username : newData.username
-            }
             return newUser
         }
         return user
@@ -55,7 +48,7 @@ export class authService{
     // add two-factor Authantication
     async add2fa(firstMail , email, code)
     {
-        const  user = await this.prisma.user.update(
+        await this.prisma.user.update(
             {
                 where : {email : firstMail},
                 data : { optionalMail : email , codeVerification : code}
@@ -85,14 +78,13 @@ export class authService{
                 usersToReturn.push(userReturn(user, req));
             }
             return usersToReturn; 
-            // return userReturn(users, req)
         }
 
 
     // send code verification { email } 
     async sigin2fa(code, email)
     {
-        const mail = await this.mail.sendMail({
+        await this.mail.sendMail({
             from : 'othmanmallah13@gmail.com',
             to : email,
             subject : 'DKOORA Game',
