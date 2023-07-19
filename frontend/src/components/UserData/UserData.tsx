@@ -126,7 +126,7 @@ const UserButtons = (props: userDataType) => {
                     onClick={isAddButton ? notfyAdd : notfyAlredySent}
                     className="settings-button add"
                 >
-                    {isAddButton ? "Add" : "Pending"}
+                    Add
                 </button>
             </a>
             <a

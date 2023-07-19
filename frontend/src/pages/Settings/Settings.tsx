@@ -82,17 +82,16 @@ export default function Settings() {
     }
 
     async function changeAvatar(e: any) {
-        const formData  = new FormData();
-        formData.append('image', newAvatar);
+        const formData = new FormData();
+        formData.append("image", newAvatar);
         const options = {
-            method: 'PUT',
-            headers: {'Authorization': `Bearer ${Cookies.get('Token')}`, 
-        },
-            body:formData
-        }
-        fetch('http://localhost:3000/profile/updatephoto', options)
-            .then(res => res.json())
-            .then(data => console.log(data));
+            method: "PUT",
+            headers: { Authorization: `Bearer ${Cookies.get("Token")}` },
+            body: formData,
+        };
+        fetch("http://localhost:3000/profile/updatephoto", options)
+            .then((res) => res.json())
+            .then((data) => console.log(data));
     }
 
     async function changeName(e) {

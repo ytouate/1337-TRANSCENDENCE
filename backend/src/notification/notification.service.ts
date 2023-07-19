@@ -34,6 +34,7 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
     }
     //get socket from connecting clients
     handleConnection(client: Socket) {
+        // console.log(client);
         this.pushClientInMap(client);
     }
 
@@ -71,7 +72,7 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
     async pushNotificationToDb(notificationBody, req){
         const sender = await this.prismaServie.user.findUnique({
             where: {
-                username: req.user.username,
+                email: req.user.email,
             }
         })
         const reicever = await this.prismaServie.user.findUnique({
@@ -92,19 +93,19 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
     }
     //push the client socket in map
     async pushClientInMap(client: Socket){
-            const userObj: any = this.jwtService.verify(client.handshake.headers.authorization.slice(7));
+            const userObj: any =  this.jwtService.verify(client.handshake.headers.authorization.slice(7));
             const user: User = await this.prismaServie.user.findFirst({
                 where: {
-                    username: userObj.username
+                    email: userObj.email
                 }
-            })
+            });
             if (!this.socketById.has(user.id))
                 this.socketById.set(user.id, [client]);
             else
                 this.socketById.get(user.id).push(client);
              await this.prismaServie.user.update({
                 where: {
-                    username: userObj.username,
+                    email: userObj.email,
                 },
                 data: {
                     activitystatus: true,
@@ -124,7 +125,7 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
                 reicever: notification.reicever,
                 status: 'accepted'
             }
-            for (let i = 0;i < this.socketById?.get(notification.reicever.id)?.length;i++){
+            for (let i = 0;i < this.socketById.get(notification.reicever.id).length;i++){
                 this.socketById.get(notification.senderId)[i].emit('receive_notification', acceptation);
             }
         }
@@ -132,7 +133,6 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
     }
     // delete notifiation from database
     async deleteNotification(messageBody){
-        try{
             let notif = await this.prismaServie.notification.findFirst({
             where : {
                 id: messageBody.id,
@@ -146,10 +146,6 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
                 title: notif.title,
             }
         })
-    }
-        catch(error){
-            throw new InternalServerErrorException();
-        }
     }
     //accept notification
     async acceptNotificaion(messageBody){
@@ -186,6 +182,5 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
                 }
             })
             return notification;
-        }
     }
 }

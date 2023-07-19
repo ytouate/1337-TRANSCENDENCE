@@ -80,7 +80,12 @@ export class authService{
             const users =  await this.prisma.user.findMany({
              orderBy : { winRate: 'asc'}
             })
-            return userReturn(users, req)
+            const usersToReturn = [];
+            for (const user of users) {
+                usersToReturn.push(userReturn(user, req));
+            }
+            return usersToReturn; 
+            // return userReturn(users, req)
         }
 
 
