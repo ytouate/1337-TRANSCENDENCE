@@ -43,7 +43,7 @@ export class UserService {
 
     // add user to specific room
     async addUserToRoom(user , name) {
-        let room = await this.prismaService.chatRoom.findFirst({where : {roomName : name}})
+        let room = await this.getRoomByName(name)
         if (!await this.avoidDuplicate(user, name))
         {
             return await this.prismaService.chatRoom.update({
@@ -141,7 +141,8 @@ export class UserService {
 
     //add data in Room { messages}
     async   putDataInDatabase(name, data, user) {
-        const room = await this.prismaService.chatRoom.findFirst({where : {roomName : name}})
+        // const room = await this.prismaService.chatRoom.findFirst({where : {roomName : name}})
+        const room = await this.getRoomByName(name)
         const message = await this.addDataInMessageTable(data, room.id, user)
         await this.prismaService.chatRoom.update({
             where : 
@@ -183,8 +184,8 @@ export class UserService {
 
     // set admin to other users in my room
     async   setAdmin(param) {
-        const member = await this.prismaService.user.findFirst({where : {username : param.username}})
-        const room = await this.prismaService.chatRoom.findFirst({ where : {roomName : param.roomName} })
+        const member = await this.getUserWithUsername(param.username)
+        const room = await this.getRoomByName(param.roomName)
         if (room.admins.indexOf(member.email) < 0)
         {
             await this.prismaService.chatRoom.update(
@@ -203,7 +204,7 @@ export class UserService {
     //change password of protected room
     async   changePasswordOfProtectedRoom(param) {
         const {roomName, password} = param
-        const room = await this.prismaService.chatRoom.findFirst({where : {roomName : roomName}})
+        const room = await this.getRoomByName(param.roomName)
         let hash = await bcrypt.hash(password, 10)
         if (room){
             await this.prismaService.chatRoom.update({where : {
@@ -218,8 +219,8 @@ a
     // ban users
     async   banUser(param) {
         const {username , roomName} = param
-        const member = await this.prismaService.user.findFirst({where : {username : username}})
-        const room = await this.prismaService.chatRoom.findFirst({where : {roomName : roomName}})
+        const member = await this.getUserWithUsername(username)
+        const room = await this.getRoomByName(roomName)
         if (room.banUsers.indexOf(member.email) < 0)
         {
             await this.prismaService.chatRoom.update(
@@ -241,8 +242,8 @@ a
     // mute users
     async   muteUsers(param) {
         const {username , roomName} = param
-        const member = await this.prismaService.user.findFirst({where : {username : username}})
-        const room = await this.prismaService.chatRoom.findFirst({where : {roomName : roomName}})
+        const member = await this.getUserWithUsername(username)
+        const room = await this.getRoomByName(roomName)
         if (room.muteUsers.indexOf(member.email) < 0)
         {
             await this.prismaService.chatRoom.update(
@@ -270,6 +271,6 @@ a
     // get admins of chatRoom
     async   getAdminsOfUsers(roomName)
     {
-        return await this.prismaService.chatRoom.findFirst({where : {roomName : roomName}})
+        return await this.prismaService.chatRoom.findFirst({where : {roomName : roomName} })
     }
 }
