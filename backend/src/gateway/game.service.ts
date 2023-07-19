@@ -1,4 +1,4 @@
-import { OnModuleInit, UseGuards } from '@nestjs/common';
+import { OnModuleInit, Req, UseGuards } from '@nestjs/common';
 import {
     ConnectedSocket,
     MessageBody,
@@ -15,6 +15,8 @@ import { GameService } from 'src/game/game.service';
 import { PrefService } from 'src/pref/pref.service';
 import { UserSettingsService } from 'src/usersettings/user.service';
 import { AuthGuard } from '@nestjs/passport';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { JwtService } from '@nestjs/jwt';
 
 @WebSocketGateway({ namespace: 'game', cors: true })
 @UseGuards(AuthGuard('websocket-jwt'))
@@ -29,7 +31,8 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
     constructor(
         private userService: UserSettingsService,
         private gameService: GameService,
-        private prefService: PrefService,
+        // private prefService: PrefService,
+        private jwtSerive: JwtService,
     ) {
         this.userSockets = new Map<number, UserData>();
         this.queue = [];
@@ -44,7 +47,13 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
 
     // called when a client is connected
     async handleConnection(@ConnectedSocket() client: Socket) {
-        this.addClient(client);
+        // console.log(client.user);
+        // console.log(client.handshake);
+        // console.log({ a: client.handshake.headers });
+        const payload = await this.jwtSerive.verifyAsync(
+            client.handshake.headers.authorization.slice(7),
+        );
+        this.addClient(client, payload.username);
     }
 
     getUserIdBySocket(socket: Socket): number | undefined {
@@ -76,10 +85,10 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
     }
 
     // add client to the userSockets
-    async addClient(client: Socket) {
-        const { userId } = client.handshake.query;
+    async addClient(client: Socket, username: string) {
+        // console.log({ username });
 
-        const user = await this.userService.getUserById(Number(userId));
+        const user = await this.userService.getUserByUsername(username);
 
         if (!user) return;
 
@@ -91,7 +100,7 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
         };
 
         //means player exists
-        console.log(`Client with userId ${userId} connected`);
+        console.log(`Client with username ${username} connected`);
 
         this.userSockets.set(user.id, userData);
     }
@@ -221,6 +230,7 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
     @SubscribeMessage('queueUp')
     async queueUp(@MessageBody() body: any, @ConnectedSocket() client: Socket) {
         const userId = body.userId;
+        console.log('queue up');
 
         if (this.queue.includes(userId)) {
             console.log('User already in the queue');
