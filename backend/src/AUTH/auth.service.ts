@@ -65,6 +65,7 @@ export class authService{
                 notifications : true
             },
         })
+        user.friends = user.friends.map(friend => userReturn(friend, req));
         return userReturn(user, req)
     }
 

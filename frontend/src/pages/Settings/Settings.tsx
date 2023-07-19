@@ -82,6 +82,7 @@ export default function Settings() {
     }
 
     async function changeAvatar(e: any) {
+        e.preventDefault();
         const formData = new FormData();
         formData.append("image", newAvatar);
         const options = {
@@ -91,7 +92,7 @@ export default function Settings() {
         };
         fetch("http://localhost:3000/profile/updatephoto", options)
             .then((res) => res.json())
-            .then((data) => console.log(data));
+            .then(() => location.reload());
     }
 
     async function changeName(e) {

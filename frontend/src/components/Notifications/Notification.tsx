@@ -2,21 +2,25 @@ import "./Notification.css";
 import bell from "../../assets/bell.svg";
 import { socketContext, userContext } from "../../context/Context";
 import { Fragment, useState, useEffect, useContext } from "react";
-import {nanoid} from 'nanoid'
+import { nanoid } from "nanoid";
 
 function acceptInvitation(id: number) {
-    socketContext.emit("answer_notification", {
-        id: id,
-        status: "accept",
-        description: "Invitaion accepted",
-    });
+    if (socketContext) {
+        socketContext.emit("answer_notification", {
+            id: id,
+            status: "accept",
+            description: "Invitaion accepted",
+        });
+    }
 }
 function rejectInvitation(id: number) {
-    socketContext.emit("answer_notification", {
-        id: id,
-        status: "accept",
-        description: "Invitaion accepted",
-    });
+    if (socketContext) {
+        socketContext.emit("answer_notification", {
+            id: id,
+            status: "reject",
+            description: "Invitaion Rejected",
+        });
+    }
 }
 
 function RequestNotification(props: any) {
@@ -60,23 +64,21 @@ export default function Notification() {
     console.log(user);
     let [notifications, setNotifications] = useState<any>(user.notifications);
     useEffect(() => {
-        socketContext.on("receive_notification", (notification: any) => {
-            console.log(notification);
-            setNotifications((prev: any) => {
-                return [...prev, notification];
+        if (socketContext) {
+            socketContext.on("receive_notification", (notification: any) => {
+                console.log(notification);
+                setNotifications((prev: any) => {
+                    return [...prev, notification];
+                });
             });
-        });
+        }
     }, [user]);
     console.log("notfications: ", notifications);
     const notifList = notifications.map((notification: any) => {
         console.log("hre: ", notification);
 
         return (
-            <Fragment
-                key={
-                    nanoid()
-                }
-            >
+            <Fragment key={nanoid()}>
                 <RequestNotification
                     {...notification}
                     user={user}
