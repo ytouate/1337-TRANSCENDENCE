@@ -37,6 +37,7 @@ export class authService{
     // generate a Token
     async signToken(username, email)
     {
+        console.log(username , email)
         const payload = {
             username : username,
             email : email

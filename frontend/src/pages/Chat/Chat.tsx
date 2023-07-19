@@ -3,10 +3,10 @@ import RightMessageCard from "../../components/RightMessageCard";
 import FriendCard from "../../components/FriendCard/FriendCard";
 import "./Chat.css";
 import { authContext } from "../../context/Context";
-import { useContext } from "react";
-import { Navigate } from "react-router-dom";
+import { useContext, useEffect, useRef, useState } from "react";
+import { Navigate, useLoaderData } from "react-router-dom";
 import ytouate from "../../assets/ytouate.jpeg";
-
+import Cookies from "js-cookie";
 export function CurrentChattingUser() {
     return (
         <div className="chatting-user">
@@ -34,8 +34,63 @@ export function SideBar() {
         </div>
     );
 }
+import io from "socket.io-client";
+import { nanoid } from "nanoid";
+
 export default function Chat() {
+    const user: any = useLoaderData();
     const [isSignedIn, setIsSignedIn] = useContext(authContext);
+    const [message, setMessage] = useState("");
+    const [allMessages, setAllMessages] = useState([]);
+
+    function sendMessage(e: any) {
+        e.preventDefault();
+        if (message.trim().length > 0) {
+            setMessage("");
+            chatSocket.emit("sendMessage", {
+                roomName: "ytouateotmallah",
+                message: message.trim(),
+            });
+        }
+    }
+
+    function createRoom() {
+        chatSocket.emit("createRoom", {
+            roomName: "ytouateotmallah",
+            status: "public",
+            username: "otmallah",
+        });
+        console.log("room created");
+    }
+
+    const chatSocket = io.connect("http://localhost:3000/chat", {
+        extraHeaders: {
+            Authorization: `Bearer ${Cookies.get("Token")}`,
+        },
+    });
+
+    useEffect(() => {
+        console.log("component rendered");
+        createRoom();
+        chatSocket.on("onMessage", (msg: any) => {
+            if (user.id == msg.sender.id) {
+                setAllMessages((prev) => [
+                    ...prev,
+                    <RightMessageCard
+                        message={msg.data}
+                        key={nanoid()}
+                        time={new Date()}
+                    />,
+                ]);
+            } else {
+                setAllMessages((prev) => [
+                    ...prev,
+                    <LeftMessageCard key={nanoid()} message={msg.data} />,
+                ]);
+            }
+        });
+    }, []);
+
     if (!isSignedIn) return <Navigate to={"/signin"} />;
     return (
         <div className="chat-wrapper">
@@ -46,17 +101,14 @@ export default function Chat() {
                     <div className="chat-body-header">
                         <CurrentChattingUser />
                     </div>
-                    <div className="chat-body-content">
-                        <LeftMessageCard />
-                        <RightMessageCard
-                            sender="ytouate"
-                            time={new Date()}
-                            message="lorem ipsum dolor"
-                        />
-                    </div>
+                    <div className="chat-body-content">{allMessages}</div>
                     <div className="chat-body-footer">
-                        <form className="message-sender">
-                            <input type="text" />
+                        <form onSubmit={sendMessage} className="message-sender">
+                            <input
+                                onChange={(e) => setMessage(e.target.value)}
+                                value={message}
+                                type="text"
+                            />
                             <button className="send-button">send</button>
                         </form>
                     </div>

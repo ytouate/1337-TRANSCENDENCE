@@ -1,8 +1,15 @@
 import img from "../assets/otmallah.jpeg";
+import { useEffect } from "react";
+import { useRef } from "react";
+function LeftMessageCard(props) {
+    const ref = useRef();
+    useEffect(() => {
+        console.log('here');
+        ref.current?.scrollIntoView({ behaviour: "smooth" });
+    }, [props.message]);
 
-function LeftMessageCard() {
     return (
-        <div className="message-card">
+        <div ref={ref} className="message-card">
             <div className="message-card--container">
                 <img src={img} alt="" className="message-card--sender-img" />
                 <div className="message-card--data">
@@ -11,12 +18,7 @@ function LeftMessageCard() {
                 </div>
             </div>
 
-            <p className="message-card--message">
-                Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-                Repudiandae odio ratione eveniet eum praesentium nemo tempore,
-                laborum voluptatum qui voluptates beatae sunt ullam, aspernatur
-                obcaecati deserunt. Animi aspernatur mollitia eligendi!
-            </p>
+            <p className="message-card--message">{props.message}</p>
         </div>
     );
 }

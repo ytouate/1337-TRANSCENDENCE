@@ -67,6 +67,7 @@
 }
 
 .chat-body-content {
+    overflow: scroll;
     height: 100%;
     border-radius: 5px;
     background-color: #f6f3eb;
@@ -85,6 +86,7 @@
         rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
 }
 .chat-body {
+    
     display: flex;
     flex-direction: column;
     border-radius: 5px;
