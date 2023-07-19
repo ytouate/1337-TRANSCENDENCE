@@ -1,7 +1,8 @@
-import { Controller, Post, Res, Req , UseGuards, Body, Put, Delete, ConsoleLogger} from "@nestjs/common";
+import { Controller, Post, Res, Req , UseGuards, Body, Put, Delete, ConsoleLogger, NotFoundException} from "@nestjs/common";
 import { authService } from "./auth.service";
 import { Get } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
+import { ExceptionsHandler } from "@nestjs/core/exceptions/exceptions-handler";
 
 
 @Controller()
@@ -10,11 +11,9 @@ export class authController {
         private authservice:authService
         ){}
         
-        private code;
-        
     @Get('login')
     @UseGuards(AuthGuard('42'))
-    gett() {}
+    login() {}
 
 
     @Get('/redirect/signin')
@@ -23,9 +22,7 @@ export class authController {
         @Res({passthrough : true}) res,
         @Req() req) 
     {
-
         const user = await this.authservice.createUser(req.user)
-        console.log('mik',user)
         const token = await this.authservice.signToken(user.username, user.email)
         await this.authservice.checkUserhave2fa(user)
         res.cookie('Token' , token)
@@ -40,7 +37,7 @@ export class authController {
         const user = await this.authservice.validateUser(req)
         if (user)
             return user;
-        return {'message' : 'user not found'}
+        throw new NotFoundException();
     }
 
     @Get('user/leaderboard')
@@ -68,12 +65,9 @@ export class authController {
     async verificationCode2fa(@Body() body, @Req() req)
     {
         const user = await this.authservice.validateUser(req)
-
-        if (user && user.codeVerification  == body.code)
-        {
+        if (user?.codeVerification  == body.code)
             return await this.authservice.setIsSignedInTrue(user, true)
-        }
-        return {'message' : 'incorrect code'}
+        throw ExceptionsHandler
     }
 
     @Put('disable2fa')
@@ -86,7 +80,6 @@ export class authController {
     @Post('logout')
     @UseGuards(AuthGuard('jwt'))
     async logout(@Req() req, @Res() res) {
-        //res.delete('isSignedIn')
         await this.authservice.setIsSignedInTrue(req.user, false)
         return res.status(200).json({'message' : 'logout succes'})
     }

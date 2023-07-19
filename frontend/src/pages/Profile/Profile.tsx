@@ -35,6 +35,7 @@ export async function userLoader({ params }: any) {
 
 export default function Profile() {
     const user: any = useLoaderData();
+    console.log(user.notifications);
     const [isSignedIn] = useContext(authContext);
     if (!isSignedIn) return <Navigate to={"/signin"} />;
     if (user.optionalMail && user.isSignedIn == false)

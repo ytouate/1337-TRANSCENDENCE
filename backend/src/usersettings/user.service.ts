@@ -153,6 +153,7 @@ export class UserSettingsService {
                 friends: true,
                 blocked: true,
                 blockedBy: true,
+               
             }
         })
         let userToReturn: any = await this.prismaService.user.findUnique({

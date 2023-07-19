@@ -21,7 +21,6 @@ async function takeAction(action: string, username: string) {
             username: username,
         });
     } else if (action == "block") {
-        console.log(username);
         const options = {
             method: "POST",
             headers: {
@@ -127,7 +126,7 @@ const UserButtons = (props: userDataType) => {
                     onClick={isAddButton ? notfyAdd : notfyAlredySent}
                     className="settings-button add"
                 >
-                    {isAddButton ? "Add" : "Pending"}
+                    Add
                 </button>
             </a>
             <a
