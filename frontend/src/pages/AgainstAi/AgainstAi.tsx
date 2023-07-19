@@ -25,7 +25,7 @@ import {
     drawPaddle,
     drawScores,
 } from './gameUtils.ts';
-import { Ball, Paddle, Preferences } from '../../interface/game.ts';
+import { Ball, Paddle } from '../../interface/game.ts';
 import './AgainstAi.css';
 import EndGameScreen from '../../components/EndGameScreen/EndGameScreen.tsx';
 
