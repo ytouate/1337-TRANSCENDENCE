@@ -234,3 +234,4 @@ export const drawGameOver = (context: CanvasRenderingContext2D) => {
     context.lineWidth = 4;
     drawNet(context, 'black');
 };
+

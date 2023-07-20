@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
-import { useLoaderData, useLocation, useNavigate } from 'react-router-dom';
+import { useLoaderData } from 'react-router-dom';
 import galaxy_black from '../../assets/space_black.jpeg';
 import galaxy_pink from '../../assets/galaxy_pink.png';
 import jungle from '../../assets/jungle.jpeg';
@@ -21,6 +21,7 @@ import {
 import {
     computerMovement,
     drawBall,
+    drawGameOver,
     drawNet,
     drawPaddle,
     drawScores,
@@ -152,12 +153,6 @@ const AgainstAi = () => {
             ball.speedY *= -1;
             ball.y -= 10;
         }
-    };
-
-    const drawGameOver = (context: CanvasRenderingContext2D) => {
-        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-        context.lineWidth = 4;
-        drawNet(context, 'black');
     };
 
     const draw = (context: CanvasRenderingContext2D) => {
