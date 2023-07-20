@@ -67,7 +67,7 @@ export class authController {
         const user = await this.authservice.validateUser(req)
         if (user?.codeVerification  == body.code)
             return await this.authservice.setIsSignedInTrue(user, true)
-            throw new UnauthorizedException({}, '');
+        throw new UnauthorizedException({}, '');
     }
 
     @Put('disable2fa')
