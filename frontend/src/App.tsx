@@ -26,6 +26,7 @@ import Cookies from 'js-cookie';
 import TwoFactor from './pages/TwoFactor/TwoFactor.js';
 import { useState } from 'react';
 import AgainstAi from './pages/AgainstAi/AgainstAi.js';
+import Queue from './pages/Queue/Queue.js';
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -41,7 +42,10 @@ const router = createBrowserRouter(
                     element={<Profile />}
                 />
                 <Route path='chat' element={<Chat />} />
+
                 <Route loader={navLoader} path='ai' element={<AgainstAi />} />
+
+                <Route loader={navLoader} path='queue' element={<Queue />} />
 
                 <Route
                     path='settings'
