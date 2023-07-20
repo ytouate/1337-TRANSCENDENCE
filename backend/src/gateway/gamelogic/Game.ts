@@ -148,7 +148,7 @@ export class Game {
                 ball.speedX *= -1;
                 let deltaY = ball.y - (players[0].y + PADDLE_HEIGHT / 2);
                 ball.speedY = deltaY * 0.22;
-            } else if (ball.x - BALL_SIZE <= 0) {
+            } else if (ball.x + BALL_SIZE <= 0) {
                 players[1].score++;
                 reset = true;
             }
@@ -164,7 +164,7 @@ export class Game {
                 ball.speedX *= -1;
                 let deltaY = ball.y - (players[1].y + PADDLE_HEIGHT / 2);
                 ball.speedY = deltaY * 0.22;
-            } else if (ball.x + BALL_SIZE >= BOARD_WIDTH) {
+            } else if (ball.x - BALL_SIZE >= BOARD_WIDTH) {
                 players[0].score++;
                 reset = true;
             }

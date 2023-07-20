@@ -12,10 +12,8 @@ import { BOARD_HEIGHT, PADDLE_HEIGHT } from './gamelogic/constants';
 import { UserData, GamePosition, PlayerPosition } from './gamelogic/interfaces';
 import { Game } from './gamelogic/Game';
 import { GameService } from 'src/game/game.service';
-import { PrefService } from 'src/pref/pref.service';
 import { UserSettingsService } from 'src/usersettings/user.service';
 import { AuthGuard } from '@nestjs/passport';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 
 @WebSocketGateway({ namespace: 'game', cors: true })
@@ -47,10 +45,10 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
 
     // called when a client is connected
     async handleConnection(@ConnectedSocket() client: Socket) {
-        const payload = await this.jwtSerive.verifyAsync(
-            client.handshake.headers.authorization.slice(7),
-        );
-        this.addClient(client, payload.username);
+        // const payload = await this.jwtSerive.verifyAsync(
+        //     client.handshake.headers.authorization.slice(7),
+        // );
+        // this.addClient(client, 'mkorchi');
     }
 
     getUserIdBySocket(socket: Socket): number | undefined {
@@ -85,7 +83,7 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
     async addClient(client: Socket, username: string) {
         const user = await this.userService.getUserByUsername(username);
 
-        if (!user) return;
+        if (!user) return null;
 
         const userData: UserData = {
             socket: client,
@@ -98,6 +96,7 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
         console.log(`Client with username ${username} connected`);
 
         this.userSockets.set(user.id, userData);
+        return user;
     }
 
     // match two players and start the game
@@ -224,15 +223,19 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
     // event handler, used when players queue up
     @SubscribeMessage('queueUp')
     async queueUp(@MessageBody() body: any, @ConnectedSocket() client: Socket) {
-        const userId = body.userId;
+        const payload = await this.jwtSerive.verifyAsync(
+            client.handshake.headers.authorization.slice(7),
+        );
+        const user = await this.addClient(client, payload.username);
+
         console.log('queue up');
 
-        if (this.queue.includes(userId)) {
+        if (this.queue.includes(user.id)) {
             console.log('User already in the queue');
             return;
         }
 
-        let check = this.checkifPlayerInGame(userId);
+        let check = this.checkifPlayerInGame(user.id);
         if (check) {
             client.emit('match_found', {
                 gameId: check.gameId,
@@ -247,13 +250,16 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
 
             return;
         }
-        this.queue.push(userId);
+        this.queue.push(user.id);
         // if more than 2 players in the queue,
         // take the oldest ones in the queue and match them
         if (this.queue.length >= 2) {
+            console.log('queue already 2 ');
             const player1 = this.queue.shift();
             const player2 = this.queue.shift();
             this.matchPlayers(player1, player2, false);
+        } else {
+            // console.log('nope');
         }
     }
 

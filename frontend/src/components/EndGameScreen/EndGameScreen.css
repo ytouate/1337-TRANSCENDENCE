@@ -80,6 +80,20 @@
     background-color: #1d8c42;
 }
 
+.winner-label {
+    position: absolute;
+    top: -1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #1d8c42;
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    z-index: 1;
+}
+/* 
 @media screen and (max-width: 768px) {
     .players-wrapper {
         flex-direction: column;
@@ -103,18 +117,30 @@
         top: -30px;
         width: 60px;
     }
+
 }
 
-.winner-label {
-    position: absolute;
-    top: -1.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #1d8c42;
-    color: white;
-    font-weight: bold;
-    font-size: 1rem;
-    padding: 0.5rem 1rem;
-    border-radius: 0.25rem;
-    z-index: 1;
-}
+@media screen and (max-width: 480px) {
+    .vs {
+        font-size: 3.5rem;
+        margin: 0.5rem 0;
+    }
+
+    .player-text {
+        font-size: 1.4rem;
+    }
+
+    .score {
+        font-size: 2.5rem;
+    }
+
+    .game-button {
+        padding: 1.2rem 2.5rem;
+        font-size: 1.3rem;
+    }
+
+    .crown-image {
+        top: -20px;
+        width: 40px;
+    }
+} */
