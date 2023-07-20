@@ -1,3 +1,9 @@
+import {
+    BALL_COLOR,
+    BALL_SPEED_X,
+    BALL_SPEED_Y,
+    PADDLE_COLOR,
+} from '../../constants/constants.ts';
 import { Ball, Button, Paddle } from '../../interface/game.ts';
 
 export const drawPaddle = (
@@ -24,7 +30,7 @@ export const drawBall = (
 
 export const drawNet = (context: CanvasRenderingContext2D, color: string) => {
     const netSpacing = 40;
-    const netWidth = 12;
+    const netWidth = 6;
     const netHeight = 20;
     const centerX = context.canvas.width / 2 - netWidth / 2;
     for (let i = 0; i < context.canvas.height; i += netSpacing) {
@@ -209,4 +215,22 @@ export const checkIfWithin = (
         mouseY >= buttonY &&
         mouseY <= buttonY + buttonHeight
     );
+};
+
+export const initBall = (): Ball => {
+    return { x: 0, y: 0, speedX: BALL_SPEED_X, speedY: BALL_SPEED_Y, size: 0 };
+};
+
+export const initPref = () => {
+    return {
+        paddleColor: PADDLE_COLOR,
+        mapTheme: '',
+        ballColor: BALL_COLOR,
+    };
+};
+
+export const drawGameOver = (context: CanvasRenderingContext2D) => {
+    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+    context.lineWidth = 4;
+    drawNet(context, 'black');
 };
