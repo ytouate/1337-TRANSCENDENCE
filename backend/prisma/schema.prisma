@@ -43,6 +43,7 @@ model User {
   win              Int            @default(0)
   loss             Int            @default(0)
   winRate          Float          @default(0)
+  winStreak        Int            @default(0)
 }
 
 model chatRoom {
