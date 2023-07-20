@@ -4,6 +4,7 @@
     height: 90%;
     min-width: 400px;
     display: grid;
+    max-height: 1000px;
     grid-template-columns: 50px 1fr 3.5fr;
     grid-template-rows: 100%;
     gap: 5px;
@@ -66,6 +67,7 @@
 }
 
 .chat-body-content {
+    overflow: scroll;
     height: 100%;
     border-radius: 5px;
     background-color: #f6f3eb;
@@ -84,6 +86,7 @@
         rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
 }
 .chat-body {
+    
     display: flex;
     flex-direction: column;
     border-radius: 5px;
@@ -109,7 +112,7 @@
     border-radius: 50%;
 }
 
-.chatting-user-status {
+.chatting-user-lastmsg {
     color: gray;
     padding: 0;
     margin: 0;

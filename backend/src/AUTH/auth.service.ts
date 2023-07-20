@@ -37,6 +37,7 @@ export class authService{
     // generate a Token
     async signToken(username, email)
     {
+        console.log(username , email)
         const payload = {
             username : username,
             email : email
@@ -65,6 +66,7 @@ export class authService{
                 notifications : true
             },
         })
+        user.friends = user.friends.map(friend => userReturn(friend, req));
         return userReturn(user, req)
     }
 

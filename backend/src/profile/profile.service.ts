@@ -43,7 +43,8 @@ export class ProfileService{
               email: req.user.email,
             },
             data: {
-              urlImage: null,
+              urlImage: "./gorilaavatar/Gorilla-Avatar-icon.png",
+              imageIsUpdate: true,
             },
           })
           if (updateUser){

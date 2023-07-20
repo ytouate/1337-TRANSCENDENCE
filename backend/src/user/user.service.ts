@@ -1,7 +1,7 @@
-import { Injectable, NotAcceptableException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt'
-import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
+import { userReturn } from 'src/utils/user.return';
 
 @Injectable()
 export class UserService {
@@ -13,7 +13,7 @@ export class UserService {
         let {roomName  , status, password} = Param
         if (!password)
             password = ''
-        const room = await this.getRoomByName(roomName)
+        const room = await this.prismaService.chatRoom.findFirst({ where : {roomName : roomName}})
         if (!room)
         {
             try {
@@ -32,6 +32,7 @@ export class UserService {
                     }
                     )
                 await this.setAdmin({'username' : user.username , 'roomName' : roomName})
+                console.log(room);
                 return room
             }
             catch(error) {
@@ -43,7 +44,7 @@ export class UserService {
 
     // add user to specific room
     async addUserToRoom(user , name) {
-        let room = await this.getRoomByName(name)
+        let room = await this.prismaService.chatRoom.findFirst({where : {roomName : name}})
         if (!await this.avoidDuplicate(user, name))
         {
             return await this.prismaService.chatRoom.update({
@@ -82,12 +83,12 @@ export class UserService {
             console.log({'message' : `user has deleted from ${name}`})
             return update
         }
-        catch(error) { throw ExceptionsHandler }
+        catch(error) { throw new UnauthorizedException({}, ''); }
     }
 
     // show all available rooms
     async getAllRooms() {
-        return await this.prismaService.chatRoom.findMany({where : {status : 'public'} , include : {users : true , messages : true } })
+        return await this.prismaService.chatRoom.findMany({ include : {users : true , messages : true } })
     }
 
     // get a specific room by name
@@ -106,8 +107,8 @@ export class UserService {
                 }
             }
         )
-        if (room.status == 'private')
-            throw UnauthorizedException
+        if (room?.status == 'private')
+            throw new UnauthorizedException({}, '');
         return room
     }
 
@@ -140,10 +141,9 @@ export class UserService {
 
 
     //add data in Room { messages}
-    async   putDataInDatabase(name, data, user) {
-        // const room = await this.prismaService.chatRoom.findFirst({where : {roomName : name}})
-        const room = await this.getRoomByName(name)
-        const message = await this.addDataInMessageTable(data, room.id, user)
+    async   putDataInDatabase(name, data, req) {
+        const room = await this.prismaService.chatRoom.findFirst({where : {roomName : name}})
+        let message : any = await this.addDataInMessageTable(data, room.id, req.user)
         await this.prismaService.chatRoom.update({
             where : 
             {
@@ -157,16 +157,19 @@ export class UserService {
                 }
             }
         })
+        let sender = await this.prismaService.user.findUnique({where : {id : message.userId}})
+        message.sender = userReturn(sender, req);
+        return message
     }
 
     //check user  if have order to join the rrom
-    async   joiningTheRoom(param, user)
+    async   joiningTheRoom(param)
     {
         const {roomName , password} = param
-        const room = await this.getRoomByName(roomName)
+        const room = await this.prismaService.chatRoom.findFirst({where : {roomName : roomName}})
         if (room.status === 'protected')
         {
-            if (password !== room.password)
+            if (!await bcrypt.compare(password, room.password))
                 return undefined       
         }
         if (room.status === 'private')
@@ -184,8 +187,8 @@ export class UserService {
     // set admin to other users in my room
     async   setAdmin(param) {
         const member = await this.getUserWithUsername(param.username)
-        const room = await this.getRoomByName(param.roomName)
-        if (room.admins.indexOf(member.email) < 0)
+        const room = await this.prismaService.chatRoom.findFirst({where : {roomName : param.roomName}})
+        if (room?.admins.indexOf(member.email) < 0)
         {
             return await this.prismaService.chatRoom.update(
             {
@@ -203,7 +206,7 @@ export class UserService {
     //change password of protected room
     async   changePasswordOfProtectedRoom(param) {
         const {roomName, password} = param
-        const room = await this.getRoomByName(roomName)
+        const room = await this.prismaService.chatRoom.findFirst({where : {roomName : roomName}})
         let hash = await bcrypt.hash(password, 10)
         if (room){
             return await this.prismaService.chatRoom.update(
@@ -218,7 +221,7 @@ export class UserService {
                 }
             })
         }
-        throw ExceptionsHandler
+        throw new NotFoundException({}, 'room not found');
     }
 
 
@@ -226,7 +229,7 @@ export class UserService {
     async   banUser(param) {
         const {username , roomName} = param
         const member = await this.getUserWithUsername(username)
-        const room = await this.getRoomByName(roomName)
+        const room = await this.prismaService.chatRoom.findFirst({where : {roomName : roomName}})
         if (room.banUsers.indexOf(member.email) < 0)
         {
             return await this.prismaService.chatRoom.update(
@@ -249,7 +252,7 @@ export class UserService {
     async   muteUsers(param) {
         const {username , roomName} = param
         const member = await this.getUserWithUsername(username)
-        const room = await this.getRoomByName(roomName)
+        const room = await this.prismaService.chatRoom.findFirst({where : {roomName : roomName}})
         if (room.muteUsers.indexOf(member.email) < 0)
         {
             return await this.prismaService.chatRoom.update(

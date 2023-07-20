@@ -41,10 +41,9 @@ const router = createBrowserRouter(
                     loader={userLoader}
                     element={<Profile />}
                 />
-                <Route path='chat' element={<Chat />} />
-
+                <Route path='chat' loader={homeLoader} element={<Chat />} />
+                
                 <Route loader={navLoader} path='ai' element={<AgainstAi />} />
-
                 <Route loader={navLoader} path='queue' element={<Queue />} />
 
                 <Route
