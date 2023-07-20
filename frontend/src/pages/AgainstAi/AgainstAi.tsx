@@ -86,7 +86,7 @@ const AgainstAi = () => {
         velocity = INITIAL_VELOCITY;
         ball.x = canvas.width / 2;
         ball.y = canvas.width / 2;
-        paddle2.y = canvas.height / 2 - paddleHeight / 2;
+        // paddle2.y = canvas.height / 2 - paddleHeight / 2;
         setGameOver(false);
     };
 
@@ -185,6 +185,7 @@ const AgainstAi = () => {
         ball.y = canvas.height / 2;
 
         paddle1.y = canvas.height / 2 - paddleHeight / 2;
+        paddle2.y = canvas.height / 2 - paddleHeight / 2;
 
         const handleMouseMove = (event: MouseEvent) => {
             const canvasRect = canvas.getBoundingClientRect();
