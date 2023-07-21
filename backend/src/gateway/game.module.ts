@@ -11,9 +11,6 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
     imports: [GameModule, UserSettingsModule, PrefModule, PrismaModule],
-    providers: [
-        GameGateWay, UserSettingsService, GameService, PrefService, PrismaService
-    ],
-    
+    providers: [UserSettingsService, GameService, PrefService, PrismaService],
 })
 export class GateWayModule {}

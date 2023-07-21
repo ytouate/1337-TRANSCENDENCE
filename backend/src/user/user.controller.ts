@@ -1,13 +1,14 @@
-import { Controller, Post , Get, Query, UseGuards, Put} from '@nestjs/common';
+import { Controller, Post , Get, Query, UseGuards, Put, Req} from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
+import { userReturn } from 'src/utils/user.return';
 
 
 @Controller('user')
 @UseGuards(AuthGuard('jwt'))
 export class UserController {
 
-    constructor (
+    constructor ( 
         private userService:UserService
         ){}
 
@@ -28,8 +29,14 @@ export class UserController {
     }
 
     @Get('getRoom')
-    async getRoomByName(@Query() Param) {
-        return await this.userService.getRoomByName(Param.roomName)
+    async getRoomByName(@Query() Param, @Req() req) {
+        const room = await this.userService.getRoomByName(Param.roomName)
+        const usersToReturn = [];
+        for (const user of room.users) {
+            usersToReturn.push(userReturn(user, req));
+        }
+        room.users = usersToReturn; 
+        return room
     }
 
     @Get('getRooms')

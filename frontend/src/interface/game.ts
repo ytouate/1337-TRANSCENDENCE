@@ -48,6 +48,8 @@ export interface Player {
     opponent: string;
     preferences: Preferences;
     order: number;
+    urlImg: string;
+
 }
 
 export interface Preferences {

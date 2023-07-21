@@ -1,4 +1,4 @@
-import { UnauthorizedException, UseGuards } from "@nestjs/common";
+import { Body, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import {  ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Socket ,Server } from "socket.io";
@@ -6,6 +6,8 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { UserService } from "src/user/user.service";
 import { Req } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
+import { userReturnToGatway } from "src/utils/user.return";
+import { Client } from "socket.io/dist/client";
 
 @WebSocketGateway({ namespace : 'chat' , cors: {origin : '*'} })
 export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
@@ -23,9 +25,11 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
     // send message to current room
     @SubscribeMessage('sendMessage')
     @UseGuards(AuthGuard('websocket-jwt'))
-    async onMessage(@MessageBody() data , @Req() req)
+    async onMessage(client : Socket , @MessageBody() data , @Req() req)
     {
         const message = await this.user.putDataInDatabase(data.roomName, data.data, req)
+        message.sender = userReturnToGatway(message.sender, req)
+        console.log(message)
         this.server.in(data.roomName).emit('onMessage', message)
     }
 
@@ -56,20 +60,19 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
     // joining the socket of user in  specific room
     @SubscribeMessage('joinRoom')
     @UseGuards(AuthGuard('websocket-jwt'))
-    async handleJoiningTheRoom(@ConnectedSocket() client : Socket , @Req() req) {
-        console.log(`client  ${client.id} connected and joining the room ${client.handshake.query.roomName}`)
-        const user = await this.validateUserByEmail(req.user.email, client.handshake.query.roomName, 1)
+    async handleJoiningTheRoom(@ConnectedSocket() client : Socket , @Req() req, @MessageBody() body) {
+        console.log(`client  ${client.id} connected and joining the room ${body.roomName}`)
+        const user = await this.validateUserByEmail(req.user.email, body.roomName, 1)
         if (user)
         {
-            const result = await this.user.joiningTheRoom(client.handshake.query);
+            const result = await this.user.joiningTheRoom(body);
             if (result == undefined)
                 throw new UnauthorizedException({}, '')
             if (result == false)
                 throw new UnauthorizedException({}, '')
-            this.server.in(client.id).socketsJoin(client.handshake.query.roomName)
-            const newUpdateChat = this.user.addUserToRoom(user, client.handshake.query.roomName)      
-            console.log(`${user.username} has joined in ${client.handshake.query.roomName}`)
-            return newUpdateChat
+            this.server.in(client.id).socketsJoin(body.roomName)
+            const newUpdateChat = this.user.addUserToRoom(user, body.roomName)      
+            console.log(`${user.username} has joined in ${body.roomName}`)
         }
     }
 
@@ -77,15 +80,15 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
     // leave the socket from room
     @SubscribeMessage('leaveRoom')
     @UseGuards(AuthGuard('websocket-jwt'))
-    async leaveRoomHandler(@ConnectedSocket() client: Socket, @Req() req) {
-        const user = await this.validateUserByUsername(client.handshake.query.username)
+    async leaveRoomHandler(@Req() req, @MessageBody() body) {
+        const user = await this.validateUserByUsername(body.username)
         if (user)
         {
             const Id = this.socketId.get(user.email)
             this.socketId.delete(user.email)
-            console.log(`client  ${Id} leave room ${client.handshake.query.roomName}`)
-            this.server.in(Id).socketsLeave(client.handshake.query.roomName)
-            this.user.deleteUserFromRoom(user , client.handshake.query.roomName)
+            console.log(`client  ${Id} leave room ${body.roomName}`)
+            this.server.in(Id).socketsLeave(body.roomName)
+            this.user.deleteUserFromRoom(user , body.roomName)
         }
     }
 

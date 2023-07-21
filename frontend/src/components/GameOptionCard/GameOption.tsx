@@ -9,27 +9,27 @@ type GameOptionData = {
 };
 
 function GameOption(props: GameOptionData) {
-    function handleClick(e, type) {
-        if (type == "ai") {
-            // do ai
-        } else if (type == "matchmaking") {
-            // matchmaking
-        }
-    }
+    // function handleClick(e, type) {
+    //     if (type == "ai") {
+    //         // do ai
+    //     } else if (type == "matchmaking") {
+    //         // matchmaking
+    //     }
+    // }
     return (
         <div className="card">
             <div className="circle"></div>
             <div className="circle"></div>
             <Link
-                to={props.type == "ai" ? "/ai" : "matchmaking"}
+                to={props.type == "ai" ? "/ai" : "/queue"}
                 className="card-inner"
             >
                 <img src={props.img} alt="" />
                 <button
-                    onClick={(e) => {
-                        handleClick(e, props.type);
-                    }}
-                    className="button"
+                    // onClick={(e) => {
+                    //     handleClick(e, props.type);
+                    // }}
+                    // className="button"
                 >
                     {props.title}
                 </button>
