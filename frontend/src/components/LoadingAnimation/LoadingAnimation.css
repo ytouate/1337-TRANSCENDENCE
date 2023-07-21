@@ -1,0 +1,45 @@
+/* LoadingAnimation.css */
+.loading-animation-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.paddle1,
+.paddle2 {
+    width: 1vh;
+    height: 10vh;
+    background-color: #fff;
+}
+
+.paddle1 {
+    left: 0; 
+}
+
+.paddle2 {
+    right: 0;
+}
+.ball {
+    width: 2.5vw; 
+    height: 2.5vw;
+    background-color: #fff;
+    border-radius: 50%;
+    animation: moveBall 8s linear infinite;
+}
+
+@keyframes moveBall {
+    0% {
+        transform: translateX(
+            -50vw
+        ); 
+    }
+    50% {
+        transform: translateX(
+            50vw
+        ); 
+    }
+    100% {
+        transform: translateX(-50vw); 
+    }
+}
