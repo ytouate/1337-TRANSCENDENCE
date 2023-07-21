@@ -11,9 +11,11 @@ import { Paddle, Player, Preferences } from '../../interface/game.ts';
 import galaxy_black from '../../assets/space_black.jpeg';
 import galaxy_pink from '../../assets/galaxy_pink.png';
 import jungle from '../../assets/jungle.jpeg';
+import arcade from '../../assets/arcade.jpg';
 import Game from '../../components/Game/Game.tsx';
 import webSocketService from '../../context/WebSocketService.ts';
 import './Queue.css';
+import LoadingAnimation from '../../components/LoadingAnimation/LoadingAnimation.tsx';
 
 const Queue = () => {
     const user: any = useLoaderData();
@@ -46,6 +48,7 @@ const Queue = () => {
             return { backgroundImage: `url(${galaxy_pink})` };
         else if (map === 'galaxy_black')
             return { backgroundImage: `url(${galaxy_black})` };
+        else if (map === 'arcade') return { backgroundImage: `url(${arcade})` };
         else
             return {
                 backgroundColor: map,
@@ -156,6 +159,7 @@ const Queue = () => {
         <div className='queue-outer-container' style={getMap()}>
             {waitState ? (
                 <div className='queue-container '>
+                    <LoadingAnimation />
                     <h1 className='queue-h1'>Waiting for players...</h1>
                 </div>
             ) : (
