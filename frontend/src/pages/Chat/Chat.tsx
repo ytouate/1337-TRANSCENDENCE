@@ -7,11 +7,6 @@ import { useContext } from "react";
 import { Navigate } from "react-router-dom";
 import ytouate from "../../assets/ytouate.jpeg";
 
-const user = {
-    img: { ytouate },
-    name: "ytouate",
-    status: "online",
-};
 export function CurrentChattingUser() {
     return (
         <div className="chatting-user">

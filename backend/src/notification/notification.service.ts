@@ -92,6 +92,7 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
     }
     //push the client socket in map
     async pushClientInMap(client: Socket){
+            console.log(client.handshake.headers.authorization)
             const userObj: any =  this.jwtService.verify(client.handshake.headers.authorization.slice(7));
             const user: User = await this.prismaServie.user.findFirst({
                 where: {
