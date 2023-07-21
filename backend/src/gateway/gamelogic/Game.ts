@@ -77,6 +77,8 @@ export class Game {
                 order: this.gamePosition.players[0].order,
                 pref: this.gamePosition.players[0].pref,
                 pref2: this.gamePosition.players[0].pref,
+                urlImg1: this.gamePosition.players[0].urlImg1,
+                urlImg2: this.gamePosition.players[0].urlImg2,
             };
             players[1] = {
                 id: this.gamePosition.players[1].id,
@@ -87,6 +89,8 @@ export class Game {
                 order: this.gamePosition.players[1].order,
                 pref: this.gamePosition.players[1].pref,
                 pref2: this.gamePosition.players[1].pref,
+                urlImg1: this.gamePosition.players[1].urlImg1,
+                urlImg2: this.gamePosition.players[1].urlImg2,
             };
             server.to(room).emit('game_update', {
                 ball: {

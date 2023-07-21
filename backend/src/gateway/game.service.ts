@@ -166,6 +166,8 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
             order: 0,
             pref: user1.preference,
             pref2: user2.preference,
+            urlImg1: user1.urlImage,
+            urlImg2: user2.urlImage,
         };
 
         players[1] = {
@@ -177,6 +179,8 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
             order: 1,
             pref: user2.preference,
             pref2: user1.preference,
+            urlImg1: user2.urlImage,
+            urlImg2: user1.urlImage,
         };
 
         this.gamePlayerPosition.set(game.id, { players });
@@ -243,6 +247,8 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
                 order: check.p.order,
                 pref: check.p.pref,
                 pref2: check.p.pref2,
+                urlImg1: check.p.urlImg1,
+                urlImg2: check.p.urlImg2,
             });
 
             const roomId = String(check.gameId);
