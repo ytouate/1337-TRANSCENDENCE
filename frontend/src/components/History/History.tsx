@@ -24,25 +24,20 @@ export default function History() {
         console.log({ url });
         fetch(url, options)
             .then((res) => {
-                // console.log(res);
                 return res.json();
             })
             .then((data) => setMatches(Object.values(data)));
     }, []);
 
-    // useEffect(() => {
-    //     console.log(matches);
-    // }, [matches]);
-
     const MatchHistory = matches.map((match: any) => {
-        const player1 =
-            match.playerOrder === match.players[0].id
-                ? match.players[0]
-                : match.players[1];
-        const player2 =
-            match.playerOrder === match.players[0].id
-                ? match.players[1]
-                : match.players[0];
+        let player1, player2;
+        if (match.playerOrder === match.players[0].id) {
+            player1 = match.players[0];
+            player2 = match.players[1];
+        } else {
+            player2 = match.players[0];
+            player1 = match.players[1];
+        }
         return (
             <Fragment key={match.id}>
                 <MatchCard
