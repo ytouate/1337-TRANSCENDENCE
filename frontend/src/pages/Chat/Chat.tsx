@@ -3,85 +3,78 @@ import RightMessageCard from "../../components/RightMessageCard";
 import FriendCard from "../../components/FriendCard/FriendCard";
 import "./Chat.css";
 import { authContext } from "../../context/Context";
-import { useContext, useEffect, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import { Navigate, useLoaderData } from "react-router-dom";
 import ytouate from "../../assets/ytouate.jpeg";
 import Cookies from "js-cookie";
 import io from "socket.io-client";
 import { nanoid } from "nanoid";
 
-export function CurrentChattingUser() {
+export function CurrentChattingUser(props) {
     return (
-        <div className="chatting-user">
-            <img src={ytouate} alt="" />
-            <div className="chatting-user-data">
-                <p>ytouate</p>
-                <p className="chatting-user-lastmsg">online</p>
-            </div>
-        </div>
+        <>
+            {props.selectedUser && (
+                <div className="chatting-user">
+                    <img src={props.selectedUser.urlImage} alt="" />
+                    <div className="chatting-user-data">
+                        <p>{props.selectedUser.username}</p>
+                        {/* <p className="chatting-user-lastmsg"></p> */}
+                    </div>
+                </div>
+            )}
+        </>
     );
 }
 
-export function SideBar(props: any) {
-    const friendsList = props.friends.map((friend: any) => {
-        return (
-            <FriendCard
-                addOption={false}
-                key={friend.id}
-                img={friend.urlImage}
-                name={friend.username}
-                lastmsg={friend.activitystatus ? "Online" : "Ofline"}
-            />
-        );
-    });
+export function SideBar() {
     return (
         <div className="chat-users">
             <div className="chat-users-header">
                 <p>Friends</p>
             </div>
-            <div className="chat-users-content">
-                {friendsList}
-                {friendsList}
-                {friendsList}
-                {friendsList}
-                {friendsList}
-                {friendsList}
-                {friendsList}
-                {friendsList}
-                {friendsList}
-                {friendsList}
-                {friendsList}
-                {friendsList}
-            </div>
+            <div className="chat-users-content">{}</div>
         </div>
     );
 }
 
-export default function Chat() {
-    const user: any = useLoaderData();
-    const [isSignedIn] = useContext(authContext);
-    const [message, setMessage] = useState("");
-    const [allMessages, setAllMessages] = useState<any>([]);
-
-    function sendMessage(e: any) {
-        e.preventDefault();
-        if (message.trim().length > 0) {
-            setMessage("");
-            chatSocket.emit("sendMessage", {
-                roomName: "ytouateotmallah",
-                message: message.trim(),
-            });
+function checkChatRoom(chatRooms: any, username: string) {
+    for (const room of chatRooms) {
+        for (const roomUser of room.users) {
+            if (roomUser.username == username && room.users.length == 2) {
+                return room;
+            }
         }
     }
+    return null;
+}
 
-    function createRoom() {
-        chatSocket.emit("createRoom", {
-            roomName: "ytouateotmallah",
-            status: "public",
-            username: "otmallah",
-        });
-        console.log("room created");
-    }
+async function getRoomByName(roomName) {
+    const options = {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${Cookies.get("Token")}`,
+        },
+    };
+    const res = await fetch(
+        `http://localhost:3000/user/getRoom?` +
+            new URLSearchParams({
+                roomName: roomName,
+            }),
+        options
+    );
+    const data = await res.json();
+    return data;
+
+    // .then((data) => setRoom(data));
+}
+export default function Chat() {
+    const [isSignedIn] = useContext(authContext);
+    if (!isSignedIn) return <Navigate to={"/signin"} />;
+
+    const user: any = useLoaderData();
+    const [message, setMessage] = useState("");
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [room, setRoom] = useState([]);
 
     const chatSocket = io.connect("http://localhost:3000/chat", {
         extraHeaders: {
@@ -89,46 +82,97 @@ export default function Chat() {
         },
     });
 
+    function sendMessage(e) {
+        e.preventDefault();
+        if (room && message.trim().length > 0) {
+            console.log("emitted\n");
+            console.log("socket", chatSocket);
+            console.log('rroooom name : ', room.roomName);
+            
+            chatSocket.emit("sendMessage", {
+                roomName: room.roomName,
+                data: message.trim(),
+            });
+            setMessage("");
+        }
+    }
+
+    function createRoom(e, chattingUser: any) {
+        setSelectedUser(chattingUser);
+        const room = checkChatRoom(user.roomChat, chattingUser.username);
+        if (room == null) {
+            chatSocket.emit("createRoom", {
+                roomName: `${user.username}${chattingUser.username}`,
+                status: "public",
+                username: chattingUser.username,
+            });
+            getRoomByName(`${user.username}${chattingUser.username}`).then(
+                (data) => setRoom(data)
+            );
+        } else {
+            setRoom(room);
+        }
+    }
+
+
     useEffect(() => {
-        createRoom();
         chatSocket.on("onMessage", (msg: any) => {
-            if (user.id == msg.sender.id) {
-                setAllMessages((prev: any) => [
-                    ...prev,
-                    <RightMessageCard
-                        img={msg.sender.urlImage}
-                        sender={msg.sender.username}
-                        message={msg.data}
-                        key={nanoid()}
-                        time={msg.time}
-                    />,
-                ]);
-            } else {
-                setAllMessages((prev: any) => [
-                    ...prev,
-                    <LeftMessageCard
-                        key={nanoid()}
-                        sender={msg.sender.username}
-                        img={msg.sender.urlImage}
-                        time={msg.time}
-                        message={msg.data}
-                    />,
-                ]);
-            }
+            console.log("message received", msg);
         });
     }, []);
 
-    if (!isSignedIn) return <Navigate to={"/signin"} />;
+
     return (
         <div className="chat-wrapper">
             <div className="chat">
-                <div className="chat-toggler"></div>
-                <SideBar friends={user.friends} />
+                <div className="chat-toggler">
+                    <button onClick={() => setSelectedUser(null)}>clear</button>
+                    {user.friends.map((friend: any) => {
+                        return (
+                            <img
+                                key={friend.id}
+                                onClick={(e) => createRoom(e, friend)}
+                                src={friend.urlImage}
+                                className="home-profile-img"
+                                alt=""
+                            />
+                        );
+                    })}
+                </div>
+                <SideBar />
                 <div className="chat-body">
                     <div className="chat-body-header">
-                        <CurrentChattingUser />
+                        <CurrentChattingUser selectedUser={selectedUser} />
                     </div>
-                    <div className="chat-body-content">{allMessages}</div>
+                    <div className="chat-body-content">
+                        {room &&
+                            room.messages?.map((msg) => {
+                                const found = room.users.find(
+                                    (user) => user.id == msg.userId
+                                );
+                                if (found) {
+                                    if (msg.userId == user.id) {
+                                        return (
+                                            <RightMessageCard
+                                                message={msg.data}
+                                                time={msg.time}
+                                                sender={found.username}
+                                                img={found.urlImage}
+                                            />
+                                        );
+                                    } else {
+                                        return (
+                                            <LeftMessageCard
+                                                message={msg.data}
+                                                time={msg.time}
+                                                sender={found.username}
+                                                img={found.urlImage}
+                                            />
+                                        );
+                                    }
+                                }
+                            })}
+                    </div>
                     <div className="chat-body-footer">
                         <form onSubmit={sendMessage} className="message-sender">
                             <input
@@ -136,7 +180,12 @@ export default function Chat() {
                                 value={message}
                                 type="text"
                             />
-                            <button className="send-button">send</button>
+                            <button
+                                onClick={sendMessage}
+                                className="send-button"
+                            >
+                                send
+                            </button>
                         </form>
                     </div>
                 </div>

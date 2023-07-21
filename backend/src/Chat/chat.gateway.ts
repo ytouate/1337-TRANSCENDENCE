@@ -25,7 +25,7 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
     @UseGuards(AuthGuard('websocket-jwt'))
     async onMessage(@MessageBody() data , @Req() req)
     {
-        const message = await this.user.putDataInDatabase(data.roomName, data.message, req)
+        const message = await this.user.putDataInDatabase(data.roomName, data.data, req)
         this.server.in(data.roomName).emit('onMessage', message)
     }
 
@@ -37,7 +37,7 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
         if (user)
         {
             const {roomName , status, password} = Body
-            const room = this.user.creatRoom({
+            const room = await this.user.creatRoom({
                 'roomName' : roomName ,
                 'status'   : status ,
                 'password' : password} , user)
@@ -45,9 +45,11 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
             if (Body.username)
             {
                 let id = this.socketId.get(Body.username)
+                console.log(Body.roomName)
                 this.server.in(id).socketsJoin(Body.roomName)
+                const newUser = await this.prisma.user.findFirst({where : {username : Body.username}})
+                await this.user.addUserToRoom(newUser, Body.roomName)
             }
-            return room
         }
     }
 
@@ -90,6 +92,7 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
     // if the user connect to the event
     async  handleConnection(@ConnectedSocket() client: Socket, ...args: any[]) {
         const payload = await this.jwt.verifyAsync(client.handshake.headers.authorization.slice(7))
+        console.log(payload.username)
         this.socketId.set(payload.username, client.id)
         console.log(`client ${client.id} has connected`)
     }

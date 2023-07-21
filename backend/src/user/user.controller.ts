@@ -12,8 +12,7 @@ export class UserController {
         ){}
 
     @Post('addAdmin')
-    async setAdmin(@Query() Param) { 
-        console.log(`the user ${Param.username} has moved from member to admin`)
+    async setAdmin(@Query() Param) {
         return await this.userService.setAdmin(Param)
     }
 
@@ -25,7 +24,6 @@ export class UserController {
 
     @Post('changePassword')
     async   changePassword(@Query() Param) {
-        console.log({'meesage' : 'the password has changed'}) 
         return await   this.userService.changePasswordOfProtectedRoom(Param)
     }
 

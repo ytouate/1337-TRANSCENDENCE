@@ -5,12 +5,13 @@
     min-width: 400px;
     display: grid;
     max-height: 1000px;
-    grid-template-columns: 50px 1fr 3.5fr;
+    grid-template-columns: 100px 1fr 3.5fr;
     grid-template-rows: 100%;
     gap: 5px;
     box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
         rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
 }
+
 
 .chat-wrapper {
     font-family: "Poppins";
@@ -25,6 +26,12 @@
     border-radius: 5px;
     border-radius: 5px;
     background-color: #f6f3eb;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding-top: 70px;
+    padding-bottom: 70px;
 }
 
 .chat-users {

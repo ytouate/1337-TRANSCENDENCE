@@ -30,7 +30,6 @@ export class ProfileController {
     @UseGuards(AuthGuard('jwt'))
     @Put('updatephoto')
     updatePhoto(@UploadedFile() file, @Req() req){
-        console.log(req);
         return this.profileService.updatePhoto(req, file.path);
     }
     @UseGuards(AuthGuard('jwt'))

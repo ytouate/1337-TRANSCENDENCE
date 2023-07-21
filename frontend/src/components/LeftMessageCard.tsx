@@ -5,7 +5,6 @@ import { MessageData } from "./RightMessageCard";
 function LeftMessageCard(props: MessageData) {
     const ref = useRef<HTMLElement>();
     useEffect(() => {
-        console.log("here");
         ref.current?.scrollIntoView({ behavior: "smooth" });
     }, [props.message]);
 
