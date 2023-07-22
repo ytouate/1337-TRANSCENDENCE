@@ -1,10 +1,10 @@
 import './App.css';
 import './index.css';
 
-import Navbar, { loader as navLoader } from "./components/Navbar/Navbar.jsx";
-import { authContext } from "./context/Context.js";
-import Home, { loader as homeLoader } from "./pages/Home/Home.jsx";
-import Test from './pages/Chat/Test'
+import Navbar, { loader as navLoader } from './components/Navbar/Navbar.jsx';
+import { authContext } from './context/Context.js';
+import Home, { loader as homeLoader } from './pages/Home/Home.jsx';
+import Test from './pages/Chat/Test';
 
 import Settings, {
     loader as settingsLoader,
@@ -42,9 +42,10 @@ const router = createBrowserRouter(
                     loader={userLoader}
                     element={<Profile />}
                 />
-                <Route path="chat" loader={homeLoader} element={<Chat />} />
-                <Route path="test" loader={homeLoader} element={<Test />} />
-                <Route loader={navLoader} path="ai" element={<AgainstAi />} />
+                <Route path='chat' loader={homeLoader} element={<Chat />} />
+                <Route path='test' loader={homeLoader} element={<Test />} />
+                <Route loader={navLoader} path='ai' element={<AgainstAi />} />
+                <Route loader={navLoader} path='queue' element={<Queue />} />
 
                 <Route
                     path='settings'
