@@ -17,7 +17,6 @@ async function bootstrap() {
       origin : '*',
       credentials : true
     })
-
     const document = SwaggerModule.createDocument(app, config)
     SwaggerModule.setup('api', app, document)
 

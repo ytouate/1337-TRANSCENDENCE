@@ -27,7 +27,7 @@ export class authController {
         await this.authservice.checkUserhave2fa(user)
         res.cookie('Token' , token)
         res.cookie('isSignedIn' , true)
-        res.redirect('http://localhost:5173/')
+        res.redirect('http://frontend:5173/')
     }
 
 
