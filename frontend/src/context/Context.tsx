@@ -15,7 +15,7 @@ export const userContext = createContext(null);
 
 // console.log(Cookies.get("Token"));
 
-let socketContext = null;
+// let socketContext = null;
 // if (Cookies.get("Token")) {
 //     socketContext = socketIO.connect("http://localhost:3000/notification", {
 //         extraHeaders: {
@@ -23,7 +23,7 @@ let socketContext = null;
 //         },
 //     });
 // }
-export { socketContext };
+// export { socketContext };
 // export const gameSocket = socketIO.connect('http://localhost:3000/game', {
 //     extraHeaders: {
 //         Authorization: `Bearer ${Cookies.get('Token')}`,

@@ -4,6 +4,7 @@ import { imageLink } from "./auth.strategy42";
 import { JwtService } from "@nestjs/jwt";
 import { MailerService } from "@nestjs-modules/mailer";
 import { userReturn } from "src/utils/user.return";
+import { use } from "passport";
 
 @Injectable()
 export class authService{
@@ -63,7 +64,8 @@ export class authService{
             include: {
                 friends: true,
                 preference : true,
-                notifications : true
+                notifications : true,
+                roomChat : {include  : { users : true , messages : true}}
             },
         })
         user.friends = user.friends.map(friend => userReturn(friend, req));

@@ -1,21 +1,25 @@
 import LeftMessageCard from "../../components/LeftMessageCard";
 import RightMessageCard from "../../components/RightMessageCard";
-import FriendCard from "../../components/FriendCard/FriendCard";
 import "./Chat.css";
+import { useEffect, useState, useContext } from "react";
 import { authContext } from "../../context/Context";
-import { useContext, useEffect, useRef, useState } from "react";
 import { Navigate, useLoaderData } from "react-router-dom";
-import ytouate from "../../assets/ytouate.jpeg";
 import Cookies from "js-cookie";
-export function CurrentChattingUser() {
+import io from "socket.io-client";
+
+export function CurrentChattingUser(props) {
     return (
-        <div className="chatting-user">
-            <img src={ytouate} alt="" />
-            <div className="chatting-user-data">
-                <p>ytouate</p>
-                <p className="chatting-user-lastmsg">online</p>
-            </div>
-        </div>
+        <>
+            {props.selectedUser && (
+                <div className="chatting-user">
+                    <img src={props.selectedUser.urlImage} alt="" />
+                    <div className="chatting-user-data">
+                        <p>{props.selectedUser.username}</p>
+                        {/* <p className="chatting-user-lastmsg"></p> */}
+                    </div>
+                </div>
+            )}
+        </>
     );
 }
 
@@ -25,83 +29,177 @@ export function SideBar() {
             <div className="chat-users-header">
                 <p>Friends</p>
             </div>
-            <div className="chat-users-content">
-                <FriendCard img={ytouate} name={"ytouate"} lastmsg={"online"} />
-                <FriendCard img={ytouate} name={"ytouate"} lastmsg={"online"} />
-                <FriendCard img={ytouate} name={"ytouate"} lastmsg={"online"} />
-                <FriendCard img={ytouate} name={"ytouate"} lastmsg={"online"} />
-            </div>
+            <div className="chat-users-content">{}</div>
         </div>
     );
 }
-import io from "socket.io-client";
-import { nanoid } from "nanoid";
 
-export default function Chat() {
-    const user: any = useLoaderData();
-    const [isSignedIn, setIsSignedIn] = useContext(authContext);
-    const [message, setMessage] = useState("");
-    const [allMessages, setAllMessages] = useState([]);
+async function checkChatRoom(chatRooms: any, username: string) {
+    const options = {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${Cookies.get("Token")}`,
+        },
+    };
 
-    function sendMessage(e: any) {
-        e.preventDefault();
-        if (message.trim().length > 0) {
-            setMessage("");
-            chatSocket.emit("sendMessage", {
-                roomName: "ytouateotmallah",
-                message: message.trim(),
-            });
+    const res = await fetch("http://localhost:3000/user", options);
+    const user = await res.json();
+    console.log("user roomChat: ", user);
+
+    for (const room of user?.roomChat) {
+        for (const roomUser of room.users) {
+            if (roomUser.username == username && room.users.length == 2) {
+                return room;
+            }
         }
     }
+    return null;
+}
 
-    function createRoom() {
-        chatSocket.emit("createRoom", {
-            roomName: "ytouateotmallah",
-            status: "public",
-            username: "otmallah",
-        });
-        console.log("room created");
-    }
+async function getRoomByName(roomName) {
+    const options = {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${Cookies.get("Token")}`,
+        },
+    };
+    const res = await fetch(
+        `http://localhost:3000/user/getRoom?` +
+            new URLSearchParams({
+                roomName: roomName,
+            }),
+        options
+    );
+    if (!res.ok) throw new Error("Failed to fetch");
+    console.log(res);
+    const data = await res.json();
+    return data;
+}
 
-    const chatSocket = io.connect("http://localhost:3000/chat", {
+const chatSocket = io.connect("http://localhost:3000/chat", {
         extraHeaders: {
             Authorization: `Bearer ${Cookies.get("Token")}`,
         },
     });
+export default function Chat() {
+    const [isSignedIn] = useContext(authContext);
+    if (!isSignedIn) return <Navigate to={"/signin"} />;
+
+    const user: any = useLoaderData();
+    const [message, setMessage] = useState("");
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [room, setRoom] = useState([]);
+    const [allMessages, setAllMessages] = useState([]);
+    // const [socket, setSocket] = useState();
+
+    
+    function sendMessage(e) {
+        e.preventDefault();
+        if (room && message.trim().length > 0) {
+            console.log("emitted", room);
+
+            chatSocket.emit("sendMessage", {
+                roomName: room.roomName,
+                data: message.trim(),
+            });
+            setMessage("");
+        }
+    }
+
+    // ... Other component imports and code ...
+
+    async function createRoom(e, chattingUser: any) {
+        setSelectedUser(chattingUser);
+        console.log("selected user email: ", chattingUser.email);
+
+        const roomName: string =
+            user.username > chattingUser.username
+                ? `${user.username}${chattingUser.username}`
+                : `${chattingUser.username}${user.username}`;
+        chatSocket.emit("createRoom", {
+            roomName: roomName,
+            status: "public",
+            email: chattingUser.email,
+        });
+
+        // try {
+        //     const roomData = await getRoomByName(roomName);
+        //     setRoom(roomData);
+        // } catch (error) {
+        //     console.error("Error fetching room data:", error);
+        // }
+    }
 
     useEffect(() => {
-        console.log("component rendered");
-        createRoom();
         chatSocket.on("onMessage", (msg: any) => {
-            if (user.id == msg.sender.id) {
-                setAllMessages((prev) => [
-                    ...prev,
-                    <RightMessageCard
-                        message={msg.data}
-                        key={nanoid()}
-                        time={new Date()}
-                    />,
-                ]);
-            } else {
-                setAllMessages((prev) => [
-                    ...prev,
-                    <LeftMessageCard key={nanoid()} message={msg.data} />,
-                ]);
-            }
+            setAllMessages((prev) => [...prev, msg]);
+            console.log("message received", msg);
+        });
+        chatSocket.on("get_room", ({ room }: any) => {
+            setRoom(room);
+            setAllMessages(room.messages);
+            console.log("room received", room);
         });
     }, []);
 
-    if (!isSignedIn) return <Navigate to={"/signin"} />;
+    useEffect(() => {
+        console.log("all messages", allMessages);
+    }, [allMessages]);
+
     return (
         <div className="chat-wrapper">
             <div className="chat">
-                <div className="chat-toggler"></div>
+                <div className="chat-toggler">
+                    <button onClick={() => setSelectedUser(null)}>clear</button>
+                    {user.friends.map((friend: any) => {
+                        return (
+                            <img
+                                key={friend.id}
+                                onClick={(e) => createRoom(e, friend)}
+                                src={friend.urlImage}
+                                className="home-profile-img"
+                                alt=""
+                            />
+                        );
+                    })}
+                </div>
                 <SideBar />
                 <div className="chat-body">
                     <div className="chat-body-header">
-                        <CurrentChattingUser />
+                        <CurrentChattingUser selectedUser={selectedUser} />
                     </div>
-                    <div className="chat-body-content">{allMessages}</div>
+                    <div className="chat-body-content">
+                        {room &&
+                            allMessages?.length > 0 &&
+                            allMessages.map((msg: any) => {
+                                if (msg.userId == user.id) {
+                                    return (
+                                        <RightMessageCard
+                                            key={msg.id}
+                                            message={msg.data}
+                                            time={msg.time}
+                                            sender={user.username}
+                                            img={user.urlImage}
+                                        />
+                                    );
+                                } else {
+                                    console.log("room users hhh", room.users);
+                                    const found = room.users.find(
+                                        (user) => user.id == msg.userId
+                                    );
+                                    
+                                    return (
+                                        <LeftMessageCard
+                                            key={msg.id}
+                                            message={msg.data}
+                                            time={msg.time}
+                                            sender={found?.username}
+                                            img={found?.urlImage}
+                                        />
+                                    );
+                                }
+                            })}
+                    </div>
                     <div className="chat-body-footer">
                         <form onSubmit={sendMessage} className="message-sender">
                             <input
@@ -109,7 +207,12 @@ export default function Chat() {
                                 value={message}
                                 type="text"
                             />
-                            <button className="send-button">send</button>
+                            <button
+                                onClick={sendMessage}
+                                className="send-button"
+                            >
+                                send
+                            </button>
                         </form>
                     </div>
                 </div>
