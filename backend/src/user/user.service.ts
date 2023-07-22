@@ -28,24 +28,24 @@ export class UserService {
                             },
                             status : status,
                             password : hash
-                        }
+                        }, include : {users : true ,messages : true}
                     }
                     )
                 await this.setAdmin({'username' : user.username , 'roomName' : roomName})
                 console.log('room ' , room)
-                return room
+                return {'found': false, room};
             }
             catch(error) {
             }
             finally { this.prismaService.$disconnect() }
         }
-        return {'message' : `room ${roomName} already exist`}
+        // return {'exist': true, room};
+        return {'found': true, room};
     }
 
     // add user to specific room
     async addUserToRoom(user , name) {
         let room = await this.prismaService.chatRoom.findFirst({where : {roomName : name}})
-        console.log(room)
         if (!await this.avoidDuplicate(user, name))
         {
             return await this.prismaService.chatRoom.update({
@@ -112,7 +112,6 @@ export class UserService {
         )
         if (room?.status == 'private')
             throw new UnauthorizedException({}, '');
-        
         return room
     }
 

@@ -1,14 +1,11 @@
 import LeftMessageCard from "../../components/LeftMessageCard";
 import RightMessageCard from "../../components/RightMessageCard";
-import FriendCard from "../../components/FriendCard/FriendCard";
 import "./Chat.css";
+import { useEffect, useState, useContext } from "react";
 import { authContext } from "../../context/Context";
-import { Fragment, useContext, useEffect, useState } from "react";
 import { Navigate, useLoaderData } from "react-router-dom";
-import ytouate from "../../assets/ytouate.jpeg";
 import Cookies from "js-cookie";
 import io from "socket.io-client";
-import { nanoid } from "nanoid";
 
 export function CurrentChattingUser(props) {
     return (
@@ -37,8 +34,19 @@ export function SideBar() {
     );
 }
 
-function checkChatRoom(chatRooms: any, username: string) {
-    for (const room of chatRooms) {
+async function checkChatRoom(chatRooms: any, username: string) {
+    const options = {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${Cookies.get("Token")}`,
+        },
+    };
+
+    const res = await fetch("http://localhost:3000/user", options);
+    const user = await res.json();
+    console.log("user roomChat: ", user);
+
+    for (const room of user?.roomChat) {
         for (const roomUser of room.users) {
             if (roomUser.username == username && room.users.length == 2) {
                 return room;
@@ -62,11 +70,17 @@ async function getRoomByName(roomName) {
             }),
         options
     );
+    if (!res.ok) throw new Error("Failed to fetch");
+    console.log(res);
     const data = await res.json();
     return data;
-
-    // .then((data) => setRoom(data));
 }
+
+const chatSocket = io.connect("http://localhost:3000/chat", {
+        extraHeaders: {
+            Authorization: `Bearer ${Cookies.get("Token")}`,
+        },
+    });
 export default function Chat() {
     const [isSignedIn] = useContext(authContext);
     if (!isSignedIn) return <Navigate to={"/signin"} />;
@@ -75,20 +89,15 @@ export default function Chat() {
     const [message, setMessage] = useState("");
     const [selectedUser, setSelectedUser] = useState(null);
     const [room, setRoom] = useState([]);
+    const [allMessages, setAllMessages] = useState([]);
+    // const [socket, setSocket] = useState();
 
-    const chatSocket = io.connect("http://localhost:3000/chat", {
-        extraHeaders: {
-            Authorization: `Bearer ${Cookies.get("Token")}`,
-        },
-    });
-
+    
     function sendMessage(e) {
         e.preventDefault();
         if (room && message.trim().length > 0) {
-            console.log("emitted\n");
-            console.log("socket", chatSocket);
-            console.log('rroooom name : ', room.roomName);
-            
+            console.log("emitted", room);
+
             chatSocket.emit("sendMessage", {
                 roomName: room.roomName,
                 data: message.trim(),
@@ -97,30 +106,45 @@ export default function Chat() {
         }
     }
 
-    function createRoom(e, chattingUser: any) {
-        setSelectedUser(chattingUser);
-        const room = checkChatRoom(user.roomChat, chattingUser.username);
-        if (room == null) {
-            chatSocket.emit("createRoom", {
-                roomName: `${user.username}${chattingUser.username}`,
-                status: "public",
-                username: chattingUser.username,
-            });
-            getRoomByName(`${user.username}${chattingUser.username}`).then(
-                (data) => setRoom(data)
-            );
-        } else {
-            setRoom(room);
-        }
-    }
+    // ... Other component imports and code ...
 
+    async function createRoom(e, chattingUser: any) {
+        setSelectedUser(chattingUser);
+        console.log("selected user email: ", chattingUser.email);
+
+        const roomName: string =
+            user.username > chattingUser.username
+                ? `${user.username}${chattingUser.username}`
+                : `${chattingUser.username}${user.username}`;
+        chatSocket.emit("createRoom", {
+            roomName: roomName,
+            status: "public",
+            email: chattingUser.email,
+        });
+
+        // try {
+        //     const roomData = await getRoomByName(roomName);
+        //     setRoom(roomData);
+        // } catch (error) {
+        //     console.error("Error fetching room data:", error);
+        // }
+    }
 
     useEffect(() => {
         chatSocket.on("onMessage", (msg: any) => {
+            setAllMessages((prev) => [...prev, msg]);
             console.log("message received", msg);
+        });
+        chatSocket.on("get_room", ({ room }: any) => {
+            setRoom(room);
+            setAllMessages(room.messages);
+            console.log("room received", room);
         });
     }, []);
 
+    useEffect(() => {
+        console.log("all messages", allMessages);
+    }, [allMessages]);
 
     return (
         <div className="chat-wrapper">
@@ -146,30 +170,33 @@ export default function Chat() {
                     </div>
                     <div className="chat-body-content">
                         {room &&
-                            room.messages?.map((msg) => {
-                                const found = room.users.find(
-                                    (user) => user.id == msg.userId
-                                );
-                                if (found) {
-                                    if (msg.userId == user.id) {
-                                        return (
-                                            <RightMessageCard
-                                                message={msg.data}
-                                                time={msg.time}
-                                                sender={found.username}
-                                                img={found.urlImage}
-                                            />
-                                        );
-                                    } else {
-                                        return (
-                                            <LeftMessageCard
-                                                message={msg.data}
-                                                time={msg.time}
-                                                sender={found.username}
-                                                img={found.urlImage}
-                                            />
-                                        );
-                                    }
+                            allMessages?.length > 0 &&
+                            allMessages.map((msg: any) => {
+                                if (msg.userId == user.id) {
+                                    return (
+                                        <RightMessageCard
+                                            key={msg.id}
+                                            message={msg.data}
+                                            time={msg.time}
+                                            sender={user.username}
+                                            img={user.urlImage}
+                                        />
+                                    );
+                                } else {
+                                    console.log("room users hhh", room.users);
+                                    const found = room.users.find(
+                                        (user) => user.id == msg.userId
+                                    );
+                                    
+                                    return (
+                                        <LeftMessageCard
+                                            key={msg.id}
+                                            message={msg.data}
+                                            time={msg.time}
+                                            sender={found?.username}
+                                            img={found?.urlImage}
+                                        />
+                                    );
                                 }
                             })}
                     </div>
