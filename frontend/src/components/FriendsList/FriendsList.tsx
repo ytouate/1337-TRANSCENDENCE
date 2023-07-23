@@ -1,10 +1,10 @@
 import SearchBar from "../SearchBar/SearchBar";
-import { authContext, userContext } from "../../context/Context";
+import { userContext } from "../../context/Context";
 import "./FriendsList.css";
 import { Fragment, useContext, useEffect, useState } from "react";
 import FriendCard from "../FriendCard/FriendCard";
 import Cookies from "js-cookie";
-import { Link, useLoaderData } from "react-router-dom";
+import { Link } from "react-router-dom";
 import UserFriends from "../UserFriends/UserFriends";
 
 function useFriendList(props: any) {
@@ -14,9 +14,10 @@ function useFriendList(props: any) {
             return (
                 <Link to={`/profile/${friend.id}`} key={friend.id}>
                     <FriendCard
-                        status={friend.status}
+                        lastmsg={friend.status ? "online" : "offline"}
                         img={friend.urlImage}
                         name={friend.username}
+                        addOption={false}
                     />
                 </Link>
             );
@@ -32,7 +33,7 @@ function useBlockedUsers(props: any) {
             return (
                 <Fragment key={user.id}>
                     <FriendCard
-                        actions={["Unblock"]}
+                        lastmsg={user.activitystatus ? "Online" : "Offline"}
                         img={user.urlImage}
                         name={user.username}
                         addOption={true}
@@ -50,7 +51,6 @@ interface friendListType {
     username: string;
     blocked: any;
     friends: any;
-
 }
 export default function FriendsList(props: friendListType) {
     const [searchPattern, setSearchPattern] = useState("");
@@ -62,13 +62,13 @@ export default function FriendsList(props: friendListType) {
     const options = {
         method: "GET",
         headers: {
-            Authorization: `Bearer ${Cookies.get('Token')}`,
+            Authorization: `Bearer ${Cookies.get("Token")}`,
         },
     };
     useEffect(() => {
         fetch("http://localhost:3000/users/" + props.id, options)
-            .then(res => res.json())
-            .then(data => setUser(data))
+            .then((res) => res.json())
+            .then((data) => setUser(data));
     }, [isSearching]);
     const friendList = useFriendList(user);
     const blockedUsers = useBlockedUsers(user);
@@ -96,8 +96,12 @@ export default function FriendsList(props: friendListType) {
                         return (
                             <Link to={`/profile/${friend.id}`} key={friend.id}>
                                 <FriendCard
-                                    id={friend.id}
-                                    status={friend.status}
+                                    lastmsg={
+                                        friend.activitystatus
+                                            ? "online"
+                                            : "offline"
+                                    }
+                                    addOption={false}
                                     img={friend.urlImage}
                                     name={friend.username}
                                 />
@@ -130,7 +134,7 @@ export default function FriendsList(props: friendListType) {
                         style={{ fontSize: "12px" }}
                         className={section == "blocked" ? "active" : ""}
                     >
-                        blocked friends{" "}
+                        blocked
                     </a>
                     <a
                         onClick={() => {
@@ -140,7 +144,7 @@ export default function FriendsList(props: friendListType) {
                         style={{ fontSize: "12px" }}
                         className={section == "search" ? "active" : ""}
                     >
-                        search for users{" "}
+                        search
                     </a>
                 </div>
 

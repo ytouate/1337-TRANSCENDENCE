@@ -1,4 +1,4 @@
-import { InternalServerErrorException, Req, UseGuards } from '@nestjs/common';
+import { InternalServerErrorException, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets';
@@ -90,6 +90,7 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
     }
     //push the client socket in map
     async pushClientInMap(client: Socket){
+        try{
             const userObj: any =  this.jwtService.verify(client.handshake.headers.authorization.slice(7));
             const user: User = await this.prismaServie.user.findFirst({
                 where: {
@@ -107,7 +108,10 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
                 data: {
                     activitystatus: true,
                 }
-            })
+            })}
+            catch(err) {
+                throw new UnauthorizedException();
+            }
     }
     //accept or reject friend request and send acceptation
     @UseGuards(AuthGuard('websocket-jwt'))

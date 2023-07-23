@@ -1,13 +1,12 @@
-import { Link, Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "./DropDownMenu.css";
 import Cookies from "js-cookie";
 import { useContext } from "react";
 import { authContext, userContext } from "../../context/Context";
 
 export default function DropDownMenup({ dropdownRef }: any) {
-    const [user, setUser] = useContext(userContext);
-    const [isSignedIn, setIsSignedIn] = useContext(authContext);
-    // if (user.isSignedIn == false) return <Navigate to="/signin" />;
+    const [user]: any = useContext(userContext);
+    const [setIsSignedIn]: any = useContext(authContext);
     return (
         <ul className="profile-dropdown-content" ref={dropdownRef}>
             <li>
@@ -28,7 +27,7 @@ export default function DropDownMenup({ dropdownRef }: any) {
             <hr />
             <li>
                 <a
-                    onClick={(e) => {
+                    onClick={() => {
                         fetch("http://localhost:3000/logout", {
                             method: "POST",
                             headers: {

@@ -1,10 +1,11 @@
 import "./Notification.css";
 import bell from "../../assets/bell.svg";
-import { userContext } from "../../context/Context";
-import { Fragment, useState, useEffect, useContext } from "react";
+import {  userContext } from "../../context/Context";
+import {  useState, useEffect, useContext } from "react";
 import { nanoid } from "nanoid";
 import socketIO from "socket.io-client";
 import Cookies from "js-cookie";
+import { Socket } from "socket.io-client/debug";
 
 function acceptInvitation(socket: any, id: number) {
     socket.emit("answer_notification", {
@@ -14,13 +15,13 @@ function acceptInvitation(socket: any, id: number) {
     });
 }
 
-function rejectInvitation(socket: any, id: number) {
-    socket.emit("answer_notification", {
-        id: id,
-        status: "reject",
-        description: "Invitaion Rejected",
-    });
-}
+// function rejectInvitation(socket: any, id: number) {
+//     socket.emit("answer_notification", {
+//         id: id,
+//         status: "reject",
+//         description: "Invitaion Rejected",
+//     });
+// }
 
 function RequestNotification(props: any) {
     return (
@@ -58,20 +59,21 @@ function RequestNotification(props: any) {
     );
 }
 export default function Notification() {
-    const [user, setUser] = useContext(userContext);
-    let socketContext = null;
-    if (Cookies.get("Token")) {
-        socketContext = socketIO.connect(
+    const [user] : any = useContext(userContext);
+    const [socketContext, setSocketContext] = useState<Socket | null>(null);
+    let [notifications, setNotifications] = useState<any>(user.notifications);
+    useEffect(() => {
+        const socketContext : any = socketIO(
             "http://localhost:3000/notification",
             {
+                autoConnect: false,
                 extraHeaders: {
                     Authorization: `Bearer ${Cookies.get("Token")}`,
                 },
             }
         );
-    }
-    let [notifications, setNotifications] = useState<any>(user.notifications);
-    useEffect(() => {
+        socketContext.connect();
+        setSocketContext(socketContext);
         socketContext.on("receive_notification", (notification: any) => {
             setNotifications((prev: any) => {
                 return [...prev, notification];
