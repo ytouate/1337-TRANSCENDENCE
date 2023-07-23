@@ -16,12 +16,11 @@ export default function History() {
         console.log({ id });
         const options = {
             method: 'GET',
-            header: {
+            headers: {
                 Authorization: `Bearer ${Cookies.get('Token')}`,
             },
         };
         const url = `http://localhost:3000/game/user/${id}`;
-        console.log({ url });
         fetch(url, options)
             .then((res) => {
                 return res.json();

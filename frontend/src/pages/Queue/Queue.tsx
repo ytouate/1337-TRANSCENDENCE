@@ -69,7 +69,6 @@ const Queue = () => {
     };
 
     useEffect(() => {
-        console.log('mounted');
         setScoket(webSocketService.connect());
         // setScoket(webSocketService.getSocket());
 
