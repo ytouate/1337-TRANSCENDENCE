@@ -68,8 +68,12 @@ export class authService{
                 roomChat : {include  : { users : true , messages : true}}
             },
         })
-        user.friends = user.friends.map(friend => userReturn(friend, req));
-        return userReturn(user, req)
+        if (user)
+        {
+            user.friends = user.friends.map(friend => userReturn(friend, req));
+            return userReturn(user, req)
+        }
+        throw new UnauthorizedException()
     }
 
         //validate user
