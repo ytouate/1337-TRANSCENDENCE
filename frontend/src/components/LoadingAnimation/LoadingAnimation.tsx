@@ -1,5 +1,3 @@
-// LoadingAnimation.js
-import React from 'react';
 import './LoadingAnimation.css';
 
 const LoadingAnimation = () => {

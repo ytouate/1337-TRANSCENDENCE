@@ -53,8 +53,6 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
                 'status'   : status ,
                 'password' : password} , User)
             room = await this.prisma.chatRoom.findUnique({where : {id : room.id} , include : {messages : true , users : true}})
-            
-            console.log(roomName);
             if (!found)
             {
                 let id = this.socketId.get(req.user.email)
@@ -62,21 +60,28 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
                 console.log(req.user.email , ': ' , client.id , ' join room' , Body.roomName)
                 if (Body.email)
                 {
-                    id = this.socketId.get(Body.email)
-                    // console.log(Body.roomName)
-                    this.server.to(id).socketsJoin(Body.email)
-                    console.log(Body.email , ': ' , id , ' join room' , Body.roomName)
-                    const newUser = await this.prisma.user.findUnique({where : {email : Body.email}})
-                    room = await this.user.addUserToRoom(newUser, Body.roomName)
+                    for (const email of Body.email)
+                    {
+                        id = this.socketId.get(email)
+                        this.server.to(id).socketsJoin(email)
+                        console.log(email , ': ' , id , ' join room' , Body.roomName)
+                        const newUser = await this.prisma.user.findUnique({where : {email : email}})
+                        room = await this.user.addUserToRoom(newUser, Body.roomName)
+                    }
                 }
             } else {
                 const id = this.socketId.get(req.user.email)
-                const newUser = await this.prisma.user.findUnique({where : {email : Body.email}})
-                const newId = this.socketId.get(newUser.email)
                 this.server.to(id).socketsJoin(roomName)
-                this.server.to(newId).socketsJoin(roomName)
+                console.log('body' , Body.email)
+                for (const email of Body.email)
+                {
+                    const newId = this.socketId.get(email)
+                    console.log('newID' , newId);
+                    this.server.to(newId).socketsJoin(roomName)
+                }
             }
-            this.server.in(roomName).emit("get_room", {'room': room});
+            client.emit("get_room", {'room' : room})
+            // this.server.to(roomName).emit("get_room", {'room': room});
         }
     }
 

@@ -58,6 +58,35 @@ export class UserSettingsService {
     }
     //push user to block scalar
     async addUserToBlocking(source, target){
+        const roomName: string = source.username > target.username
+            ? `${source.username}${target.username}`
+            : `${target.username}${source.username}`;
+        const room = await this.prismaService.chatRoom.findFirst({
+            where: {
+               roomName: roomName,
+            },
+            include: {
+                messages: true,
+            }
+        });
+        if (room){
+            let arrayOfId = [];
+            room.messages.map(msg => {
+                arrayOfId.push(msg.id);
+            })
+            await this.prismaService.message.deleteMany({
+                where:{
+                    id :{
+                        in: arrayOfId
+                    }
+                }
+            })
+            await this.prismaService.chatRoom.delete({
+                where: {
+                    id: room.id
+                }
+            })
+        }
         let user = await this.prismaService.user.update({
             where: {
                 email: source.email,

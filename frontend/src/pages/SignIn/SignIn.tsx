@@ -1,11 +1,11 @@
 import "./SignIn.css";
 import background from "../../assets/signin-img.jpg";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { authContext } from "../../context/Context";
 import { Navigate } from "react-router-dom";
 
 function SignIn() {
-    const [isSignedIn, setIsSignedIn] = useContext(authContext);
+    const [isSignedIn] : any = useContext(authContext);
     if (isSignedIn) return <Navigate to='/' />
     
     return (

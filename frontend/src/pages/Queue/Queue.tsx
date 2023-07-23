@@ -1,12 +1,11 @@
-import { CSSProperties, useEffect, useRef, useState } from 'react';
-import { io } from 'socket.io-client';
+import { useEffect, useState } from 'react';
 // import Game from './Game';
 import * as Constant from '../../constants/constants.ts';
 import { useLoaderData } from 'react-router-dom';
 
 // import webSocketService from '../service/WebSocketService.ts';
-import { useNavigate, useLocation } from 'react-router';
-import { Paddle, Player, Preferences } from '../../interface/game.ts';
+import { useNavigate  } from 'react-router';
+import { Paddle, Player } from '../../interface/game.ts';
 // import { PacmanLoader } from 'react-spinners';
 import galaxy_black from '../../assets/space_black.jpeg';
 import galaxy_pink from '../../assets/galaxy_pink.png';
@@ -21,6 +20,7 @@ const Queue = () => {
     const user: any = useLoaderData();
     const { id, username, preference } = user;
     // let { preference } = user;
+    console.log(preference);
 
     const [waitState, setWaitState] = useState(true);
     const [gameId, setGameId] = useState(null);

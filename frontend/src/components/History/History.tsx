@@ -1,7 +1,5 @@
 import MatchCard from '../HistoryCard/HistoryCard';
 import historyIcon from '../../assets/history-icon.svg';
-import profileImg from '../../assets/ytouate.jpeg';
-
 import './History.css';
 import { Fragment, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
@@ -13,7 +11,6 @@ export default function History() {
     const { id } = user;
 
     useEffect(() => {
-        console.log({ id });
         const options = {
             method: 'GET',
             header: {
@@ -21,7 +18,6 @@ export default function History() {
             },
         };
         const url = `http://localhost:3000/game/user/${id}`;
-        console.log({ url });
         fetch(url, options)
             .then((res) => {
                 return res.json();
