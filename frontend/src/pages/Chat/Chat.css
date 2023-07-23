@@ -16,6 +16,7 @@
 .chat-wrapper {
     font-family: "Poppins";
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 100%;
@@ -34,6 +35,9 @@
     padding-bottom: 70px;
 }
 
+.online {
+    color: green !important;
+}
 .chat-users {
     border-radius: 5px;
     display: flex;
@@ -154,4 +158,9 @@ styling the message sender
     border-bottom: 3px solid #28235c;
     border-left: 1px solid #28235c;
     border-radius: 0 38px 38px 0;
+}
+
+.room-form {
+    display: flex;
+    flex-direction: column;
 }

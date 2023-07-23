@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './EndGameScreen.css';
 import defaultImage from '../../assets/ape.jpeg';

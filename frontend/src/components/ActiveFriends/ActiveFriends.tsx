@@ -25,7 +25,7 @@ import webSocketService from '../../context/WebSocketService.js';
 // }
 
 export default function ActiveFriends() {
-    const [user, setUser]: any = useContext(userContext);
+    const [user]: any = useContext(userContext);
     const activeFriends = useActiveFriends(user);
     const [socket, setScoket] = useState<any>();
 

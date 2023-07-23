@@ -1,5 +1,4 @@
 import './HistoryCard.css';
-import profileImg from '../../assets/ytouate.jpeg';
 
 type HistoryCardData = {
     userImg: string;

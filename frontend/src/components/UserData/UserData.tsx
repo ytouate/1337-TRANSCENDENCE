@@ -5,7 +5,6 @@ import { useState } from "react";
 import Cookies from "js-cookie";
 import { ToastContainer, toast } from "react-toastify";
 import { unblock, notifyUnblocked } from "../FriendCard/FriendCard";
-import socketIO from "socket.io-client";
 
 async function takeAction(socket: any, action: string, username: string) {
     const options = {
