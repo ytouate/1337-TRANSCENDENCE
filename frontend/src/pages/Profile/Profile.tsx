@@ -10,6 +10,7 @@ import { Navigate, useLoaderData, useRouteError } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import socketIO from "socket.io-client";
 import NotFound from "../../components/NotFound";
+import { Socket } from "socket.io-client/debug";
 export function ErrorBoundary() {
     let error: any = useRouteError();
     return <NotFound message={error.message} />;
@@ -36,12 +37,12 @@ export async function userLoader({ params }: any) {
 
 export default function Profile() {
     const user: any = useLoaderData();
-    const [isSignedIn] = useContext(authContext);
+    const [isSignedIn]: any = useContext(authContext);
     if (!isSignedIn) return <Navigate to={"/signin"} />;
     if (user.optionalMail && user.isSignedIn == false)
         return <Navigate to={"/twofactor"} />;
 
-    const [socketContext, setSocketContext] = useState(null);
+    const [socketContext, setSocketContext] = useState<Socket | any>(null);
     useEffect(() => {
         const socketContext = socketIO("http://localhost:3000/notification", {
             extraHeaders: {
@@ -52,14 +53,6 @@ export default function Profile() {
         socketContext.connect();
         setSocketContext(socketContext);
     }, []);
-    // let socketContext = null;
-    // if (Cookies.get("Token")) {
-    //     socketContext = socketIO.connect("http://localhost:3000/notification", {
-    //         extraHeaders: {
-    //             Authorization: `Bearer ${Cookies.get("Token")}`,
-    //         },
-    //     });
-    // }
     return (
         <section className="profile">
             <div className="profile--left">

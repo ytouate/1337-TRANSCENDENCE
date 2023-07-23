@@ -14,7 +14,7 @@ function useFriendList(props: any) {
             return (
                 <Link to={`/profile/${friend.id}`} key={friend.id}>
                     <FriendCard
-                        lastmsg={friend.status ? "online" : "offline"}
+                        lastmsg={friend.activitystatus ? "online" : "offline"}
                         img={friend.urlImage}
                         name={friend.username}
                         addOption={false}
@@ -124,7 +124,7 @@ export default function FriendsList(props: friendListType) {
                         style={{ fontSize: "12px" }}
                         className={section == "friends" ? "active" : ""}
                     >
-                        friends{" "}
+                        friends
                     </a>
                     <a
                         onClick={() => {
