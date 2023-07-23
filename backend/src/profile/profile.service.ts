@@ -52,6 +52,8 @@ export class ProfileService{
         }
     }
     async updateName(newUserame, req) {
+        if (newUserame.length > 10)
+          throw new BadRequestException();
         let userToCheck = await this.prismaService.user.findFirst({
           where: {
             username: newUserame,

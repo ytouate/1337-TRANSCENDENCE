@@ -10,6 +10,8 @@ services:
       POSTGRES_DB: nest
     restart: always
   backend:
+    volumes:
+      - ./backend:/app
     build: 
       context: ./backend
     ports:
