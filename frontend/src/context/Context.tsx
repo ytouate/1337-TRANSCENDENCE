@@ -13,17 +13,17 @@ export const userContext = createContext(null);
 //     },
 // );
 
-console.log(Cookies.get("Token"));
+// console.log(Cookies.get("Token"));
 
-let socketContext = null;
-if (Cookies.get("Token")) {
-    socketContext = socketIO.connect("http://localhost:3000/notification", {
-        extraHeaders: {
-            Authorization: `Bearer ${Cookies.get("Token")}`,
-        },
-    });
-}
-export { socketContext };
+// let socketContext = null;
+// if (Cookies.get("Token")) {
+//     socketContext = socketIO.connect("http://localhost:3000/notification", {
+//         extraHeaders: {
+//             Authorization: `Bearer ${Cookies.get("Token")}`,
+//         },
+//     });
+// }
+// export { socketContext };
 // export const gameSocket = socketIO.connect('http://localhost:3000/game', {
 //     extraHeaders: {
 //         Authorization: `Bearer ${Cookies.get('Token')}`,

@@ -1,3 +1,4 @@
+/* Updated styles for responsiveness */
 .flex-container {
     display: flex;
     justify-content: center;
@@ -27,8 +28,10 @@
 }
 
 .player-image-container {
-    width: 150px;
-    height: 150px;
+    width: 12vw;
+    height: 12vw;
+    max-width: 150px; 
+    max-height: 150px; 
     border-radius: 50%;
     overflow: hidden;
     margin-bottom: 0.5rem;
@@ -41,20 +44,20 @@
 }
 
 .player-text {
-    font-size: 1.8rem;
+    font-size: 1.8vw;
     margin-bottom: 0.5rem;
     color: white;
 }
 
 .score {
-    font-size: 3rem;
+    font-size: 3vw;
     color: white;
 }
 
 .vs {
-    font-size: 4.5rem;
+    font-size: 4.5vw;
     font-weight: bold;
-    margin: 0 6rem;
+    margin: 0 6vw;
     color: white;
 }
 
@@ -62,8 +65,8 @@
     background-color: #4285f4;
     color: white;
     font-weight: bold;
-    font-size: 1.5rem;
-    padding: 1rem 2rem;
+    font-size: 1.5vw; 
+    padding: 1vw 2vw; 
     margin-bottom: 0.5rem;
     border-radius: 0.25rem;
 }
@@ -80,41 +83,49 @@
     background-color: #1d8c42;
 }
 
-@media screen and (max-width: 768px) {
-    .players-wrapper {
-        flex-direction: column;
-        align-items: flex-start;
-        margin-bottom: 1rem;
-    }
-
-    .player {
-        margin-bottom: 1rem;
-    }
-
-    .vs {
-        margin: 1rem 0;
-    }
-
-    .game-button {
-        padding: 1.5rem 3rem;
-    }
-
-    .crown-image {
-        top: -30px;
-        width: 60px;
-    }
-}
-
 .winner-label {
     position: absolute;
-    top: -1.5rem;
+    top: -1.5vw; 
     left: 50%;
     transform: translateX(-50%);
     background-color: #1d8c42;
     color: white;
     font-weight: bold;
-    font-size: 1rem;
-    padding: 0.5rem 1rem;
+    font-size: 1vw;
+    padding: 0.5vw 1vw;
     border-radius: 0.25rem;
     z-index: 1;
+}
+
+@media (max-width: 768px) {
+    .player-image-container {
+        width: 20vw;
+        height: 20vw;
+        max-width: none;
+        max-height: none;
+    }
+
+    .player-text {
+        font-size: 3vw;
+    }
+
+    .score {
+        font-size: 5vw;
+    }
+
+    .vs {
+        font-size: 8vw;
+        margin: 0 12vw;
+    }
+
+    .game-button {
+        font-size: 3vw;
+        padding: 2vw 4vw;
+    }
+
+    .winner-label {
+        font-size: 2vw;
+        padding: 1vw 2vw;
+        top: -2vw;
+    }
 }

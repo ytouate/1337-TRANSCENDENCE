@@ -1,22 +1,28 @@
-import img from "../assets/otmallah.jpeg";
+import { useEffect } from "react";
+import { useRef } from "react";
+import { MessageData } from "./RightMessageCard";
 
-function LeftMessageCard() {
+function LeftMessageCard(props: MessageData) {
+    const ref = useRef<HTMLElement>();
+    useEffect(() => {
+        ref.current?.scrollIntoView({ behavior: "smooth" });
+    }, [props.message]);
+
     return (
-        <div className="message-card">
+        <div ref={ref} className="message-card">
             <div className="message-card--container">
-                <img src={img} alt="" className="message-card--sender-img" />
+                <img
+                    src={props.img}
+                    alt=""
+                    className="message-card--sender-img"
+                />
                 <div className="message-card--data">
-                    <p className="message-cad--sender-name">otmallah</p>
-                    <p className="message-card--message-time">5:00PM</p>
+                    <p className="message-cad--sender-name">{props.sender}</p>
+                    <p className="message-card--message-time">{props.time}</p>
                 </div>
             </div>
 
-            <p className="message-card--message">
-                Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-                Repudiandae odio ratione eveniet eum praesentium nemo tempore,
-                laborum voluptatum qui voluptates beatae sunt ullam, aspernatur
-                obcaecati deserunt. Animi aspernatur mollitia eligendi!
-            </p>
+            <p className="message-card--message">{props.message}</p>
         </div>
     );
 }

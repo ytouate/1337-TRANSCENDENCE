@@ -1,19 +1,20 @@
-import { UseGuards } from "@nestjs/common";
+import { Body, OnModuleInit, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import {  ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Socket ,Server } from "socket.io";
 import { PrismaService } from "src/prisma/prisma.service";
 import { UserService } from "src/user/user.service";
 import { Req } from "@nestjs/common";
-import { ExceptionsHandler } from "@nestjs/core/exceptions/exceptions-handler";
+import { JwtService } from "@nestjs/jwt";
+import { userReturnToGatway } from "src/utils/user.return";
+import { Client } from "socket.io/dist/client";
 
-
-@WebSocketGateway({ namespace : 'chat' , cors : true})
-@UseGuards(AuthGuard('websocket-jwt'))
-export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
+@WebSocketGateway({ namespace : 'chat' , cors: {origin : '*'} })
+export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGatewayDisconnect {
     constructor (
         private prisma: PrismaService,
-        private user: UserService
+        private user: UserService,
+        private jwt: JwtService
         ) {}
 
     @WebSocketServer()
@@ -23,72 +24,107 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
 
     // send message to current room
     @SubscribeMessage('sendMessage')
-    onMessage(@ConnectedSocket() client : Socket, @MessageBody() data , @Req() req)
+    @UseGuards(AuthGuard('websocket-jwt'))
+    async onMessage(client : Socket , @MessageBody() data , @Req() req)
     {
-        this.server.in(client.handshake.query.roomName).emit('onMessage', data)
-        this.user.putDataInDatabase(client.handshake.query.roomName, data, req.user)
+        const message = await this.user.putDataInDatabase(data.roomName, data.data, req)
+        message.sender = userReturnToGatway(message.sender, req);
+        console.log('backend romname' , data.roomName)
+        this.server.to(data.roomName).emit('onMessage', message)
+    }
+
+    onModuleInit() {
+        this.server.on('connection', (socket) => {
+            // console.log(socket.id);
+        });
     }
 
 
-    // joining the socket of user in  specific room
     @SubscribeMessage('createRoom')
-    async handleCreationOfTheRoom(@ConnectedSocket() client : Socket , @Req() req) {
-        console.log(`client  ${client.id} connected and creat the room ${client.handshake.query.roomName}`)
-        const user = await this.validateUserByEmail(req.user.email, client.handshake.query.roomName)
-        if (user)
+    @UseGuards(AuthGuard('websocket-jwt'))
+    async handleCreationOfTheRoom(@ConnectedSocket() client : Socket , @Req() req, @MessageBody() Body) {
+        console.log(`client  ${client.id} connected and creat the room ${Body.roomName}`)
+        const User = await this.validateUserByEmail(req.user.email, Body.roomName, 0)
+        if (User)
         {
-            const room = this.user.creatRoom({
-                'roomName' : client.handshake.query.roomName ,
-                'status'   : client.handshake.query.status  ,
-                'password' : client.handshake.query.password} , user)
-            this.socketId.set(user.email, client.id)
-            this.server.in(client.id).socketsJoin(client.handshake.query.roomName)  
-            return room
+            const {roomName , status, password} = Body
+            let {found, room} = await this.user.creatRoom({
+                'roomName' : roomName ,
+                'status'   : status ,
+                'password' : password} , User)
+            room = await this.prisma.chatRoom.findUnique({where : {id : room.id} , include : {messages : true , users : true}})
+            
+            console.log(roomName);
+            if (!found)
+            {
+                let id = this.socketId.get(req.user.email)
+                this.server.in(id).socketsJoin(Body.roomName)
+                console.log(req.user.email , ': ' , client.id , ' join room' , Body.roomName)
+                if (Body.email)
+                {
+                    id = this.socketId.get(Body.email)
+                    // console.log(Body.roomName)
+                    this.server.to(id).socketsJoin(Body.email)
+                    console.log(Body.email , ': ' , id , ' join room' , Body.roomName)
+                    const newUser = await this.prisma.user.findUnique({where : {email : Body.email}})
+                    room = await this.user.addUserToRoom(newUser, Body.roomName)
+                }
+            } else {
+                const id = this.socketId.get(req.user.email)
+                const newUser = await this.prisma.user.findUnique({where : {email : Body.email}})
+                const newId = this.socketId.get(newUser.email)
+                this.server.to(id).socketsJoin(roomName)
+                this.server.to(newId).socketsJoin(roomName)
+            }
+            this.server.in(roomName).emit("get_room", {'room': room});
         }
     }
 
     // joining the socket of user in  specific room
     @SubscribeMessage('joinRoom')
-    async handleJoiningTheRoom(@ConnectedSocket() client : Socket , @Req() req) {
-        console.log(`client  ${client.id} connected and joining the room ${client.handshake.query.roomName}`)
-        const user = await this.validateUserByEmail(req.user.email, client.handshake.query.roomName)
+    @UseGuards(AuthGuard('websocket-jwt'))
+    async handleJoiningTheRoom(@ConnectedSocket() client : Socket , @Req() req, @MessageBody() body) {
+        console.log(`client  ${client.id} connected and joining the room ${body.roomName}`)
+        const user = await this.validateUserByEmail(req.user.email, body.roomName, 1)
         if (user)
         {
-            const result = await this.user.joiningTheRoom(client.handshake.query, user);
+            const result = await this.user.joiningTheRoom(body);
             if (result == undefined)
-                throw ExceptionsHandler
+                throw new UnauthorizedException({}, '')
             if (result == false)
-                throw ExceptionsHandler
-            this.socketId.set(user.email, client.id)
-            this.server.in(client.id).socketsJoin(client.handshake.query.roomName)
-            const newUpdateChat = this.user.addUserToRoom(user, client.handshake.query.roomName)      
-            console.log(`${user.username} has joined in ${client.handshake.query.roomName}`)
-            return newUpdateChat
+                throw new UnauthorizedException({}, '')
+            this.server.in(client.id).socketsJoin(body.roomName)
+            const newUpdateChat = this.user.addUserToRoom(user, body.roomName)      
+            console.log(`${user.username} has joined in ${body.roomName}`)
         }
     }
 
 
     // leave the socket from room
     @SubscribeMessage('leaveRoom')
-    async leaveRoomHandler(@ConnectedSocket() client: Socket, @Req() req) {
-        const user = await this.validateUserByUsername(client.handshake.query.username)
+    @UseGuards(AuthGuard('websocket-jwt'))
+    async leaveRoomHandler(@Req() req, @MessageBody() body) {
+        const user = await this.validateUserByUsername(body.username)
         if (user)
         {
             const Id = this.socketId.get(user.email)
             this.socketId.delete(user.email)
-            console.log(`client  ${Id} leave room ${client.handshake.query.roomName}`)
-            this.server.in(Id).socketsLeave(client.handshake.query.roomName)
-            this.user.deleteUserFromRoom(user , client.handshake.query.roomName)
+            console.log(`client  ${Id} leave room ${body.roomName}`)
+            this.server.in(Id).socketsLeave(body.roomName)
+            this.user.deleteUserFromRoom(user , body.roomName)
         }
     }
 
     // if the user connect to the event
     async  handleConnection(client: Socket, ...args: any[]) {
-        console.log(`client ${client.id} has connected`)
+        const payload = await this.jwt.verifyAsync(client.handshake.headers.authorization.slice(7))
+        this.socketId.set(payload.email, client.id)
     }
 
     // if the user disconnect to the event
     async handleDisconnect(client: any) {
+        const payload = await this.jwt.verifyAsync(client.handshake.headers.authorization.slice(7))
+        this.socketId.delete(payload.email)
         console.log(`client ${client.id} has disconnect`)    
     }
 
@@ -98,10 +134,12 @@ export class chatGateway  implements OnGatewayConnection , OnGatewayDisconnect {
     }
 
     //check the user if exist 
-    async validateUserByEmail(email, roomName) {
+    async validateUserByEmail(email, roomName, num) {
         const user =  await this.prisma.user.findUnique({where : {email : email}})
         const room = await this.prisma.chatRoom.findFirst({ where : {roomName : roomName} })
-        return room.banUsers.indexOf(user.email) < 0 ? user : undefined
+        if (num == 0)
+            return user
+        return room?.banUsers?.indexOf(user.email) < 0 ? user : undefined
     }
 
 }

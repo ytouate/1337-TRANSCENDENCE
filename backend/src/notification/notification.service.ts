@@ -8,7 +8,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { userReturn, userReturnToGatway } from 'src/utils/user.return';
 
 
-@WebSocketGateway({namespace: 'notification', cors: true})
+@WebSocketGateway({namespace: 'notification', cors: {origin : '*'}})
 export class NotificationService implements OnGatewayConnection, OnGatewayDisconnect{
     socketById: Map<number, Socket[]> ;
     constructor(private jwtService: JwtService, private prismaServie: PrismaService){
@@ -21,7 +21,6 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
    // make user offline and delete socket from map
     async changeActivityStatusToOffline(client: Socket){
         const userObj: any = this.jwtService.verify(client.handshake.headers.authorization.slice(7));
-        console.log("user ", userObj)
         const user = await this.prismaServie.user.update({
             where: {
                 email: userObj.email,
@@ -34,7 +33,6 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
     }
     //get socket from connecting clients
     handleConnection(client: Socket) {
-        // console.log(client);
         this.pushClientInMap(client);
     }
 
@@ -115,7 +113,6 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
     @UseGuards(AuthGuard('websocket-jwt'))
     @SubscribeMessage('answer_notification')
     async answerToNotification(@MessageBody() body: any, @Req() req){
-        console.log(body);
         if (body.status == 'accept'){
             let notification = await this.acceptNotificaion(body);
             this.deleteNotification(body);
@@ -137,7 +134,6 @@ export class NotificationService implements OnGatewayConnection, OnGatewayDiscon
                 id: messageBody.id,
             }
         })
-        console.log(notif);
         await this.prismaServie.notification.deleteMany({
             where: {
                 senderId: notif.senderId,

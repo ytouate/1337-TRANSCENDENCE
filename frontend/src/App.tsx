@@ -4,6 +4,7 @@ import './index.css';
 import Navbar, { loader as navLoader } from './components/Navbar/Navbar.jsx';
 import { authContext } from './context/Context.js';
 import Home, { loader as homeLoader } from './pages/Home/Home.jsx';
+import Test from './pages/Chat/Test';
 
 import Settings, {
     loader as settingsLoader,
@@ -26,6 +27,7 @@ import Cookies from 'js-cookie';
 import TwoFactor from './pages/TwoFactor/TwoFactor.js';
 import { useState } from 'react';
 import AgainstAi from './pages/AgainstAi/AgainstAi.js';
+import Queue from './pages/Queue/Queue.js';
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -40,8 +42,10 @@ const router = createBrowserRouter(
                     loader={userLoader}
                     element={<Profile />}
                 />
-                <Route path='chat' element={<Chat />} />
+                <Route path='chat' loader={homeLoader} element={<Chat />} />
+                <Route path='test' loader={homeLoader} element={<Test />} />
                 <Route loader={navLoader} path='ai' element={<AgainstAi />} />
+                <Route loader={navLoader} path='queue' element={<Queue />} />
 
                 <Route
                     path='settings'

@@ -13,7 +13,7 @@ export function userReturn(user: any, req: any) {
 export function userReturnToGatway(user: any, req: any) {
   if (user?.imageIsUpdate && user?.urlImage)
     user.urlImage =
-      req.protocol +
+      'http' +
       '://' +
       req.handshake.headers.host +
       '/profile/getphoto/' +

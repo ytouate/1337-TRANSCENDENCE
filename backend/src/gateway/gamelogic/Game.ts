@@ -77,6 +77,8 @@ export class Game {
                 order: this.gamePosition.players[0].order,
                 pref: this.gamePosition.players[0].pref,
                 pref2: this.gamePosition.players[0].pref,
+                urlImg1: this.gamePosition.players[0].urlImg1,
+                urlImg2: this.gamePosition.players[0].urlImg2,
             };
             players[1] = {
                 id: this.gamePosition.players[1].id,
@@ -87,6 +89,8 @@ export class Game {
                 order: this.gamePosition.players[1].order,
                 pref: this.gamePosition.players[1].pref,
                 pref2: this.gamePosition.players[1].pref,
+                urlImg1: this.gamePosition.players[1].urlImg1,
+                urlImg2: this.gamePosition.players[1].urlImg2,
             };
             server.to(room).emit('game_update', {
                 ball: {
@@ -148,7 +152,7 @@ export class Game {
                 ball.speedX *= -1;
                 let deltaY = ball.y - (players[0].y + PADDLE_HEIGHT / 2);
                 ball.speedY = deltaY * 0.22;
-            } else if (ball.x - BALL_SIZE <= 0) {
+            } else if (ball.x + BALL_SIZE <= 0) {
                 players[1].score++;
                 reset = true;
             }
@@ -164,7 +168,7 @@ export class Game {
                 ball.speedX *= -1;
                 let deltaY = ball.y - (players[1].y + PADDLE_HEIGHT / 2);
                 ball.speedY = deltaY * 0.22;
-            } else if (ball.x + BALL_SIZE >= BOARD_WIDTH) {
+            } else if (ball.x - BALL_SIZE >= BOARD_WIDTH) {
                 players[0].score++;
                 reset = true;
             }

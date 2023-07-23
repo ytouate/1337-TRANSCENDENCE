@@ -35,11 +35,14 @@ a {
 
 .home-profile-img {
     height: 50px;
-    object-fit: contain;
+    object-fit: cover;
     border-radius: 50%;
     box-shadow: 2px 2px 10px gray;
 }
 
+.home-profile-img:hover {
+    cursor: pointer;
+}
 .logo {
     width: 80px;
     cursor: pointer;
@@ -63,8 +66,6 @@ hr {
     background-color: lightgray;
     border: none;
 }
-
-
 
 @media only screen and (max-width: 580px) {
     .home-profile-img {
