@@ -4,16 +4,15 @@ export const BOARD_HEIGHT = 1200;
 export const BOARD_WIDTH = 1600;
 
 export const BALL_SPEED_X = 6;
-export const BALL_SPEED_Y = 3;
-
+export const BALL_SPEED_Y = 4;
 
 export const PADDLE_MARGIN_RATIO = 0.0025;
 export const PADDLE_WIDTH_RATIO = 0.01;
 export const PADDLE_HEIGHT_RATIO = 0.1;
 export const BALL_SIZE_RATIO = 0.025;
 
-export const INITIAL_VELOCITY = 0.035;
-export const VELOCITY_INCREASE = 0.000007;
+export const INITIAL_VELOCITY = 0.02;
+export const VELOCITY_INCREASE = 0.000004;
 
 export const PADDLE_MARGIN = BOARD_WIDTH * PADDLE_MARGIN_RATIO;
 export const PADDLE_WIDTH = BOARD_HEIGHT * PADDLE_WIDTH_RATIO;

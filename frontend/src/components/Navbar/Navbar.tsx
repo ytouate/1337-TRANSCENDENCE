@@ -12,13 +12,7 @@ import Notifications from "../Notifications/Notification";
 import Cookies from "js-cookie";
 import "./Navbar.css";
 import { useContext, useEffect, useRef, useState } from "react";
-import { userContext, authContext } from "../../context/Context";
-import { Socket } from "socket.io-client";
-
-type NavData = {
-    profileImg: string;
-    socket: Socket;
-};
+import { userContext } from "../../context/Context";
 
 export async function loader() {
     const data = await fetch("http://localhost:3000/user", {
@@ -31,7 +25,7 @@ export async function loader() {
 
 
 function ProfileDropDown() {
-    const [user, setUser] = useContext(userContext);
+    const [user]: any = useContext(userContext);
     const location = useLocation();
     const [isMenuDropDownOpen, setMenuDropDownOpen] = useState(false);
     const dropdownRef: any = useRef(null);

@@ -1,30 +1,29 @@
 import "./Notification.css";
 import bell from "../../assets/bell.svg";
-import { socketContext, userContext } from "../../context/Context";
-import { Fragment, useState, useEffect, useContext } from "react";
+import {  userContext } from "../../context/Context";
+import {  useState, useEffect, useContext } from "react";
 import { nanoid } from "nanoid";
+import socketIO from "socket.io-client";
+import Cookies from "js-cookie";
+import { Socket } from "socket.io-client/debug";
 
-function acceptInvitation(id: number) {
-    if (socketContext) {
-        socketContext.emit("answer_notification", {
-            id: id,
-            status: "accept",
-            description: "Invitaion accepted",
-        });
-    }
+function acceptInvitation(socket: any, id: number) {
+    socket.emit("answer_notification", {
+        id: id,
+        status: "accept",
+        description: "Invitaion accepted",
+    });
 }
-function rejectInvitation(id: number) {
-    if (socketContext) {
-        socketContext.emit("answer_notification", {
-            id: id,
-            status: "reject",
-            description: "Invitaion Rejected",
-        });
-    }
-}
+
+// function rejectInvitation(socket: any, id: number) {
+//     socket.emit("answer_notification", {
+//         id: id,
+//         status: "reject",
+//         description: "Invitaion Rejected",
+//     });
+// }
 
 function RequestNotification(props: any) {
-    console.log("here id", props.id);
     return (
         <li key={props.id} className="notification-card">
             <div className="notification-card--data">
@@ -40,7 +39,7 @@ function RequestNotification(props: any) {
                     <>
                         <button
                             onClick={() => {
-                                acceptInvitation(props.id);
+                                acceptInvitation(props.socket, props.id);
                                 // props.setUser(...props.user);
                             }}
                             className="notification-card--action"
@@ -60,31 +59,36 @@ function RequestNotification(props: any) {
     );
 }
 export default function Notification() {
-    const [user, setUser] = useContext(userContext);
-    console.log(user);
+    const [user] : any = useContext(userContext);
+    const [socketContext, setSocketContext] = useState<Socket | null>(null);
     let [notifications, setNotifications] = useState<any>(user.notifications);
     useEffect(() => {
-        if (socketContext) {
-            socketContext.on("receive_notification", (notification: any) => {
-                console.log(notification);
-                setNotifications((prev: any) => {
-                    return [...prev, notification];
-                });
+        const socketContext : any = socketIO(
+            "http://localhost:3000/notification",
+            {
+                autoConnect: false,
+                extraHeaders: {
+                    Authorization: `Bearer ${Cookies.get("Token")}`,
+                },
+            }
+        );
+        socketContext.connect();
+        setSocketContext(socketContext);
+        socketContext.on("receive_notification", (notification: any) => {
+            setNotifications((prev: any) => {
+                return [...prev, notification];
             });
-        }
-    }, [user]);
-    console.log("notfications: ", notifications);
-    const notifList = notifications.map((notification: any) => {
-        console.log("hre: ", notification);
+        });
+    }, []);
 
+    const notifList = notifications.map((notification: any) => {
         return (
-            <Fragment key={nanoid()}>
-                <RequestNotification
-                    {...notification}
-                    user={user}
-                    setUser={setUser}
-                />
-            </Fragment>
+            <RequestNotification
+                key={nanoid()}
+                socket={socketContext}
+                id={notification.id}
+                {...notification}
+            />
         );
     });
     return (

@@ -3,6 +3,7 @@ import { useLoaderData } from 'react-router-dom';
 import galaxy_black from '../../assets/space_black.jpeg';
 import galaxy_pink from '../../assets/galaxy_pink.png';
 import jungle from '../../assets/jungle.jpeg';
+import arcade from '../../assets/arcade.jpg';
 import {
     BALL_SIZE_RATIO,
     INITIAL_VELOCITY,
@@ -228,6 +229,7 @@ const AgainstAi = () => {
             paddleMargin = canvas.width * PADDLE_MARGIN_RATIO;
             paddleWidth = canvas.height * PADDLE_WIDTH_RATIO;
             paddleHeight = canvas.height * PADDLE_HEIGHT_RATIO;
+            
             ball.size = canvas.height * BALL_SIZE_RATIO;
 
             ball.x = (ball.x / prevCanvasWidth) * canvas.width;
@@ -271,6 +273,7 @@ const AgainstAi = () => {
                 backgroundImage: `url(${galaxy_black})`,
                 backgroundSize: 'cover',
             };
+        else if (map === 'arcade') return { backgroundImage: `url(${arcade})` };
         else
             return {
                 backgroundColor: map,

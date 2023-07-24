@@ -26,10 +26,10 @@ export async function loader() {
 }
 
 export default function Settings() {
-    const [isSignedIn, setIsSignedIn] = useContext(authContext);
+    const [isSignedIn, setIsSignedIn] : any = useContext(authContext);
     if (isSignedIn == false) return <Navigate to={"/signin"} />;
     const [newName, setNewName] = useState("");
-    const [newAvatar, setNewAvatar] = useState(null);
+    const [newAvatar, setNewAvatar] = useState('');
     const [clicked2fa, setClicked2fa] = useState(false);
     const [email2fa, setEmail2fa] = useState("");
     const token = Cookies.get("Token");
@@ -95,7 +95,7 @@ export default function Settings() {
             .then(() => location.reload());
     }
 
-    async function changeName(e) {
+    async function changeName() {
         const token = Cookies.get("Token");
         const options = {
             method: "PUT",

@@ -98,18 +98,24 @@ export const computerMovement = (
     deltaTime: number,
     canvas: HTMLCanvasElement,
 ) => {
-    let paddleYCenter = paddle.y + height / 2;
-    const targetY = ball.y - height / 2;
-    const distance = Math.abs(paddleYCenter - targetY);
+    const paddleYCenter = paddle.y + height / 2;
+    const ballYCenter = ball.y + ball.size;
+    // Calculate the offset based on the ball's vertical speed to improve difficulty
+    const verticalSpeedOffset = ball.speedY * deltaTime * 0.5;
 
-    const paddleSpeed = distance > 100 ? 800 : 400;
+    // Update the paddle's target position with an additional offset
+    const targetPaddleYCenter = ballYCenter + verticalSpeedOffset;
 
-    const delta = deltaTime / 1000;
-
-    if (paddleYCenter < targetY) {
-        paddle.y += paddleSpeed * delta;
-    } else if (paddleYCenter > targetY) {
-        paddle.y -= paddleSpeed * delta;
+    // Smoothly move the paddle towards the target position
+    const maxPaddleSpeed = 8; // lower this for easier difficulty
+    const paddleSpeed = Math.min(
+        Math.abs(targetPaddleYCenter - paddleYCenter),
+        maxPaddleSpeed,
+    );
+    if (targetPaddleYCenter < paddleYCenter) {
+        paddle.y -= paddleSpeed;
+    } else if (targetPaddleYCenter > paddleYCenter) {
+        paddle.y += paddleSpeed;
     }
 
     if (paddle.y < 0) {
@@ -232,6 +238,5 @@ export const initPref = () => {
 export const drawGameOver = (context: CanvasRenderingContext2D) => {
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
     context.lineWidth = 4;
-    drawNet(context, 'black');
+    drawNet(context, 'gray');
 };
-

@@ -1,9 +1,10 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, UnauthorizedException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { imageLink } from "./auth.strategy42";
 import { JwtService } from "@nestjs/jwt";
 import { MailerService } from "@nestjs-modules/mailer";
 import { userReturn } from "src/utils/user.return";
+import { use } from "passport";
 
 @Injectable()
 export class authService{
@@ -37,7 +38,6 @@ export class authService{
     // generate a Token
     async signToken(username, email)
     {
-        console.log(username , email)
         const payload = {
             username : username,
             email : email
@@ -59,15 +59,21 @@ export class authService{
 
     //validate user
     async validateUser(req) : Promise<any>{
+        console.log('request: ', req.headers);
         const user =  await this.prisma.user.findUnique({where : {email : req.user.email} ,
             include: {
                 friends: true,
                 preference : true,
-                notifications : true
+                notifications : true,
+                roomChat : {include  : { users : true , messages : true}}
             },
         })
-        user.friends = user.friends.map(friend => userReturn(friend, req));
-        return userReturn(user, req)
+        if (user)
+        {
+            user.friends = user.friends.map(friend => userReturn(friend, req));
+            return userReturn(user, req)
+        }
+        throw new UnauthorizedException()
     }
 
         //validate user

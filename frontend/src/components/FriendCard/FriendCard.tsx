@@ -21,6 +21,7 @@ interface friendCardType {
     img: string;
     name: string;
     lastmsg: string | null;
+    addOption: boolean;
 }
 function FriendCard(props: friendCardType) {
     return (

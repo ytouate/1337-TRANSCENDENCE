@@ -17,7 +17,6 @@ export class webSocketJwtStrategy extends PassportStrategy (Strategy, 'websocket
         })
     }
     async validate(payload: any){
-        console.log(payload)
         return (payload);
     }
 }

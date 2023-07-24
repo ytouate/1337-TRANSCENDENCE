@@ -18,7 +18,7 @@ export class UserService {
         {
             try {
                 let hash = await bcrypt.hash(password, 10)
-                await this.prismaService.chatRoom.create(
+                let room = await this.prismaService.chatRoom.create(
                     {
                         data : {
                             roomName : roomName,
@@ -28,18 +28,19 @@ export class UserService {
                             },
                             status : status,
                             password : hash
-                        }
+                        }, include : {users : true ,messages : true}
                     }
                     )
                 await this.setAdmin({'username' : user.username , 'roomName' : roomName})
-                console.log(room);
-                return room
+                console.log('room ' , room)
+                return {'found': false, room};
             }
             catch(error) {
             }
             finally { this.prismaService.$disconnect() }
         }
-        return {'message' : `room ${roomName} already exist`}
+        // return {'exist': true, room};
+        return {'found': true, room};
     }
 
     // add user to specific room
@@ -80,7 +81,6 @@ export class UserService {
                     }
                 }
             })
-            console.log({'message' : `user has deleted from ${name}`})
             return update
         }
         catch(error) { throw new UnauthorizedException({}, ''); }
@@ -98,12 +98,15 @@ export class UserService {
                 where : 
                 { 
                     roomName : name,
-                    status : 'public'
                 },
                 include :
                 {
                     users : true,
-                    messages : { include : { user : true} },
+                    messages :{
+                        include: {
+                            user : true,
+                        }
+                    }
                 }
             }
         )
@@ -114,7 +117,7 @@ export class UserService {
 
 
     // check user is has already joined
-    async   avoidDuplicate(user, name){
+    async avoidDuplicate(user, name){
         const chatRoom = await this.prismaService.chatRoom.findFirst({
             where : 
             {

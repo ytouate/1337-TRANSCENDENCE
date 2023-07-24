@@ -1,28 +1,35 @@
-import "./HistoryCard.css";
-import profileImg from "../../assets/ytouate.jpeg";
+import './HistoryCard.css';
 
 type HistoryCardData = {
     userImg: string;
     opponentImg: string;
+    userScore: string;
     userName?: string;
-    oppoentName?: string;
+    opponentName?: string;
+    opponentScore: string;
 };
 
 function MatchCard(props: HistoryCardData) {
     return (
-        <div className="match-card">
-            <div className="match-card--left">
-                <img src={profileImg} alt="" className="card--user-profile" />
-                <p className="match-card--player">Lorem</p>
+        <div className='match-card'>
+            <div className='match-card--left'>
+                <img
+                    src={props.userImg}
+                    alt=''
+                    className='card--user-profile'
+                />
+                <p className='match-card--player'>{props.userName}</p>
             </div>
-            <div className="match-card--status">3 - 5</div>
-            <div className="match-card--right">
+            <div className='match-card--status'>
+                {props.userScore} - {props.opponentScore}
+            </div>
+            <div className='match-card--right'>
                 <img
                     src={props.opponentImg}
-                    alt=""
-                    className="card--user-profile"
+                    alt=''
+                    className='card--user-profile'
                 />
-                <p className="match-card--player">ytouate</p>
+                <p className='match-card--player'>{props.opponentName}</p>
             </div>
         </div>
     );

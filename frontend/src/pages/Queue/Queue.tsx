@@ -1,24 +1,26 @@
-import { CSSProperties, useEffect, useRef, useState } from 'react';
-import { io } from 'socket.io-client';
+import { useEffect, useState } from 'react';
 // import Game from './Game';
 import * as Constant from '../../constants/constants.ts';
 import { useLoaderData } from 'react-router-dom';
 
 // import webSocketService from '../service/WebSocketService.ts';
-import { useNavigate, useLocation } from 'react-router';
-import { Paddle, Player, Preferences } from '../../interface/game.ts';
+import { useNavigate  } from 'react-router';
+import { Paddle, Player } from '../../interface/game.ts';
 // import { PacmanLoader } from 'react-spinners';
 import galaxy_black from '../../assets/space_black.jpeg';
 import galaxy_pink from '../../assets/galaxy_pink.png';
 import jungle from '../../assets/jungle.jpeg';
+import arcade from '../../assets/arcade.jpg';
 import Game from '../../components/Game/Game.tsx';
 import webSocketService from '../../context/WebSocketService.ts';
 import './Queue.css';
+import LoadingAnimation from '../../components/LoadingAnimation/LoadingAnimation.tsx';
 
 const Queue = () => {
     const user: any = useLoaderData();
     const { id, username, preference } = user;
     // let { preference } = user;
+    console.log(preference);
 
     const [waitState, setWaitState] = useState(true);
     const [gameId, setGameId] = useState(null);
@@ -46,6 +48,7 @@ const Queue = () => {
             return { backgroundImage: `url(${galaxy_pink})` };
         else if (map === 'galaxy_black')
             return { backgroundImage: `url(${galaxy_black})` };
+        else if (map === 'arcade') return { backgroundImage: `url(${arcade})` };
         else
             return {
                 backgroundColor: map,
@@ -66,7 +69,6 @@ const Queue = () => {
     };
 
     useEffect(() => {
-        console.log('mounted');
         setScoket(webSocketService.connect());
         // setScoket(webSocketService.getSocket());
 
@@ -156,6 +158,7 @@ const Queue = () => {
         <div className='queue-outer-container' style={getMap()}>
             {waitState ? (
                 <div className='queue-container '>
+                    <LoadingAnimation />
                     <h1 className='queue-h1'>Waiting for players...</h1>
                 </div>
             ) : (

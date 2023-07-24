@@ -10,12 +10,14 @@ export interface UserData {
 export interface PlayerPosition {
     id: number;
     username: string;
-    opponent: string
+    opponent: string;
     y: number;
     score: number;
     order: number;
     pref: Preference;
     pref2: Preference;
+    urlImg1: String;
+    urlImg2: String;
 }
 
 export interface GamePosition {

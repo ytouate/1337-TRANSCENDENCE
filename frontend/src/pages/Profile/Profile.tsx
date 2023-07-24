@@ -7,8 +7,10 @@ import Stats from "../../components/Stats/Stats";
 import { authContext } from "../../context/Context";
 import Cookies from "js-cookie";
 import { Navigate, useLoaderData, useRouteError } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
+import socketIO from "socket.io-client";
 import NotFound from "../../components/NotFound";
+import { Socket } from "socket.io-client/debug";
 export function ErrorBoundary() {
     let error: any = useRouteError();
     return <NotFound message={error.message} />;
@@ -35,12 +37,22 @@ export async function userLoader({ params }: any) {
 
 export default function Profile() {
     const user: any = useLoaderData();
-    console.log(user.notifications);
-    const [isSignedIn] = useContext(authContext);
+    const [isSignedIn]: any = useContext(authContext);
     if (!isSignedIn) return <Navigate to={"/signin"} />;
     if (user.optionalMail && user.isSignedIn == false)
         return <Navigate to={"/twofactor"} />;
 
+    const [socketContext, setSocketContext] = useState<Socket | any>(null);
+    useEffect(() => {
+        const socketContext = socketIO("http://localhost:3000/notification", {
+            extraHeaders: {
+                Authorization: `Bearer ${Cookies.get("Token")}`,
+            },
+            autoConnect: false,
+        });
+        socketContext.connect();
+        setSocketContext(socketContext);
+    }, []);
     return (
         <section className="profile">
             <div className="profile--left">
@@ -49,6 +61,7 @@ export default function Profile() {
                     username={user.username}
                     me={user.me}
                     friendStatus={user.friendStatus}
+                    socket={socketContext}
                 />
                 <History />
             </div>
@@ -65,7 +78,11 @@ export default function Profile() {
             </div>
             <div className="profile--right">
                 <Achievements />
-                <Stats winRate={user.winRate} wins={user.win} losses={user.loss} />
+                <Stats
+                    winRate={user.winRate}
+                    wins={user.win}
+                    losses={user.loss}
+                />
             </div>
         </section>
     );

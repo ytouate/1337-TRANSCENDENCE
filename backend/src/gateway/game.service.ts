@@ -45,10 +45,10 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
 
     // called when a client is connected
     async handleConnection(@ConnectedSocket() client: Socket) {
-        // const payload = await this.jwtSerive.verifyAsync(
-        //     client.handshake.headers.authorization.slice(7),
-        // );
-        // this.addClient(client, 'mkorchi');
+        const payload = await this.jwtSerive.verifyAsync(
+            client.handshake.headers.authorization.slice(7),
+        );
+        this.addClient(client, payload.username);
     }
 
     getUserIdBySocket(socket: Socket): number | undefined {
@@ -166,6 +166,8 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
             order: 0,
             pref: user1.preference,
             pref2: user2.preference,
+            urlImg1: user1.urlImage,
+            urlImg2: user2.urlImage,
         };
 
         players[1] = {
@@ -177,6 +179,8 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
             order: 1,
             pref: user2.preference,
             pref2: user1.preference,
+            urlImg1: user2.urlImage,
+            urlImg2: user1.urlImage,
         };
 
         this.gamePlayerPosition.set(game.id, { players });
@@ -243,6 +247,8 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
                 order: check.p.order,
                 pref: check.p.pref,
                 pref2: check.p.pref2,
+                urlImg1: check.p.urlImg1,
+                urlImg2: check.p.urlImg2,
             });
 
             const roomId = String(check.gameId);
@@ -265,8 +271,15 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
 
     // event to handle players' invite
     @SubscribeMessage('gameInvite')
-    async gameInvite(@MessageBody() body: any) {
-        const userId: number = body.userId;
+    async gameInvite(
+        @MessageBody() body: any,
+        @ConnectedSocket() client: Socket,
+    ) {
+        const payload = await this.jwtSerive.verifyAsync(
+            client.handshake.headers.authorization.slice(7),
+        );
+        const user = await this.addClient(client, payload.username); 
+        const userId = user.id;
         const opponentUsername: string = body.opponentUsername;
 
         const opponent = await this.userService.getUserByUsername(
@@ -278,7 +291,10 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
         }
 
         const opponentData = this.userSockets.get(opponent.id);
-        if (!opponentData) return;
+        if (!opponentData) {
+            console.log('opponent not connected'); // the socket is not at least..
+            return;
+        }
         const myData = this.userSockets.get(userId);
         if (opponentData.id === myData.id) {
             console.log('inviting userself retard ?');
@@ -298,55 +314,55 @@ export class GameGateWay implements OnGatewayConnection, OnModuleInit {
     }
 
     // event handler, when the player responds to an invite from another player
-    @SubscribeMessage('inviteResponse')
-    async inviteResponse(@MessageBody() body: any) {
-        const userId: number = body.userId;
-        const opponentId: number = body.opponentId;
-        const status: string = body.status;
+    // @SubscribeMessage('inviteResponse')
+    // async inviteResponse(@MessageBody() body: any) {
+    //     const userId: number = body.userId;
+    //     const opponentId: number = body.opponentId;
+    //     const status: string = body.status;
 
-        // if the invitee accepts, match the two players
-        // else sends a feedback to the inviter that the player declined
-        if (status === 'accepted') {
-            console.log('players matched');
-            await new Promise(() => {
-                setTimeout(() => {
-                    this.matchPlayers(opponentId, userId, true);
-                }, 1000);
-            });
-        } else if (status === 'declined') {
-            console.log('player declined');
-            const myData = this.userSockets.get(userId);
-            const opponentData = this.userSockets.get(opponentId);
-            if (myData) {
-                myData.socket
-                    .to(opponentData.socket.id)
-                    .emit('invite_response', {
-                        userId: userId,
-                        username: myData.username,
-                        status: 'declined',
-                    });
-            }
-        }
-    }
+    //     // if the invitee accepts, match the two players
+    //     // else sends a feedback to the inviter that the player declined
+    //     if (status === 'accepted') {
+    //         console.log('players matched');
+    //         await new Promise(() => {
+    //             setTimeout(() => {
+    //                 this.matchPlayers(opponentId, userId, true);
+    //             }, 1000);
+    //         });
+    //     } else if (status === 'declined') {
+    //         console.log('player declined');
+    //         const myData = this.userSockets.get(userId);
+    //         const opponentData = this.userSockets.get(opponentId);
+    //         if (myData) {
+    //             myData.socket
+    //                 .to(opponentData.socket.id)
+    //                 .emit('invite_response', {
+    //                     userId: userId,
+    //                     username: myData.username,
+    //                     status: 'declined',
+    //                 });
+    //         }
+    //     }
+    // }
 
-    @SubscribeMessage('spectateGame')
-    async spectateGame(
-        @MessageBody() body: any,
-        @ConnectedSocket() client: Socket,
-    ) {
-        const gameId: number = body.gameId;
+    // @SubscribeMessage('spectateGame')
+    // async spectateGame(
+    //     @MessageBody() body: any,
+    //     @ConnectedSocket() client: Socket,
+    // ) {
+    //     const gameId: number = body.gameId;
 
-        const gamePosition = this.gamePlayerPosition.get(gameId);
-        if (gamePosition) {
-            const roomId = String(gameId);
+    //     const gamePosition = this.gamePlayerPosition.get(gameId);
+    //     if (gamePosition) {
+    //         const roomId = String(gameId);
 
-            this.server.to(client.id).emit('spectate_ready', {
-                gameId: gameId,
-                player1: gamePosition.players[0],
-                player2: gamePosition.players[1],
-            });
+    //         this.server.to(client.id).emit('spectate_ready', {
+    //             gameId: gameId,
+    //             player1: gamePosition.players[0],
+    //             player2: gamePosition.players[1],
+    //         });
 
-            client.join(roomId);
-        }
-    }
+    //         client.join(roomId);
+    //     }
+    // }
 }
