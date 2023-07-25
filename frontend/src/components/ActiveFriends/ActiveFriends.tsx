@@ -2,7 +2,7 @@ import './ActiveFriends.css';
 import swordsIcon from '../../assets/sword.svg';
 import { userContext } from '../../context/Context.js';
 import { Fragment, useContext, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import ChallengeCard from '../ChallengeCard/ChallengeCard.js';
 import webSocketService from '../../context/WebSocketService.js';
 
@@ -27,11 +27,22 @@ import webSocketService from '../../context/WebSocketService.js';
 export default function ActiveFriends() {
     const [user]: any = useContext(userContext);
     const activeFriends = useActiveFriends(user);
-    const [socket, setScoket] = useState<any>();
+    // const [socket, setScoket] = useState<any>();
+    const navigate = useNavigate();
 
     const emitInvite = (username: string) => {
         // maybe some checks on socket
-        socket.emit('gameInvite', { opponentUsername: username });
+        const socket = webSocketService.getSocket();
+        if (!socket) console.log('socket not connected cant emit');
+        socket?.emit('gameInvite', {
+            userId: user.id,
+            opponentUsername: username,
+        });
+        console.log('emitted');
+
+        socket?.on('invite_sent', (data: any) => {
+            navigate(`/challenge/${data.id}`, { state: { username } });
+        });
     };
 
     function useActiveFriends(user: any) {
@@ -57,15 +68,6 @@ export default function ActiveFriends() {
         }
         return activeFriends;
     }
-
-    useEffect(() => {
-        setScoket(webSocketService.connect());
-
-        return () => {
-            webSocketService.disconnect();
-            setScoket(null);
-        };
-    }, []);
 
     return (
         <div className='active-friends'>
