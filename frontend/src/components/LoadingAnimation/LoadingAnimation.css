@@ -13,14 +13,14 @@
 }
 
 .paddle1 {
-    left: 0; 
+    left: 0;
 }
 
 .paddle2 {
     right: 0;
 }
 .ball {
-    width: 2.5vw; 
+    width: 2.5vw;
     height: 2.5vw;
     background-color: #fff;
     border-radius: 50%;
@@ -29,16 +29,12 @@
 
 @keyframes moveBall {
     0% {
-        transform: translateX(
-            -50vw
-        ); 
+        transform: translateX(-50vw);
     }
     50% {
-        transform: translateX(
-            50vw
-        ); 
+        transform: translateX(50vw);
     }
     100% {
-        transform: translateX(-50vw); 
+        transform: translateX(-50vw);
     }
 }

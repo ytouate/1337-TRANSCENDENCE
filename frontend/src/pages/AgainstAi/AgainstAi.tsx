@@ -229,6 +229,7 @@ const AgainstAi = () => {
             paddleMargin = canvas.width * PADDLE_MARGIN_RATIO;
             paddleWidth = canvas.height * PADDLE_WIDTH_RATIO;
             paddleHeight = canvas.height * PADDLE_HEIGHT_RATIO;
+            
             ball.size = canvas.height * BALL_SIZE_RATIO;
 
             ball.x = (ball.x / prevCanvasWidth) * canvas.width;
