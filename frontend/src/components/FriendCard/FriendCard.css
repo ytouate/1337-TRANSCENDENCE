@@ -9,7 +9,7 @@
   min-width: 250px;
   display: flex;
   justify-content: space-between;
-  border-radius: 15px;
+  border-radius: 10px;
   transition: transform 0.25s cubic-bezier(0.7, 0.98, 0.86, 0.98),
     box-shadow 0.25s cubic-bezier(0.7, 0.98, 0.86, 0.98);
 }

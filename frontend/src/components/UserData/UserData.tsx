@@ -4,10 +4,10 @@ import {} from "../../context/Context";
 import { useState } from "react";
 import Cookies from "js-cookie";
 import { ToastContainer, toast } from "react-toastify";
-import { socketContext } from "../../context/Context";
 import { unblock, notifyUnblocked } from "../FriendCard/FriendCard";
+import socketIO from "socket.io-client";
 
-async function takeAction(action: string, username: string) {
+async function takeAction(socket: any, action: string, username: string) {
     const options = {
         method: "GET",
         headers: { Authorization: `Bearer ${Cookies.get("Token")}` },
@@ -15,7 +15,7 @@ async function takeAction(action: string, username: string) {
     const data = await fetch("http://localhost:3000/user", options);
     const res = await data.json();
     if (action == "add") {
-        socketContext.emit("send_notification", {
+        socket.emit("send_notification", {
             title: "Request",
             description: `new friend request from ${res.username}`,
             username: username,
@@ -82,12 +82,20 @@ const MainUserButtons = () => {
 const MainUserFriendsButtons = (props: any) => {
     return (
         <>
-            <a onClick={() => takeAction("unfriend", props.username)}>
+            <a
+                onClick={() =>
+                    takeAction(props.socket, "unfriend", props.username)
+                }
+            >
                 <button onClick={notfyUnfriend} className="settings-button add">
                     Unfriend
                 </button>
             </a>
-            <a onClick={() => takeAction("block", props.username)}>
+            <a
+                onClick={() =>
+                    takeAction(props.socket, "block", props.username)
+                }
+            >
                 <button
                     onClick={notifyBlocked}
                     className="settings-button block"
@@ -118,7 +126,7 @@ const UserButtons = (props: userDataType) => {
         <>
             <a
                 onClick={() => {
-                    takeAction("add", props.username);
+                    takeAction(props.socket, "add", props.username);
                     setIsAddButton(false);
                 }}
             >
@@ -132,7 +140,7 @@ const UserButtons = (props: userDataType) => {
             <a
                 onClick={() => {
                     isBlockButton
-                        ? takeAction("block", props.username)
+                        ? takeAction(props.socket, "block", props.username)
                         : unblock(props.username);
                     setBlockButton(!isBlockButton);
                 }}
@@ -153,6 +161,7 @@ interface userDataType {
     username: string;
     me: boolean;
     friendStatus: boolean;
+    socket: any;
 }
 export default function UserData(props: userDataType) {
     return (
@@ -171,9 +180,11 @@ export default function UserData(props: userDataType) {
                     {props.me ? (
                         <MainUserButtons />
                     ) : props.friendStatus ? (
-                        <MainUserFriendsButtons {...props} />
+                        <MainUserFriendsButtons
+                            {...props}
+                        />
                     ) : (
-                        <UserButtons {...props} />
+                        <UserButtons  {...props} />
                     )}
                 </div>
 

@@ -4,10 +4,14 @@
     height: 90%;
     min-width: 400px;
     display: grid;
-    grid-template-columns: 50px 1fr 3.5fr;
+    max-height: 1000px;
+    grid-template-columns: 100px 1fr 3.5fr;
     grid-template-rows: 100%;
     gap: 5px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+        rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
 }
+
 
 .chat-wrapper {
     font-family: "Poppins";
@@ -20,8 +24,14 @@
 
 .chat-toggler {
     border-radius: 5px;
-    background-color: #a49f91;
     border-radius: 5px;
+    background-color: #f6f3eb;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding-top: 70px;
+    padding-bottom: 70px;
 }
 
 .chat-users {
@@ -40,8 +50,7 @@
     justify-content: center;
     align-items: center;
     border-radius: 5px;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
-        rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+    
 }
 
 .chat-users-content {
@@ -53,24 +62,19 @@
     padding: 20px;
     overflow: scroll;
     background-color: #f6f3eb;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
-        rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
 }
 
 .chat-body-header {
     height: 70px;
     border-radius: 5px;
-    background-color: #f6f3eb;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
-        rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+    background-color: #f6f3eb
 }
 
 .chat-body-content {
+    overflow: scroll;
     height: 100%;
     border-radius: 5px;
     background-color: #f6f3eb;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
-        rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
 }
 
 .chat-body-footer {
@@ -80,10 +84,9 @@
     align-items: center;
     padding-left: 20px;
     background-color: #f6f3eb;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
-        rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
 }
 .chat-body {
+    
     display: flex;
     flex-direction: column;
     border-radius: 5px;
@@ -109,7 +112,7 @@
     border-radius: 50%;
 }
 
-.chatting-user-status {
+.chatting-user-lastmsg {
     color: gray;
     padding: 0;
     margin: 0;

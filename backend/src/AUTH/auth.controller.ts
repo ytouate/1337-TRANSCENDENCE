@@ -1,4 +1,4 @@
-import { Controller, Post, Res, Req , UseGuards, Body, Put, Delete, ConsoleLogger, NotFoundException} from "@nestjs/common";
+import { Controller, Post, Res, Req , UseGuards, Body, Put, Delete, ConsoleLogger, NotFoundException, UnauthorizedException} from "@nestjs/common";
 import { authService } from "./auth.service";
 import { Get } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
@@ -67,7 +67,7 @@ export class authController {
         const user = await this.authservice.validateUser(req)
         if (user?.codeVerification  == body.code)
             return await this.authservice.setIsSignedInTrue(user, true)
-        throw ExceptionsHandler
+        throw new UnauthorizedException({}, '');
     }
 
     @Put('disable2fa')

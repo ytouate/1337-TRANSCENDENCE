@@ -4,6 +4,7 @@ import { imageLink } from "./auth.strategy42";
 import { JwtService } from "@nestjs/jwt";
 import { MailerService } from "@nestjs-modules/mailer";
 import { userReturn } from "src/utils/user.return";
+import { use } from "passport";
 
 @Injectable()
 export class authService{
@@ -37,6 +38,7 @@ export class authService{
     // generate a Token
     async signToken(username, email)
     {
+        console.log(username , email)
         const payload = {
             username : username,
             email : email
@@ -62,16 +64,18 @@ export class authService{
             include: {
                 friends: true,
                 preference : true,
-                notifications : true
+                notifications : true,
+                roomChat : {include  : { users : true , messages : true}}
             },
         })
+        user.friends = user.friends.map(friend => userReturn(friend, req));
         return userReturn(user, req)
     }
 
         //validate user
         async getUserWithWinRate(req) : Promise<any>{
             const users =  await this.prisma.user.findMany({
-             orderBy : { winRate: 'asc'}
+             orderBy : { winRate: 'desc'}
             })
             const usersToReturn = [];
             for (const user of users) {

@@ -1,5 +1,5 @@
 // AI Game
-export const WIN_CONDITION = 1;
+export const WIN_CONDITION = 3;
 
 export const BOARD_COLOR = 'black';
 

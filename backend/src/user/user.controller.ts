@@ -1,19 +1,19 @@
-import { Controller, Post , Get, Query, UseGuards, Put} from '@nestjs/common';
+import { Controller, Post , Get, Query, UseGuards, Put, Req} from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
+import { userReturn } from 'src/utils/user.return';
 
 
 @Controller('user')
 @UseGuards(AuthGuard('jwt'))
 export class UserController {
 
-    constructor (
+    constructor ( 
         private userService:UserService
         ){}
 
     @Post('addAdmin')
-    async setAdmin(@Query() Param) { 
-        console.log(`the user ${Param.username} has moved from member to admin`)
+    async setAdmin(@Query() Param) {
         return await this.userService.setAdmin(Param)
     }
 
@@ -25,13 +25,18 @@ export class UserController {
 
     @Post('changePassword')
     async   changePassword(@Query() Param) {
-        console.log({'meesage' : 'the password has changed'}) 
         return await   this.userService.changePasswordOfProtectedRoom(Param)
     }
 
     @Get('getRoom')
-    async getRoomByName(@Query() Param) {
-        return await this.userService.getRoomByName(Param.roomName)
+    async getRoomByName(@Query() Param, @Req() req) {
+        const room = await this.userService.getRoomByName(Param.roomName)
+        const usersToReturn = [];
+        for (const user of room.users) {
+            usersToReturn.push(userReturn(user, req));
+        }
+        room.users = usersToReturn; 
+        return room
     }
 
     @Get('getRooms')

@@ -1,26 +1,28 @@
 import "./Notification.css";
 import bell from "../../assets/bell.svg";
-import { socketContext, userContext } from "../../context/Context";
+import { userContext } from "../../context/Context";
 import { Fragment, useState, useEffect, useContext } from "react";
-import {nanoid} from 'nanoid'
+import { nanoid } from "nanoid";
+import socketIO from "socket.io-client";
+import Cookies from "js-cookie";
 
-function acceptInvitation(id: number) {
-    socketContext.emit("answer_notification", {
+function acceptInvitation(socket: any, id: number) {
+    socket.emit("answer_notification", {
         id: id,
         status: "accept",
         description: "Invitaion accepted",
     });
 }
-function rejectInvitation(id: number) {
-    socketContext.emit("answer_notification", {
+
+function rejectInvitation(socket: any, id: number) {
+    socket.emit("answer_notification", {
         id: id,
-        status: "accept",
-        description: "Invitaion accepted",
+        status: "reject",
+        description: "Invitaion Rejected",
     });
 }
 
 function RequestNotification(props: any) {
-    console.log("here id", props.id);
     return (
         <li key={props.id} className="notification-card">
             <div className="notification-card--data">
@@ -36,7 +38,7 @@ function RequestNotification(props: any) {
                     <>
                         <button
                             onClick={() => {
-                                acceptInvitation(props.id);
+                                acceptInvitation(props.socket, props.id);
                                 // props.setUser(...props.user);
                             }}
                             className="notification-card--action"
@@ -57,32 +59,34 @@ function RequestNotification(props: any) {
 }
 export default function Notification() {
     const [user, setUser] = useContext(userContext);
-    console.log(user);
+    let socketContext = null;
+    if (Cookies.get("Token")) {
+        socketContext = socketIO.connect(
+            "http://localhost:3000/notification",
+            {
+                extraHeaders: {
+                    Authorization: `Bearer ${Cookies.get("Token")}`,
+                },
+            }
+        );
+    }
     let [notifications, setNotifications] = useState<any>(user.notifications);
     useEffect(() => {
         socketContext.on("receive_notification", (notification: any) => {
-            console.log(notification);
             setNotifications((prev: any) => {
                 return [...prev, notification];
             });
         });
-    }, [user]);
-    console.log("notfications: ", notifications);
-    const notifList = notifications.map((notification: any) => {
-        console.log("hre: ", notification);
+    }, []);
 
+    const notifList = notifications.map((notification: any) => {
         return (
-            <Fragment
-                key={
-                    nanoid()
-                }
-            >
-                <RequestNotification
-                    {...notification}
-                    user={user}
-                    setUser={setUser}
-                />
-            </Fragment>
+            <RequestNotification
+                key={nanoid()}
+                socket={socketContext}
+                id={notification.id}
+                {...notification}
+            />
         );
     });
     return (
