@@ -9,7 +9,7 @@ export class UserService {
 
     
     // create room {2 users => n users}
-    async creatRoom(Param , user) {
+    async creatRoom(Param , user, isDm) {
         let {roomName  , status, password} = Param
         if (!password)
             password = ''
@@ -27,25 +27,26 @@ export class UserService {
                                 connect : { id : user.id}
                             },
                             status : status,
-                            password : hash
-                        }
+                            password : hash,
+                            isDms : isDm,
+                        }, include : {users : true ,messages : true}
                     }
                     )
                 await this.setAdmin({'username' : user.username , 'roomName' : roomName})
                 console.log('room ' , room)
-                return room
+                return {'found': false, room};
             }
             catch(error) {
             }
             finally { this.prismaService.$disconnect() }
         }
-        return {'message' : `room ${roomName} already exist`}
+        // return {'exist': true, room};
+        return {'found': true, room};
     }
 
     // add user to specific room
     async addUserToRoom(user , name) {
         let room = await this.prismaService.chatRoom.findFirst({where : {roomName : name}})
-        console.log(room)
         if (!await this.avoidDuplicate(user, name))
         {
             return await this.prismaService.chatRoom.update({
@@ -88,7 +89,7 @@ export class UserService {
 
     // show all available rooms
     async getAllRooms() {
-        return await this.prismaService.chatRoom.findMany({ include : {users : true , messages : true } })
+        return await this.prismaService.chatRoom.findMany({where : {status : { in : ['public', 'protected'] } } , include : {users : true , messages : true } })
     }
 
     // get a specific room by name
@@ -112,7 +113,6 @@ export class UserService {
         )
         if (room?.status == 'private')
             throw new UnauthorizedException({}, '');
-        
         return room
     }
 
@@ -131,11 +131,15 @@ export class UserService {
 
     // add data in message table
     async   addDataInMessageTable(data , id, user) {
+        const dataTime = new Date()
+        let date = ("0" + dataTime.getDate()).slice(-2);
+        let month = ("0" + (dataTime.getMonth() + 1)).slice(-2);
+        const time = dataTime.getFullYear()+"-"+month+"-"+date+" "+" "+dataTime.getHours()+":"+dataTime.getMinutes()
         const userFind = await this.prismaService.user.findUnique({where : {email : user.email}})
         const message = await this.prismaService.message.create({
             data : {
                 data : data,
-                time : new Date(Date.now()),
+                time : time,
                 roomId : id,
                 userId : userFind.id,
             }

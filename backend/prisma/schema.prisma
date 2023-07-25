@@ -35,7 +35,7 @@ model User {
   blockedBy        User[]         @relation("blocking")
   notifications    Notification[]
   status           String?
-  activitystatus   Boolean        @default(false)
+  activitystatus   UserStatus     @default(OFFLINE)
   roomChat         chatRoom[]     @relation("userInChatRoom")
   message          Message[]
   preference       Preference?
@@ -55,6 +55,7 @@ model chatRoom {
   admins     String[]
   muteUsers  String[]
   banUsers   String[]
+  isDms      Boolean   @default(false)
   status     String    @default("public")
   password   String?
 }
@@ -62,7 +63,7 @@ model chatRoom {
 model Message {
   id       Int      @id @default(autoincrement())
   data     String
-  time     DateTime @default(now())
+  time     String
   roomId   Int
   userId   Int
   user     User     @relation(fields: [userId], references: [id])
@@ -90,10 +91,15 @@ model Game {
   duration    Int        @default(0)
   playerOrder Int
 
-  @@map("games")
 }
 
 enum GameStatus {
   FINISHED
   OUTGOING
+}
+
+enum UserStatus {
+  ONLINE
+  OFFLINE
+  INGAME
 }

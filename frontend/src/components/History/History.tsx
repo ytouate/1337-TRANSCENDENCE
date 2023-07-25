@@ -1,33 +1,30 @@
 import MatchCard from '../HistoryCard/HistoryCard';
 import historyIcon from '../../assets/history-icon.svg';
-import profileImg from '../../assets/ytouate.jpeg';
-
 import './History.css';
 import { Fragment, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
-import { useLoaderData } from 'react-router-dom';
+import { useLoaderData, useParams } from 'react-router-dom';
 
 export default function History() {
     const [matches, setMatches] = useState([]);
     const user: any = useLoaderData();
-    const { id } = user;
+    const { id } = useParams();
 
     useEffect(() => {
-        console.log({ id });
         const options = {
             method: 'GET',
-            header: {
+            headers: {
                 Authorization: `Bearer ${Cookies.get('Token')}`,
             },
         };
         const url = `http://localhost:3000/game/user/${id}`;
-        console.log({ url });
+        console.log(url);
         fetch(url, options)
             .then((res) => {
                 return res.json();
             })
             .then((data) => setMatches(Object.values(data)));
-    }, []);
+    }, [id]);
 
     const MatchHistory = matches.map((match: any) => {
         let player1, player2;

@@ -47,10 +47,7 @@ export class Game {
         this.velocity = INITIAL_VELOCITY;
     }
 
-    public startGameLoop(
-        server: Server,
-        gamePlayerPosition: Map<number, GamePosition>,
-    ) {
+    public startGameLoop(server: Server, clearMaps: any) {
         let ball: Ball = {
             x: BOARD_WIDTH / 2,
             y: BOARD_HEIGHT / 2,
@@ -77,6 +74,8 @@ export class Game {
                 order: this.gamePosition.players[0].order,
                 pref: this.gamePosition.players[0].pref,
                 pref2: this.gamePosition.players[0].pref,
+                urlImg1: this.gamePosition.players[0].urlImg1,
+                urlImg2: this.gamePosition.players[0].urlImg2,
             };
             players[1] = {
                 id: this.gamePosition.players[1].id,
@@ -87,6 +86,8 @@ export class Game {
                 order: this.gamePosition.players[1].order,
                 pref: this.gamePosition.players[1].pref,
                 pref2: this.gamePosition.players[1].pref,
+                urlImg1: this.gamePosition.players[1].urlImg1,
+                urlImg2: this.gamePosition.players[1].urlImg2,
             };
             server.to(room).emit('game_update', {
                 ball: {
@@ -124,8 +125,7 @@ export class Game {
                     this.updateGameEnd(winnerData.id, loserData.id);
                     this.socket1.leave(String(this.roomId));
                     this.socket2.leave(String(this.roomId));
-                    gamePlayerPosition.delete(this.roomId);
-
+                    clearMaps();
                     clearInterval(interval); // Stop the interval
                     return;
                 }

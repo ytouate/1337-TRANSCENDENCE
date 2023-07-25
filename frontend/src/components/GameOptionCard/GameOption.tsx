@@ -1,5 +1,4 @@
 import "./GameOption.css";
-import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Link } from "react-router-dom";
 type GameOptionData = {
@@ -9,13 +8,6 @@ type GameOptionData = {
 };
 
 function GameOption(props: GameOptionData) {
-    // function handleClick(e, type) {
-    //     if (type == "ai") {
-    //         // do ai
-    //     } else if (type == "matchmaking") {
-    //         // matchmaking
-    //     }
-    // }
     return (
         <div className="card">
             <div className="circle"></div>
@@ -29,7 +21,7 @@ function GameOption(props: GameOptionData) {
                     // onClick={(e) => {
                     //     handleClick(e, props.type);
                     // }}
-                    // className="button"
+                    className="button"
                 >
                     {props.title}
                 </button>

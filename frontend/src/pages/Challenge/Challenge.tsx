@@ -4,7 +4,7 @@ import * as Constant from '../../constants/constants.ts';
 import { useLoaderData } from 'react-router-dom';
 
 // import webSocketService from '../service/WebSocketService.ts';
-import { useNavigate  } from 'react-router';
+import { useNavigate } from 'react-router';
 import { Paddle, Player } from '../../interface/game.ts';
 // import { PacmanLoader } from 'react-spinners';
 import galaxy_black from '../../assets/space_black.jpeg';
@@ -13,21 +13,27 @@ import jungle from '../../assets/jungle.jpeg';
 import arcade from '../../assets/arcade.jpg';
 import Game from '../../components/Game/Game.tsx';
 import webSocketService from '../../context/WebSocketService.ts';
-import './Queue.css';
+import './Challenge.css';
 import LoadingAnimation from '../../components/LoadingAnimation/LoadingAnimation.tsx';
+import { useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
-const Queue = () => {
+const Challenge = () => {
     const user: any = useLoaderData();
-    const { id, username, preference } = user;
+    const { username, preference } = user;
+    const id: number = user.id;
+    const { hostId } = useParams();
     // let { preference } = user;
-    console.log(preference);
 
     const [waitState, setWaitState] = useState(true);
     const [gameId, setGameId] = useState(null);
     const [player1, setPlayer1] = useState<Player>({} as Player);
     const [player2, setPlayer2] = useState<Player>({} as Player);
     const navigate = useNavigate();
-    const [socket, setScoket] = useState<any>();
+    // const [socket, setScoket] = useState<any>();
+    const location = useLocation();
+    const opponent = location.state?.username || 'player 2';
 
     let paddle1: Paddle = {
         x: Constant.PADDLE_MARGIN,
@@ -57,45 +63,39 @@ const Queue = () => {
             };
     };
 
-    const resetState = () => {
-        // const socket = webSocketService.getSocket();
-        if (!socket) {
+    const resetState = () => {};
+
+    useEffect(() => {
+        const socket = webSocketService.getSocket();
+
+        // inform the server that we are in this page and ready to play
+        socket?.emit('playerReady', {
+            userId: Number(id),
+            hostId: Number(hostId),
+        });
+
+        // while in this page waiting for the other player
+        // if the other player declines our invitation
+        // redirect him to home page and informs him that the
+        // invitation has been declined
+        socket?.on('invite_declined', (data: any) => {
+            console.log('he declined lol');
+            const username = data.username;
+            console.log(`${username} has declined ur invitation`);
             navigate('/');
-            return;
-        }
-        socket.emit('queueUp');
-        setGameId(null);
-        setWaitState(true);
-    };
+        });
 
-    useEffect(() => {
-        setScoket(webSocketService.connect());
-        // setScoket(webSocketService.getSocket());
+        // if no one invited u, or if u try to acces other players
+        // private lobby, u will be redirected to the home page
+        socket?.on('unauthorized_lobby', (data: any) => {
+            console.log('unauthorized_lobby');
+            navigate('/');
+        });
 
-        return () => {
-            webSocketService.disconnect();
-            setScoket(null);
-        };
-    }, []);
-
-    useEffect(() => {
-        // const socket = webSocketService.getSocket();
-        console.log('connected');
-
-        socket?.emit('queueUp', { userId: id });
-
-        // socket.on('disconnect', (reason: string) => {
-        //     if (reason === 'io server disconnect') {
-        //         return;
-        //     }
-        //     console.log(
-        //         'Disconnected from the server. Attempting to reconnect...',
-        //     );
-        //     connectSocket();
-        // });
-
-        socket?.on('match_found', (data: any) => {
-            console.log('match found');
+        // if both players are ready (emitted 'playerReady')
+        // the server will emit this event and the game will start
+        socket?.on('game_invite_start', (data: any) => {
+            console.log('game_invite_start');
             const { opponent, gameId, order, pref, pref2, urlImg1, urlImg2 } =
                 data;
 
@@ -149,17 +149,21 @@ const Queue = () => {
         });
 
         return () => {
-            socket?.off('connect');
-            socket?.off('match_found');
+            // maybe cancel the invite
+            if (Number(hostId) === id)
+                socket?.emit('cancelInvite', { userId: id });
+            socket?.off('invite_declined');
+            socket?.off('game_invite_start');
+            socket?.off('unauthorized_lobby');
         };
-    }, [socket]);
+    }, []);
 
     return (
         <div className='queue-outer-container' style={getMap()}>
             {waitState ? (
                 <div className='queue-container '>
                     <LoadingAnimation />
-                    <h1 className='queue-h1'>Waiting for players...</h1>
+                    <h1 className='queue-h1'>Waiting for {opponent}...</h1>
                 </div>
             ) : (
                 <div className='game-container'>
@@ -168,7 +172,7 @@ const Queue = () => {
                         player1={player1}
                         player2={player2}
                         gameId={gameId}
-                        resetState={resetState}
+                        resetState={null}
                     />
                 </div>
             )}
@@ -176,4 +180,4 @@ const Queue = () => {
     );
 };
 
-export default Queue;
+export default Challenge;

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './EndGameScreen.css';
 import defaultImage from '../../assets/ape.jpeg';
@@ -25,8 +24,7 @@ const EndGameScreen = ({
     const navigate = useNavigate();
 
     const onHomeClick = () => {
-        if (resetState) navigate('/');
-        else window.location.reload();
+        navigate('/');
     };
 
     return (

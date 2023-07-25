@@ -1,10 +1,9 @@
 import './App.css';
 import './index.css';
 
-import Navbar, { loader as navLoader } from "./components/Navbar/Navbar.jsx";
-import { authContext } from "./context/Context.js";
-import Home, { loader as homeLoader } from "./pages/Home/Home.jsx";
-import Test from './pages/Chat/Test'
+import Navbar, { loader as navLoader } from './components/Navbar/Navbar.jsx';
+import { authContext } from './context/Context.js';
+import Home, { loader as homeLoader } from './pages/Home/Home.jsx';
 
 import Settings, {
     loader as settingsLoader,
@@ -28,6 +27,7 @@ import TwoFactor from './pages/TwoFactor/TwoFactor.js';
 import { useState } from 'react';
 import AgainstAi from './pages/AgainstAi/AgainstAi.js';
 import Queue from './pages/Queue/Queue.js';
+import Challenge from './pages/Challenge/Challenge.js';
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -42,9 +42,15 @@ const router = createBrowserRouter(
                     loader={userLoader}
                     element={<Profile />}
                 />
-                <Route path="chat" loader={homeLoader} element={<Chat />} />
-                <Route path="test" loader={homeLoader} element={<Test />} />
-                <Route loader={navLoader} path="ai" element={<AgainstAi />} />
+                <Route path='chat' loader={homeLoader} element={<Chat />} />
+                <Route loader={navLoader} path='ai' element={<AgainstAi />} />
+                <Route loader={navLoader} path='queue' element={<Queue />} />
+
+                <Route
+                    loader={navLoader}
+                    path='challenge/:hostId'
+                    element={<Challenge />}
+                />
 
                 <Route
                     path='settings'

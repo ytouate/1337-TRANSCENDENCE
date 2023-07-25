@@ -2,6 +2,7 @@ import { Controller, Post , Get, Query, UseGuards, Put, Req} from '@nestjs/commo
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
 import { userReturn } from 'src/utils/user.return';
+import { Console } from 'console';
 
 
 @Controller('user')
@@ -32,11 +33,14 @@ export class UserController {
     async getRoomByName(@Query() Param, @Req() req) {
         const room = await this.userService.getRoomByName(Param.roomName)
         const usersToReturn = [];
-        for (const user of room.users) {
-            usersToReturn.push(userReturn(user, req));
+        if (room)
+        {
+            for (const user of room.users) {
+                usersToReturn.push(userReturn(user, req));
+            }
+            room.users = usersToReturn;
+            return room
         }
-        room.users = usersToReturn; 
-        return room
     }
 
     @Get('getRooms')

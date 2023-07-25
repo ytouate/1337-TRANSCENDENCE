@@ -3,8 +3,7 @@
     line-height: 28px;
     align-items: center;
     position: relative;
-    width: 100%;
-    max-width: 400px;
+    width: 85%;
     margin: auto;
     outline: none;
     border-color: var(--cards-color);

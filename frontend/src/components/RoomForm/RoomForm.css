@@ -1,0 +1,37 @@
+.room-form {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    background-color: brown;
+    width: 400px;
+    background-color: #f6f3eb;
+    gap: 10px;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+        rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+    border: 1px solid black;
+}
+.status-field {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.status-option {
+    display: flex;
+    gap: 5px;
+}
+
+
+.select-field {
+    display: flex;
+    gap: 20px;
+}
+
+.room-form-friends-section {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    height: 150px;
+    overflow: scroll;
+}

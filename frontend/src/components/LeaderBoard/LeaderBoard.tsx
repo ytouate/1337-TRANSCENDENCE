@@ -1,5 +1,4 @@
 import "./LeaderBoard.css";
-import ytouate from "../../assets/ytouate.jpeg";
 import leaderboardIcon from "../../assets/leaderboard-icon.svg";
 import { Fragment, useEffect, useState } from "react";
 import Cookies from "js-cookie";
