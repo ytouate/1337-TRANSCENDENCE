@@ -52,6 +52,25 @@ interface friendListType {
     blocked: any;
     friends: any;
 }
+export async function searchForUsers(e: any, searchPattern: string) {
+    e.preventDefault();
+    const token = Cookies.get("Token");
+    const options = {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    };
+    const res = await fetch(
+        `http://localhost:3000/users/search?` +
+            new URLSearchParams({
+                pattern: searchPattern,
+            }),
+        options
+    );
+    const data = await res.json();
+    return data;
+}
 export default function FriendsList(props: friendListType) {
     const [searchPattern, setSearchPattern] = useState("");
     const [section, setSection] = useState("friends");
@@ -72,46 +91,28 @@ export default function FriendsList(props: friendListType) {
     }, [isSearching]);
     const friendList = useFriendList(user);
     const blockedUsers = useBlockedUsers(user);
-    function searchForUsers(e: any) {
-        e.preventDefault();
-        const token = Cookies.get("Token");
-        const options = {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        };
-        fetch(
-            `http://localhost:3000/users/search?` +
-                new URLSearchParams({
-                    pattern: searchPattern,
-                }),
-            options
-        )
-            .then((res) => res.json())
-            .then((data) => {
-                setSearchFriends(
-                    data.map((friend: any) => {
-                        setIsSearching(true);
-                        return (
-                            <Link to={`/profile/${friend.id}`} key={friend.id}>
-                                <FriendCard
-                                    lastmsg={
-                                        friend.activitystatus
-                                            ? "online"
-                                            : "offline"
-                                    }
-                                    addOption={false}
-                                    img={friend.urlImage}
-                                    name={friend.username}
-                                />
-                            </Link>
-                        );
-                    })
-                );
-            });
-    }
 
+    function handleSearch(e) {
+        searchForUsers(e, searchPattern).then((data) => {
+            setSearchFriends(
+                data.map((friend: any) => {
+                    setIsSearching(true);
+                    return (
+                        <Link to={`/profile/${friend.id}`} key={friend.id}>
+                            <FriendCard
+                                lastmsg={
+                                    friend.activitystatus ? "online" : "offline"
+                                }
+                                addOption={false}
+                                img={friend.urlImage}
+                                name={friend.username}
+                            />
+                        </Link>
+                    );
+                })
+            );
+        });
+    }
     return (
         <div className="friends-list">
             <div className="friends-list--header">
@@ -151,7 +152,7 @@ export default function FriendsList(props: friendListType) {
                 {isSearching && (
                     <SearchBar
                         value={searchPattern}
-                        searchForUsers={searchForUsers}
+                        searchForUsers={handleSearch}
                         setValue={setSearchPattern}
                     />
                 )}

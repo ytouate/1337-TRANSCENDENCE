@@ -1,11 +1,12 @@
 import "./Notification.css";
 import bell from "../../assets/bell.svg";
-import {  userContext } from "../../context/Context";
-import {  useState, useEffect, useContext } from "react";
+import { userContext } from "../../context/Context";
+import { useState, useEffect, useContext } from "react";
 import { nanoid } from "nanoid";
 import socketIO from "socket.io-client";
 import Cookies from "js-cookie";
 import { Socket } from "socket.io-client/debug";
+import { ToastContainer, toast } from "react-toastify";
 
 function acceptInvitation(socket: any, id: number) {
     socket.emit("answer_notification", {
@@ -40,16 +41,12 @@ function RequestNotification(props: any) {
                         <button
                             onClick={() => {
                                 acceptInvitation(props.socket, props.id);
-                                // props.setUser(...props.user);
                             }}
                             className="notification-card--action"
                         >
                             Accept
                         </button>
-                        <button
-                            // onClick={() => rejectInvitation(props.id)}
-                            className="notification-card--action"
-                        >
+                        <button className="notification-card--action">
                             Reject
                         </button>
                     </>
@@ -58,12 +55,13 @@ function RequestNotification(props: any) {
         </li>
     );
 }
+
 export default function Notification() {
-    const [user] : any = useContext(userContext);
+    const [user]: any = useContext(userContext);
     const [socketContext, setSocketContext] = useState<Socket | null>(null);
     let [notifications, setNotifications] = useState<any>(user.notifications);
     useEffect(() => {
-        const socketContext : any = socketIO(
+        const socketContext: any = socketIO(
             "http://localhost:3000/notification",
             {
                 autoConnect: false,
