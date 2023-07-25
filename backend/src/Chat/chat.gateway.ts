@@ -8,6 +8,7 @@ import { Req } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { userReturnToGatway } from "src/utils/user.return";
 import { Client } from "socket.io/dist/client";
+import { use } from "passport";
 
 @WebSocketGateway({ namespace : 'chat' , cors: {origin : '*'} })
 export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGatewayDisconnect {
@@ -25,12 +26,21 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
     // send message to current room
     @SubscribeMessage('sendMessage')
     @UseGuards(AuthGuard('websocket-jwt'))
-    async onMessage(client : Socket , @MessageBody() data , @Req() req)
+    async onMessage(client : Socket , @MessageBody() Body , @Req() req)
     {
-        const message = await this.user.putDataInDatabase(data.roomName, data.data, req)
+        console.log('body' , Body)
+        const id = this.socketId.get(req.user.email)
+        this.server.to(id).socketsJoin(Body.roomName)
+        for (const email of Body.email)
+        {
+            const newId = this.socketId.get(email)
+            this.server.to(newId).socketsJoin(Body.roomName)
+        }
+        const message = await this.user.putDataInDatabase(Body.roomName, Body.data, req)
         message.sender = userReturnToGatway(message.sender, req);
-        console.log('backend romname' , data.roomName)
-        this.server.to(data.roomName).emit('onMessage', message)
+        message.roomName = Body.roomName;
+        console.log('room' , Body.roomName)
+        this.server.to(Body.roomName).emit('onMessage', message)
     }
 
     onModuleInit() {
@@ -51,20 +61,20 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
             let {found, room} = await this.user.creatRoom({
                 'roomName' : roomName ,
                 'status'   : status ,
-                'password' : password} , User)
-            room = await this.prisma.chatRoom.findUnique({where : {id : room.id} , include : {messages : true , users : true}})
+                'password' : password} , User, Body.isDm)
+            const newRoom = await this.prisma.chatRoom.findUnique({where : {id : room.id} , include : {messages : true , users : true}})
             if (!found)
             {
                 let id = this.socketId.get(req.user.email)
                 this.server.in(id).socketsJoin(Body.roomName)
-                console.log(req.user.email , ': ' , client.id , ' join room' , Body.roomName)
+                // console.log(req.user.email , ': ' , client.id , ' join room' , Body.roomName)
                 if (Body.email)
                 {
                     for (const email of Body.email)
                     {
                         id = this.socketId.get(email)
                         this.server.to(id).socketsJoin(email)
-                        console.log(email , ': ' , id , ' join room' , Body.roomName)
+                        // console.log(email , ': ' , id , ' join room' , Body.roomName)
                         const newUser = await this.prisma.user.findUnique({where : {email : email}})
                         room = await this.user.addUserToRoom(newUser, Body.roomName)
                     }
@@ -72,7 +82,6 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
             } else {
                 const id = this.socketId.get(req.user.email)
                 this.server.to(id).socketsJoin(roomName)
-                console.log('body' , Body.email)
                 for (const email of Body.email)
                 {
                     const newId = this.socketId.get(email)
@@ -80,7 +89,7 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
                     this.server.to(newId).socketsJoin(roomName)
                 }
             }
-            client.emit("get_room", {'room' : room})
+            client.emit("get_room", {'room' : newRoom})
             // this.server.to(roomName).emit("get_room", {'room': room});
         }
     }
@@ -109,9 +118,10 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
     @SubscribeMessage('leaveRoom')
     @UseGuards(AuthGuard('websocket-jwt'))
     async leaveRoomHandler(@Req() req, @MessageBody() body) {
-        const user = await this.validateUserByUsername(body.username)
+        const user = await this.validateUserByUsername(req.user.username)
         if (user)
         {
+            console.log
             const Id = this.socketId.get(user.email)
             this.socketId.delete(user.email)
             console.log(`client  ${Id} leave room ${body.roomName}`)
