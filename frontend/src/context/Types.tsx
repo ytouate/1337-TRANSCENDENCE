@@ -44,6 +44,7 @@ export interface chatRoom {
     banUsers: string[];
     status: string;
     password?: string;
+    isDms: boolean;
 }
 
 export interface Message {
@@ -86,7 +87,7 @@ export interface Props {
     user: User;
     setSelectedUser(user: User): any;
     createRoom(user: User): any;
-    setRoom(room: chatRoom): any;
+    setRoom?(room: chatRoom): any;
 }
 
 export interface CurrentChattingUserProps {

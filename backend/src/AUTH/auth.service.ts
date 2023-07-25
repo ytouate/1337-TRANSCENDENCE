@@ -59,7 +59,6 @@ export class authService{
 
     //validate user
     async validateUser(req) : Promise<any>{
-        console.log('request: ', req.headers);
         const user =  await this.prisma.user.findUnique({where : {email : req.user.email} ,
             include: {
                 friends: true,

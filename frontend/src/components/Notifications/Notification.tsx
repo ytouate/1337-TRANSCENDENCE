@@ -60,9 +60,9 @@ function RequestNotification(props: any) {
         </li>
     );
 }
+
 export default function Notification() {
     const [user]: any = useContext(userContext);
-
     const [socketContext, setSocketContext] = useState<Socket | null>(null);
     const [gameSocket, setGameSocket] = useState<Socket | null>(null);
     const navigate = useNavigate();

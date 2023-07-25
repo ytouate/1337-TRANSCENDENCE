@@ -8,13 +8,6 @@ type GameOptionData = {
 };
 
 function GameOption(props: GameOptionData) {
-    // function handleClick(e, type) {
-    //     if (type == "ai") {
-    //         // do ai
-    //     } else if (type == "matchmaking") {
-    //         // matchmaking
-    //     }
-    // }
     return (
         <div className="card">
             <div className="circle"></div>
