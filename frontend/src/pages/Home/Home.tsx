@@ -4,10 +4,10 @@ import LeaderBoardCard from "../../components/LeaderBoard/LeaderBoard";
 import ActiveFriends from "../../components/ActiveFriends/ActiveFriends";
 import "./Home.css";
 import { authContext, userContext } from "../../context/Context";
-
 import { Navigate, redirect, useLoaderData } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useContext, useState } from "react";
+import { Spectate } from "../../components/Spectate/Spectate";
 export async function loader() {
     const Token = Cookies.get("Token");
     const options = {
@@ -27,8 +27,9 @@ export async function loader() {
     return redirect("/signin");
 }
 
+
 function Home() {
-    const [isSignedIn] = useContext(authContext);
+    const [isSignedIn]: any = useContext(authContext);
     if (isSignedIn == false) return <Navigate to={"/signin"} />;
 
     const user: any = useLoaderData();
@@ -44,6 +45,9 @@ function Home() {
                 </div>
                 <div className="home--right">
                     <LeaderBoardCard />
+                </div>
+                <div className="home-buttom">
+                    <Spectate />
                 </div>
             </div>
         </userContext.Provider>

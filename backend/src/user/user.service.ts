@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt'
-import { userReturn, userReturnToGatway } from 'src/utils/user.return';
 
 @Injectable()
 export class UserService {
@@ -9,8 +8,8 @@ export class UserService {
 
     
     // create room {2 users => n users}
-    async creatRoom(Param , user, isDm) {
-        let {roomName  , status, password} = Param
+    async creatRoom(user, Body) {
+        let {roomName  , status, password} = Body
         if (!password)
             password = ''
         const room = await this.prismaService.chatRoom.findFirst({ where : {roomName : roomName}})
@@ -28,12 +27,11 @@ export class UserService {
                             },
                             status : status,
                             password : hash,
-                            isDms : isDm,
+                            isDms : Body.isDms,
                         }, include : {users : true ,messages : true}
                     }
                     )
-                await this.setAdmin({'username' : user.username , 'roomName' : roomName})
-                console.log('room ' , room)
+                await this.setAdmin({email : [user.email] , roomName : Body.roomName})
                 return {'found': false, room};
             }
             catch(error) {
@@ -46,10 +44,11 @@ export class UserService {
 
     // add user to specific room
     async addUserToRoom(user , name) {
+        let newRoom : any;
         let room = await this.prismaService.chatRoom.findFirst({where : {roomName : name}})
         if (!await this.avoidDuplicate(user, name))
         {
-            return await this.prismaService.chatRoom.update({
+            newRoom =  await this.prismaService.chatRoom.update({
                 where : { id : room.id},
                 data :
                 { 
@@ -60,10 +59,11 @@ export class UserService {
                             id : user.id 
                         },
                     } 
-                }
+                },
+                include : { users : true , messages : true}
             })
         }
-        return room
+        return newRoom;
     }
 
     // delete user from current room
@@ -80,8 +80,16 @@ export class UserService {
                             id : user.id
                         }
                     }
-                }
+                }, include : {users : true}
             })
+            let neW : any
+            console.log(update.users.length)
+            if (update.users.length == 0)
+            {
+                await this.prismaService.message.deleteMany({where : {roomId : update.id}})
+                neW = await this.prismaService.chatRoom.delete({where : {id : update.id}})
+            }
+            console.log('nw' ,neW)
             return update
         }
         catch(error) { throw new UnauthorizedException({}, ''); }
@@ -194,20 +202,20 @@ export class UserService {
 
     // set admin to other users in my room
     async   setAdmin(param) {
-        const member = await this.getUserWithUsername(param.username)
+        // const member = await this.getUserWithUsername(param.username)
         const room = await this.prismaService.chatRoom.findFirst({where : {roomName : param.roomName}})
-        if (room?.admins.indexOf(member.email) < 0)
-        {
+        // if (room?.admins.indexOf(member.email) < 0)
+        // {
             return await this.prismaService.chatRoom.update(
             {
                 where : {id : room.id} , 
                 data : {
-                    admins : {push : member.email}
-                }
+                    admins : {push : param.email}
+                }, include : {users : true , messages : true}
             }    
             )
-        }
-        return room
+        // }
+        // return room
     }
 
 
@@ -232,13 +240,30 @@ export class UserService {
         throw new NotFoundException({}, 'room not found');
     }
 
+    // delete pass from protected room
+    async   deletePasswordOfProtectedRoom(param) {
+        const {roomName} = param
+        const room = await this.prismaService.chatRoom.findFirst({where : {roomName : roomName}})
+        if (room){
+            return await this.prismaService.chatRoom.update(
+            {
+                where :
+                {
+                    id : room.id
+                },
+                data : 
+                {
+                    status : 'public'
+                }
+            })
+        }
+        throw new NotFoundException({}, 'room not found');
+    }
 
     // ban users
-    async   banUser(param) {
-        const {username , roomName} = param
-        const member = await this.getUserWithUsername(username)
+    async   banUser(user, roomName, emails) {
         const room = await this.prismaService.chatRoom.findFirst({where : {roomName : roomName}})
-        if (room.banUsers.indexOf(member.email) < 0)
+        if (room.banUsers.indexOf(user.email) < 0)
         {
             return await this.prismaService.chatRoom.update(
                 {
@@ -247,22 +272,25 @@ export class UserService {
                     {
                         banUsers : 
                         {
-                            push : member.email
+                            push : emails
                         }
                     }
                 }
             )
         }
+        console.log('ban ' , room)
         return room
     }
 
     // mute users
-    async   muteUsers(param) {
-        const {username , roomName} = param
-        const member = await this.getUserWithUsername(username)
+    async   muteUsers(body) {
+        const {email , roomName} = body
+        console.log('body : ' , body)
         const room = await this.prismaService.chatRoom.findFirst({where : {roomName : roomName}})
-        if (room.muteUsers.indexOf(member.email) < 0)
-        {
+        if (!room)
+            throw new NotFoundException()
+        // if (room.muteUsers.indexOf(member.email) < 0)
+        // {
             return await this.prismaService.chatRoom.update(
                 {
                     where : {id : room.id} , 
@@ -270,14 +298,43 @@ export class UserService {
                     {
                         muteUsers : 
                         {
-                            push : member.email
+                            push : email
                         }
-                    }
+                    }, include : {users : true , messages : true}
                 }
             )
-        }
-        return room
+        // }
     }
+
+
+    // delet user from mute users
+    async   deleteUserFromMuteUsers(body) {
+        const {email , roomName} = body
+        console.log('body : ' , body)
+        const room = await this.prismaService.chatRoom.findFirst({where : {roomName : roomName}})
+
+        const emails = room.muteUsers.filter(userMail => {
+            if (email.find(mail => mail == userMail))
+                return false;
+            return true;
+        } )
+        console.log('filtered mails: ', emails);
+        if (!room)
+            throw new NotFoundException()
+        // if (room.muteUsers.indexOf(member.email) < 0)
+        // {
+            return await this.prismaService.chatRoom.update(
+                {
+                    where : {id : room.id} , 
+                    data : 
+                    {
+                        muteUsers : emails
+                    }, include : {users : true , messages : true}
+                }
+            )
+        // }
+    }
+
 
     // validate user to create chat
     async   validateUserToCreateChat(req)

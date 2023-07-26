@@ -3,9 +3,7 @@ import GameOption from "../GameOptionCard/GameOption";
 import againstAi from "../../assets/against_ai.jpg";
 import "./GameOptions.css";
 
-export default function () {
-  
-
+export default function GameOptions () {
   return (
     <div className="game-options">
       <p className="home-text">

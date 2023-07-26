@@ -1,33 +1,14 @@
 import './ActiveFriends.css';
 import swordsIcon from '../../assets/sword.svg';
 import { userContext } from '../../context/Context.js';
-import { Fragment, useContext, useEffect, useState } from 'react';
+import { Fragment, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ChallengeCard from '../ChallengeCard/ChallengeCard.js';
 import webSocketService from '../../context/WebSocketService.js';
 
-// function useActiveFriends(user: any) {
-//     let activeFriends = [];
-//     if (user) {
-//         activeFriends = user.friends.map((friend: any) => {
-//             return (
-//                 <Link key={friend.id} to={`/profile/${friend.id}`}>
-//                     <ChallengeCard
-//                         img={friend.urlImage}
-//                         name={friend.username}
-//                         status={friend.status}
-//                     />
-//                 </Link>
-//             );
-//         });
-//     }
-//     return activeFriends;
-// }
-
 export default function ActiveFriends() {
     const [user]: any = useContext(userContext);
     const activeFriends = useActiveFriends(user);
-    // const [socket, setScoket] = useState<any>();
     const navigate = useNavigate();
 
     const emitInvite = (username: string) => {

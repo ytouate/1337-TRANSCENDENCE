@@ -1,4 +1,4 @@
-import { Controller, Post , Get, Query, UseGuards, Put, Req} from '@nestjs/common';
+import { Controller, Post , Get, Query, UseGuards, Put, Req, Body} from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
 import { userReturn } from 'src/utils/user.return';
@@ -14,19 +14,28 @@ export class UserController {
         ){}
 
     @Post('addAdmin')
-    async setAdmin(@Query() Param) {
-        return await this.userService.setAdmin(Param)
+    async setAdmin(@Body() Body) {
+        return await this.userService.setAdmin(Body)
     }
 
-    @Post('muteUser')
-    async   muteUser(@Query() Param) {
-        return await this.userService.muteUsers(Param)
+    @Post('mute')
+    async   muteUser(@Body() body) {
+        return await this.userService.muteUsers(body)
     } 
 
+    @Post('unmute')
+    async   deleteMuteUser(@Body() body) {
+        return await this.userService.deleteUserFromMuteUsers(body);
+    } 
 
     @Post('changePassword')
     async   changePassword(@Query() Param) {
         return await   this.userService.changePasswordOfProtectedRoom(Param)
+    }
+
+    @Post('deletePassword')
+    async   deletePasword(@Query() Param) {
+        return await   this.userService.deletePasswordOfProtectedRoom(Param)
     }
 
     @Get('getRoom')

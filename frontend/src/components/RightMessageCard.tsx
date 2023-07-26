@@ -2,7 +2,7 @@ import { useRef, useEffect } from "react";
 
 export type MessageData = {
     message: string;
-    time: string;
+    time: Date;
     sender: string;
     img: string;
 };
@@ -20,7 +20,7 @@ function RightMessageCard(props: MessageData) {
                         {props.sender}
                     </p>
                     <p className="right-message-card--message-time">
-                        {props.time}
+                        {props.time.toString()}
                     </p>
                 </div>
                 <img

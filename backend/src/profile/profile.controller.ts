@@ -1,11 +1,11 @@
-import { Controller, Delete, Get, Inject, Param, Put, Req, Res, StreamableFile, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Controller, Delete, Get, Inject, Param, Put, Req, Res, StreamableFile, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { diskStorage } from 'multer';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as mimeTypes from 'mime-types';
 import { createReadStream } from 'fs';
 import { ProfileService } from './profile.service';
-
+import * as fs from 'fs';
 
 
 @Controller('profile')
@@ -25,7 +25,14 @@ export class ProfileController {
                 const filename = req.user.email + '.' + mimeTypes.extension(extension);
                 callback(null, filename);
             }
-        })
+        }),
+        fileFilter: (req, file, callback) => {
+            if (file.mimetype != 'image/jpeg' && file.mimetype != 'image/jpg')
+                callback(new Error('file type not allowed'),false);
+            if (file.size > 700000)
+                callback(new Error('size not allowed'), false);
+            callback(null, true);
+        }
     }))
     @UseGuards(AuthGuard('jwt'))
     @Put('updatephoto')

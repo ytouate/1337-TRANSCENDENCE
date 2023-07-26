@@ -9,6 +9,8 @@ import { JwtService } from "@nestjs/jwt";
 import { userReturnToGatway } from "src/utils/user.return";
 import { Client } from "socket.io/dist/client";
 import { use } from "passport";
+import { chownSync } from "fs";
+import { concatAll } from "rxjs";
 
 @WebSocketGateway({ namespace : 'chat' , cors: {origin : '*'} })
 export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGatewayDisconnect {
@@ -28,7 +30,6 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
     @UseGuards(AuthGuard('websocket-jwt'))
     async onMessage(client : Socket , @MessageBody() Body , @Req() req)
     {
-        console.log('body' , Body)
         const id = this.socketId.get(req.user.email)
         this.server.to(id).socketsJoin(Body.roomName)
         for (const email of Body.email)
@@ -39,7 +40,6 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
         const message = await this.user.putDataInDatabase(Body.roomName, Body.data, req)
         message.sender = userReturnToGatway(message.sender, req);
         message.roomName = Body.roomName;
-        console.log('room' , Body.roomName)
         this.server.to(Body.roomName).emit('onMessage', message)
     }
 
@@ -54,43 +54,40 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
     @UseGuards(AuthGuard('websocket-jwt'))
     async handleCreationOfTheRoom(@ConnectedSocket() client : Socket , @Req() req, @MessageBody() Body) {
         console.log(`client  ${client.id} connected and creat the room ${Body.roomName}`)
+        let userAddToRoom  : any;
         const User = await this.validateUserByEmail(req.user.email, Body.roomName, 0)
         if (User)
         {
-            const {roomName , status, password} = Body
-            let {found, room} = await this.user.creatRoom({
-                'roomName' : roomName ,
-                'status'   : status ,
-                'password' : password} , User, Body.isDm)
-            const newRoom = await this.prisma.chatRoom.findUnique({where : {id : room.id} , include : {messages : true , users : true}})
+            let {found, room} = await this.user.creatRoom( User, Body)
+            let newRoom = await this.prisma.chatRoom.findUnique({where : {id : room.id} , include : {messages : true , users : true}})
+            console.log({found , room})
             if (!found)
             {
+                console.log(room)
                 let id = this.socketId.get(req.user.email)
                 this.server.in(id).socketsJoin(Body.roomName)
-                // console.log(req.user.email , ': ' , client.id , ' join room' , Body.roomName)
                 if (Body.email)
                 {
                     for (const email of Body.email)
                     {
+                        console.log(email)
                         id = this.socketId.get(email)
                         this.server.to(id).socketsJoin(email)
-                        // console.log(email , ': ' , id , ' join room' , Body.roomName)
                         const newUser = await this.prisma.user.findUnique({where : {email : email}})
-                        room = await this.user.addUserToRoom(newUser, Body.roomName)
+                        newRoom = await this.user.addUserToRoom(newUser, Body.roomName)
                     }
                 }
             } else {
                 const id = this.socketId.get(req.user.email)
-                this.server.to(id).socketsJoin(roomName)
+                this.server.to(id).socketsJoin(Body.roomName)
                 for (const email of Body.email)
                 {
                     const newId = this.socketId.get(email)
-                    console.log('newID' , newId);
-                    this.server.to(newId).socketsJoin(roomName)
+                    this.server.to(newId).socketsJoin(Body.roomName)
                 }
             }
+            console.log(newRoom)
             client.emit("get_room", {'room' : newRoom})
-            // this.server.to(roomName).emit("get_room", {'room': room});
         }
     }
 
@@ -99,18 +96,25 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
     @UseGuards(AuthGuard('websocket-jwt'))
     async handleJoiningTheRoom(@ConnectedSocket() client : Socket , @Req() req, @MessageBody() body) {
         console.log(`client  ${client.id} connected and joining the room ${body.roomName}`)
+        console.log(body)
         const user = await this.validateUserByEmail(req.user.email, body.roomName, 1)
         if (user)
         {
             const result = await this.user.joiningTheRoom(body);
             if (result == undefined)
-                throw new UnauthorizedException({}, '')
-            if (result == false)
-                throw new UnauthorizedException({}, '')
+                client.emit('onError' , {'message' : 'password incorrect'})
             this.server.in(client.id).socketsJoin(body.roomName)
-            const newUpdateChat = this.user.addUserToRoom(user, body.roomName)      
-            console.log(`${user.username} has joined in ${body.roomName}`)
+            await this.user.addUserToRoom(user, body.roomName)
+            for (const email of body.email)
+            {
+                const id = this.socketId.get(email)
+                this.server.in(id).socketsJoin(body.roomName)
+                const newUser = await this.prisma.user.findUnique({where : {email : email}})
+                const newUpdateChat = await this.user.addUserToRoom(newUser, body.roomName)
+            }
         }
+        else
+            client.emit('onError' , {'message' : 'you are baned'})
     }
 
 
@@ -118,15 +122,22 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
     @SubscribeMessage('leaveRoom')
     @UseGuards(AuthGuard('websocket-jwt'))
     async leaveRoomHandler(@Req() req, @MessageBody() body) {
+        console.log('body' , body)
+        if (!body.kick && !body.ban)
+            body.email.push(req.user.email)
         const user = await this.validateUserByUsername(req.user.username)
         if (user)
         {
-            console.log
-            const Id = this.socketId.get(user.email)
-            this.socketId.delete(user.email)
-            console.log(`client  ${Id} leave room ${body.roomName}`)
-            this.server.in(Id).socketsLeave(body.roomName)
-            this.user.deleteUserFromRoom(user , body.roomName)
+            for (const email of body.email)
+            {
+                const Id = this.socketId.get(email)
+                this.socketId.delete(email)
+                this.server.in(Id).socketsLeave(body.roomName)
+                const user = await this.validateUserByEmail(email, body.roomName, 0)
+                if (body.ban)
+                    await this.user.banUser(user , body.roomName, body.email)
+                this.user.deleteUserFromRoom(user , body.roomName)
+            }
         }
     }
 
