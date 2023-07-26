@@ -79,12 +79,22 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
                     }
                 }
             } else {
-                const id = this.socketId.get(req.user.email)
-                this.server.to(id).socketsJoin(roomName)
-                for (const email of Body.email)
+                if (newRoom.isDms && (User.blocked.find(user => user.email == Body.email[0]) 
+                    || User.blockedBy.find(user => user.email == Body.email[0])))
                 {
-                    const newId = this.socketId.get(email)
-                    this.server.to(newId).socketsJoin(roomName)
+                    await this.prisma.message.deleteMany({where : {roomId : room.id}})
+                    await this.prisma.chatRoom.delete({where : {id : room.id}})
+                    client.emit('onError' , {'message' : 'you are blocked this user'})
+                }
+                else
+                {
+                    const id = this.socketId.get(req.user.email)
+                    this.server.to(id).socketsJoin(roomName)
+                    for (const email of Body.email)
+                    {
+                        const newId = this.socketId.get(email)
+                        this.server.to(newId).socketsJoin(roomName)
+                    }
                 }
             }
             client.emit("get_room", {'room' : newRoom})
@@ -155,7 +165,7 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
 
     //check the user if exist 
     async validateUserByEmail(email, roomName, num) {
-        const user =  await this.prisma.user.findUnique({where : {email : email}})
+        const user =  await this.prisma.user.findUnique({where : {email : email} , include : {blocked : true ,blockedBy : true}})
         const room = await this.prisma.chatRoom.findFirst({ where : {roomName : roomName} })
         if (num == 0)
             return user
