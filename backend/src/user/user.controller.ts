@@ -28,10 +28,14 @@ export class UserController {
         return await this.userService.deleteUserFromMuteUsers(body);
     } 
 
-
     @Post('changePassword')
     async   changePassword(@Query() Param) {
         return await   this.userService.changePasswordOfProtectedRoom(Param)
+    }
+
+    @Post('deletePassword')
+    async   deletePasword(@Query() Param) {
+        return await   this.userService.deletePasswordOfProtectedRoom(Param)
     }
 
     @Get('getRoom')

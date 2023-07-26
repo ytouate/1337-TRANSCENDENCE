@@ -1,8 +1,6 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt'
-import { userReturn, userReturnToGatway } from 'src/utils/user.return';
-import { log } from 'console';
 
 @Injectable()
 export class UserService {
@@ -82,8 +80,16 @@ export class UserService {
                             id : user.id
                         }
                     }
-                }
+                }, include : {users : true}
             })
+            let neW : any
+            console.log(update.users.length)
+            if (update.users.length == 0)
+            {
+                await this.prismaService.message.deleteMany({where : {roomId : update.id}})
+                neW = await this.prismaService.chatRoom.delete({where : {id : update.id}})
+            }
+            console.log('nw' ,neW)
             return update
         }
         catch(error) { throw new UnauthorizedException({}, ''); }
@@ -234,27 +240,25 @@ export class UserService {
         throw new NotFoundException({}, 'room not found');
     }
 
-
-        //change password of protected room
-        async   deletePasswordOfProtectedRoom(param) {
-            const {roomName, password} = param
-            const room = await this.prismaService.chatRoom.findFirst({where : {roomName : roomName}})
-            let hash = await bcrypt.hash(password, 10)
-            if (room){
-                return await this.prismaService.chatRoom.update(
+    // delete pass from protected room
+    async   deletePasswordOfProtectedRoom(param) {
+        const {roomName} = param
+        const room = await this.prismaService.chatRoom.findFirst({where : {roomName : roomName}})
+        if (room){
+            return await this.prismaService.chatRoom.update(
+            {
+                where :
                 {
-                    where :
-                    {
-                        id : room.id
-                    },
-                    data : 
-                    {
-                        status : 'public'
-                    }
-                })
-            }
-            throw new NotFoundException({}, 'room not found');
+                    id : room.id
+                },
+                data : 
+                {
+                    status : 'public'
+                }
+            })
         }
+        throw new NotFoundException({}, 'room not found');
+    }
 
     // ban users
     async   banUser(user, roomName, emails) {
