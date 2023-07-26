@@ -254,7 +254,7 @@ export class GameGateWay implements OnGatewayConnection {
 
         console.log('queue up');
 
-        const user = await this.addClient(client, payload.username);
+        const user = await this.addClient(client, payload.email);
 
         if (this.queue.includes(user.id)) {
             console.log('User already in the queue');
