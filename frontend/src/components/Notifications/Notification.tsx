@@ -42,7 +42,6 @@ function RequestNotification(props: any) {
                         <button
                             onClick={() => {
                                 props.acceptInvitation();
-                                // props.setUser(...props.user);
                             }}
                             className='notification-card--action'
                         >
