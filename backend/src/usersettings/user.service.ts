@@ -57,35 +57,36 @@ export class UserSettingsService {
         return userTarget;
     }
     //push user to block scalar
-    async addUserToBlocking(source, target){
-        const roomName: string = source.username > target.username
-            ? `${source.username}${target.username}`
-            : `${target.username}${source.username}`;
+    async addUserToBlocking(source, target) {
+        const roomName: string =
+            source.username > target.username
+                ? `${source.username}${target.username}`
+                : `${target.username}${source.username}`;
         const room = await this.prismaService.chatRoom.findFirst({
             where: {
-               roomName: roomName,
+                roomName: roomName,
             },
             include: {
                 messages: true,
-            }
+            },
         });
-        if (room){
+        if (room) {
             let arrayOfId = [];
-            room.messages.map(msg => {
+            room.messages.map((msg) => {
                 arrayOfId.push(msg.id);
-            })
+            });
             await this.prismaService.message.deleteMany({
-                where:{
-                    id :{
-                        in: arrayOfId
-                    }
-                }
-            })
+                where: {
+                    id: {
+                        in: arrayOfId,
+                    },
+                },
+            });
             await this.prismaService.chatRoom.delete({
                 where: {
-                    id: room.id
-                }
-            })
+                    id: room.id,
+                },
+            });
         }
         let user = await this.prismaService.user.update({
             where: {
@@ -215,10 +216,22 @@ export class UserSettingsService {
         throw new NotFoundException({}, 'not found');
     }
 
-    async getUserByUsername(name: string) {
+    async getUserByEmail(email: string) {
         const user = await this.prismaService.user.findUnique({
             where: {
-                username: name,
+                email: email,
+            },
+        });
+        if (!user)
+            // check if user exists
+            throw new ForbiddenException('user not found');
+        return user;
+    }
+
+    async getUserByUsername(username: string) {
+        const user = await this.prismaService.user.findUnique({
+            where: {
+                username: username,
             },
         });
         if (!user)
