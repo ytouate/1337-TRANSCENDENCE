@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/co
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt'
 import { userReturn, userReturnToGatway } from 'src/utils/user.return';
+import { timeout } from 'rxjs';
 
 @Injectable()
 export class UserService {
@@ -232,6 +233,24 @@ export class UserService {
         throw new NotFoundException({}, 'room not found');
     }
 
+    async   deletePasswordOfProtectedRoom(param) {
+        const {roomName} = param
+        const room = await this.prismaService.chatRoom.findFirst({where : {roomName : roomName}})
+        if (room){
+            return await this.prismaService.chatRoom.update(
+            {
+                where :
+                {
+                    id : room.id
+                },
+                data : 
+                {
+                    status : 'public'
+                }
+            })
+        }
+        throw new NotFoundException({}, 'room not found');
+    }
 
     // ban users
     async   banUser(param) {
@@ -271,6 +290,29 @@ export class UserService {
                         muteUsers : 
                         {
                             push : member.email
+                        }
+                    }
+                }
+            )
+        }
+        @Tim
+        return room
+    }
+
+    async   deleteMuteUser(param) {
+        const {username , roomName} = param
+        const member = await this.getUserWithUsername(username)
+        const room = await this.prismaService.chatRoom.findFirst({where : {roomName : roomName}})
+        if (room.muteUsers.indexOf(member.email) < 0)
+        {
+            return await this.prismaService.chatRoom.update(
+                {
+                    where : {id : room.id} , 
+                    data : 
+                    {
+                        muteUsers : 
+                        {
+                            
                         }
                     }
                 }

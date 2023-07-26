@@ -29,6 +29,11 @@ export class UserController {
         return await   this.userService.changePasswordOfProtectedRoom(Param)
     }
 
+    @Post('deletePassword')
+    async   deletePasword(@Query() Param) {
+        return await   this.userService.deletePasswordOfProtectedRoom(Param)
+    }
+
     @Get('getRoom')
     async getRoomByName(@Query() Param, @Req() req) {
         const room = await this.userService.getRoomByName(Param.roomName)
