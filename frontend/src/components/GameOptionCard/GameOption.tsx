@@ -1,6 +1,7 @@
 import "./GameOption.css";
 import "react-toastify/dist/ReactToastify.css";
 import { Link } from "react-router-dom";
+
 type GameOptionData = {
     img: string;
     title: string;
@@ -18,9 +19,6 @@ function GameOption(props: GameOptionData) {
             >
                 <img src={props.img} alt="" />
                 <button
-                    // onClick={(e) => {
-                    //     handleClick(e, props.type);
-                    // }}
                     className="button"
                 >
                     {props.title}

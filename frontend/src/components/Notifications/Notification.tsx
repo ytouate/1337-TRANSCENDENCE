@@ -211,7 +211,7 @@ export default function Notification() {
                 <RequestNotification
                     key={nanoid()}
                     id={notification.id}
-                    declineInvitation={() => {}}
+                    declineInvitation={() => {rejectInvitation(socketContext, notification.id)}}
                     acceptInvitation={() => {
                         acceptInvitation(socketContext, notification.id);
                     }}

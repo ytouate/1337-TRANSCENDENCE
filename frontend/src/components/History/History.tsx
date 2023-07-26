@@ -3,11 +3,10 @@ import historyIcon from '../../assets/history-icon.svg';
 import './History.css';
 import { Fragment, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
-import { useLoaderData, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 export default function History() {
     const [matches, setMatches] = useState([]);
-    const user: any = useLoaderData();
     const { id } = useParams();
 
     useEffect(() => {
@@ -18,7 +17,6 @@ export default function History() {
             },
         };
         const url = `http://localhost:3000/game/user/${id}`;
-        console.log(url);
         fetch(url, options)
             .then((res) => {
                 return res.json();

@@ -17,7 +17,6 @@ import './Challenge.css';
 import LoadingAnimation from '../../components/LoadingAnimation/LoadingAnimation.tsx';
 import { useParams } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
-import { toast } from 'react-toastify';
 
 const Challenge = () => {
     const user: any = useLoaderData();

@@ -1,5 +1,5 @@
-import { Form } from "react-router-dom";
-import { Props, User } from "../../context/Types";
+
+import { User } from "../../context/Types";
 import FriendCard from "../FriendCard/FriendCard";
 import "./RoomForm.css";
 import { useEffect, useRef, useState } from "react";
@@ -23,7 +23,7 @@ export function createGroup(
 
 function RoomFrom({ friends, socket, setCreateRoomClicked }: any) {
     const [members, setMembers] = useState<any>([]);
-    function getUsers(e) {
+    function getUsers(e: any) {
         const { value, checked } = e.target;
 
         if (checked) setMembers((prev: any) => [...prev, value]);
@@ -33,10 +33,11 @@ function RoomFrom({ friends, socket, setCreateRoomClicked }: any) {
             });
         }
     }
+
     const [data, setData] = useState({
         roomName: "",
         status: "",
-        passwrod: "",
+        password: "",
     });
 
     function handleChange(e: any) {
@@ -53,7 +54,7 @@ function RoomFrom({ friends, socket, setCreateRoomClicked }: any) {
     }
 
     const ref = useRef(null);
-    function handleClickOutside(event) {
+    function handleClickOutside(event : any) {
         if (ref.current && !ref.current.contains(event.target)) {
             setCreateRoomClicked(false);
         }
@@ -66,7 +67,6 @@ function RoomFrom({ friends, socket, setCreateRoomClicked }: any) {
     });
 
     const [isProtected, setIsProtected] = useState(false);
-
     return (
         <form
             style={{ zIndex: "1" }}
@@ -74,8 +74,9 @@ function RoomFrom({ friends, socket, setCreateRoomClicked }: any) {
             onSubmit={(e) => {
                 createGroup(e, socket, data, members);
                 setCreateRoomClicked(false);
-                setData({ roomName: "", status: "" });
+                setData({ roomName: "", status: "", password: "" });
                 setMembers([]);
+                
             }}
             action=""
             className="room-form"
@@ -132,6 +133,7 @@ function RoomFrom({ friends, socket, setCreateRoomClicked }: any) {
                             maxLength={10}
                             type="password"
                             name="password"
+                            placeholder="XXXX"
                             className="twofactor-input"
                             onChange={handleChange}
                         />
@@ -140,7 +142,7 @@ function RoomFrom({ friends, socket, setCreateRoomClicked }: any) {
             </div>
             <p>Add Friends</p>
             <div className="room-form-friends-section">
-                {friends.map((friend) => {
+                {friends.map((friend : User) => {
                     return (
                         <div key={friend.id} className="select-field">
                             <input
