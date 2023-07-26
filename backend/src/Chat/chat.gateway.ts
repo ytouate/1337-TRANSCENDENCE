@@ -58,20 +58,19 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
         const User = await this.validateUserByEmail(req.user.email, Body.roomName, 0)
         if (User)
         {
-            const {roomName , status, password} = Body
-            let {found, room} = await this.user.creatRoom({
-                'roomName' : roomName ,
-                'status'   : status ,
-                'password' : password} , User, Body.isDm)
+            let {found, room} = await this.user.creatRoom( User, Body)
             let newRoom = await this.prisma.chatRoom.findUnique({where : {id : room.id} , include : {messages : true , users : true}})
+            console.log({found , room})
             if (!found)
             {
+                console.log(room)
                 let id = this.socketId.get(req.user.email)
                 this.server.in(id).socketsJoin(Body.roomName)
                 if (Body.email)
                 {
                     for (const email of Body.email)
                     {
+                        console.log(email)
                         id = this.socketId.get(email)
                         this.server.to(id).socketsJoin(email)
                         const newUser = await this.prisma.user.findUnique({where : {email : email}})
@@ -80,13 +79,14 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
                 }
             } else {
                 const id = this.socketId.get(req.user.email)
-                this.server.to(id).socketsJoin(roomName)
+                this.server.to(id).socketsJoin(Body.roomName)
                 for (const email of Body.email)
                 {
                     const newId = this.socketId.get(email)
-                    this.server.to(newId).socketsJoin(roomName)
+                    this.server.to(newId).socketsJoin(Body.roomName)
                 }
             }
+            console.log(newRoom)
             client.emit("get_room", {'room' : newRoom})
         }
     }
@@ -96,16 +96,22 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
     @UseGuards(AuthGuard('websocket-jwt'))
     async handleJoiningTheRoom(@ConnectedSocket() client : Socket , @Req() req, @MessageBody() body) {
         console.log(`client  ${client.id} connected and joining the room ${body.roomName}`)
+        console.log(body)
         const user = await this.validateUserByEmail(req.user.email, body.roomName, 1)
         if (user)
         {
             const result = await this.user.joiningTheRoom(body);
             if (result == undefined)
                 client.emit('onError' , {'message' : 'password incorrect'})
-            if (result == false)
-                throw new UnauthorizedException({}, '')
             this.server.in(client.id).socketsJoin(body.roomName)
-            const newUpdateChat = await this.user.addUserToRoom(user, body.roomName)      
+            await this.user.addUserToRoom(user, body.roomName)
+            for (const email of body.email)
+            {
+                const id = this.socketId.get(email)
+                this.server.in(id).socketsJoin(body.roomName)
+                const newUser = await this.prisma.user.findUnique({where : {email : email}})
+                const newUpdateChat = await this.user.addUserToRoom(newUser, body.roomName)
+            }
         }
         else
             client.emit('onError' , {'message' : 'you are baned'})

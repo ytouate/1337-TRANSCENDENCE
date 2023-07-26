@@ -1,7 +1,7 @@
 import LeftMessageCard from "../../components/LeftMessageCard";
 import RightMessageCard from "../../components/RightMessageCard";
 import "./Chat.css";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import { authContext } from "../../context/Context";
 import { Navigate, useLoaderData, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
@@ -17,9 +17,6 @@ import createRoomIcon from "../../assets/create-room.svg";
 import RoomFrom from "../../components/RoomForm/RoomForm";
 import roomImg from "../../assets/against_friends_img.jpg";
 import { createGroup } from "../../components/RoomForm/RoomForm";
-import { toast } from "react-toastify";
-import { ToastContainer } from "react-toastify";
-import optionsIcon from "../../assets/options.svg";
 
 function GroupSideBar({
     chatRooms,
@@ -54,7 +51,7 @@ function GroupSideBar({
 
     const [wantsToJoinProtected, setWantToJoinProtected] = useState(false);
     function joinProtectedRoom(roomName: string) {
-        socket.emit("joinRoom", { roomName: roomName, password: password });
+        socket.emit("joinRoom", { roomName: roomName, password: password, email: [] });
     }
     const [password, setPassword] = useState("");
     useEffect(() => {
@@ -132,9 +129,9 @@ function GroupSideBar({
                                         if (group.status != "protected") {
                                             socket.emit("joinRoom", {
                                                 roomName: group.roomName,
+                                                email: []
                                             });
                                         } else {
-                                            console.log("here");
                                             setWantToJoinProtected(true);
                                             joinProtectedRoom(group.roomName);
                                         }
@@ -156,6 +153,7 @@ function GroupSideBar({
                                             socket.emit("joinRoom", {
                                                 roomName: group.roomName,
                                                 password: password,
+                                                email: []
                                             });
                                         }}
                                         style={{
@@ -241,17 +239,79 @@ function SelectedRoom({
     );
 }
 
+function ToCards({ users, getUsers }) {
+    return users.map((friend: User) => {
+        return (
+            <div key={friend.id} className="select-field">
+                <input
+                    value={friend.email}
+                    onChange={(e) => getUsers(e)}
+                    name="selectedUsers"
+                    type="checkbox"
+                />
+                <label>
+                    <FriendCard
+                        name={friend.username}
+                        img={friend.urlImage}
+                        lastmsg={friend.activitystatus ? "Online" : "Offline"}
+                        addOption={false}
+                    />
+                </label>
+            </div>
+        );
+    });
+}
 function ManageRoom({
+    setManageClicked,
     handleOptionChange,
     takeAction,
     room,
     getUsers,
+    option,
+    user,
 }: {
+    user: User;
     handleOptionChange(option: any): any;
     room: chatRoom;
+    option: string;
     takeAction(e: any): void;
     getUsers(event: any): void;
+    setManageClicked(value: boolean): void;
 }) {
+    function handleClickOutside(e: any) {
+        if (!formRef.current?.contains(e.target)) setManageClicked(false);
+    }
+    useEffect(() => {
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    });
+    const formRef: any = useRef(null);
+
+    const allMembers = room.users.filter((member) => member.id != user.id);
+
+    const mutedMembers = allMembers.filter((member) => {
+        if (room.muteUsers.find((userMail) => userMail == member.email))
+            return true;
+        return false;
+    });
+
+    const unMutedMemebers = allMembers.filter((member) => {
+        if (room.muteUsers.find((userMail) => userMail == member.email))
+            return false;
+        return true;
+    });
+
+    const nonAdminsMembers = allMembers.filter((member) => {
+        if (room.admins.find((admin) => admin == member.email)) return false;
+        return true;
+    });
+    const nonMembers = user.friends.filter((friend) => {
+        if (room.users.find((member) => member.email == friend.email))
+            return false;
+        return true;
+    });
     return (
         <div
             style={{
@@ -262,7 +322,11 @@ function ManageRoom({
             }}
             className="manage-form"
         >
-            <form onSubmit={(e) => takeAction(e)} className="room-form">
+            <form
+                ref={formRef}
+                onSubmit={(e) => takeAction(e)}
+                className="room-form"
+            >
                 <div className="status-field">
                     <div className="status-option">
                         <input
@@ -302,6 +366,28 @@ function ManageRoom({
                             required
                             onChange={(e) => handleOptionChange(e)}
                             type="radio"
+                            id="add-admins"
+                            name="action"
+                            value="add-admins"
+                        />
+                          <label htmlFor="add-admins">add admins</label>
+                    </div>
+                    <div className="status-option">
+                        <input
+                            required
+                            onChange={(e) => handleOptionChange(e)}
+                            type="radio"
+                            id="invite"
+                            name="action"
+                            value="invite"
+                        />
+                          <label htmlFor="invite">invite friends</label>
+                    </div>
+                    <div className="status-option">
+                        <input
+                            required
+                            onChange={(e) => handleOptionChange(e)}
+                            type="radio"
                             id="mute"
                             name="action"
                             value="mute"
@@ -311,30 +397,24 @@ function ManageRoom({
                 </div>
                 <p>Choose Members</p>
                 <div className="room-form-friends-section">
-                    {room.users.map((friend: User) => {
-                        return (
-                            <div key={friend.id} className="select-field">
-                                <input
-                                    value={friend.email}
-                                    onChange={(e) => getUsers(e)}
-                                    name="selectedUsers"
-                                    type="checkbox"
-                                />
-                                <label>
-                                    <FriendCard
-                                        name={friend.username}
-                                        img={friend.urlImage}
-                                        lastmsg={
-                                            friend.activitystatus
-                                                ? "Online"
-                                                : "Offline"
-                                        }
-                                        addOption={false}
-                                    />
-                                </label>
-                            </div>
-                        );
-                    })}
+                    {option != "mute" &&
+                        option != "unmute" &&
+                        option != "add-admins" &&
+                        option != "invite" && (
+                            <ToCards users={allMembers} getUsers={getUsers} />
+                        )}
+                    {option == "invite" && (
+                        <ToCards users={nonMembers} getUsers={getUsers} />
+                    )}
+                    {option == "add-admins" && (
+                        <ToCards users={nonAdminsMembers} getUsers={getUsers} />
+                    )}
+                    {option == "mute" && (
+                        <ToCards users={unMutedMemebers} getUsers={getUsers} />
+                    )}
+                    {option == "unmute" && (
+                        <ToCards users={mutedMembers} getUsers={getUsers} />
+                    )}
                 </div>
                 <button className="button">submit</button>
             </form>
@@ -357,6 +437,8 @@ export default function Chat() {
     const [searchPattern, setSearchPattern] = useState("");
     const [searchedFriends, setSearchFriends] = useState([]);
     const [createRoomClicked, setCreateRoomClicked] = useState(false);
+    const [manageClicked, setManageClicked] = useState(false);
+    const [option, setOption] = useState("");
 
     function sendMessage(e: any) {
         e.preventDefault();
@@ -397,7 +479,6 @@ export default function Chat() {
         setChatSocket(chatSocket);
 
         chatSocket.on("onError", (err) => {
-            setError(err);
             console.log("error: ", err);
         });
         chatSocket.on("get_room", ({ room }: any) => {
@@ -406,11 +487,11 @@ export default function Chat() {
         });
     }, []);
 
-    const [error, setError] = useState("");
     useEffect(() => {
         if (chatSocket) {
             chatSocket.on("onMessage", (msg: Message) => {
                 if (msg.roomName == room?.roomName) {
+                    console.log("message received and matched")
                     setAllMessages((prev: Message[]) => {
                         return prev.length > 0 ? [...prev, msg] : [msg];
                     });
@@ -486,7 +567,6 @@ export default function Chat() {
     const [members, setMembers] = useState<User[]>([]);
     function getUsers(e: any) {
         const { value, checked } = e.target;
-        console.log("am here");
 
         if (checked) setMembers((prev: any) => [...prev, value]);
         else {
@@ -495,8 +575,6 @@ export default function Chat() {
             });
         }
     }
-    const [manageClicked, setManageClicked] = useState(false);
-    const [option, setOption] = useState("");
 
     function handleOptionChange(e) {
         setOption(e.target.value);
@@ -509,6 +587,7 @@ export default function Chat() {
                 email: members,
                 kick: true,
             });
+            setManageClicked(false);
         }
         if (option == "ban") {
             chatSocket?.emit("leaveRoom", {
@@ -516,8 +595,9 @@ export default function Chat() {
                 email: members,
                 ban: true,
             });
+            setManageClicked(false);
         }
-        if (option == "mute" || option == 'unmute') {
+        if (option == "mute" || option == "unmute") {
             const options = {
                 method: "POST",
                 headers: {
@@ -531,7 +611,36 @@ export default function Chat() {
             };
             fetch("http://localhost:3000/user/" + option, options)
                 .then((res) => res.json())
-                .then((data) => console.log("muted succefullly : ", data));
+                .then((data) => console.log(option, "ed succefullly : ", data));
+            setManageClicked(false);
+            setMembers([]);
+        }
+        if (option == "add-admins") {
+            const options = {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${Cookies.get("Token")}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    roomName: room?.roomName,
+                    email: members,
+                }),
+            };
+            fetch("http://localhost:3000/user/addAdmin", options)
+                .then((res) => res.json())
+                .then((data) => console.log("added succefullly : ", data));
+            setManageClicked(false);
+            setMembers([]);
+        }
+        if (option == "invite") {
+            chatSocket?.emit('joinRoom', {
+                roomName: room?.roomName,
+                email: members,
+            })
+            console.log('friend added succefully');
+            setManageClicked(false);
+            setMembers([]);
         }
     }
     return (
@@ -546,7 +655,7 @@ export default function Chat() {
             <div className="chat">
                 <div className="chat-users">
                     <div className="chat-users-header">
-                        <a
+                        {!isDmsSection && <a
                             onClick={() =>
                                 setCreateRoomClicked(!createRoomClicked)
                             }
@@ -555,7 +664,8 @@ export default function Chat() {
                                 style={{ marginRight: "10px", width: "25px" }}
                                 src={createRoomIcon}
                             />
-                        </a>
+                        </a>}
+                        
                         <button
                             className={
                                 !isDmsSection
@@ -655,8 +765,11 @@ export default function Chat() {
                 </div>
                 {manageClicked && (
                     <ManageRoom
+                        user={user}
+                        setManageClicked={setManageClicked}
                         takeAction={takeAction}
                         room={room!}
+                        option={option}
                         getUsers={getUsers}
                         handleOptionChange={handleOptionChange}
                     />
