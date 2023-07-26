@@ -7,20 +7,22 @@ class WebSocketService {
 
     connect(): any {
         if (!this.socket) {
-            this.socket = socketIO.connect('http://localhost:3000/game', {
+            this.socket = socketIO('http://localhost:3000/game', {
+                autoConnect: false,
                 extraHeaders: {
                     Authorization: `Bearer ${Cookies.get('Token')}`,
                 },
             });
+            this.socket.connect();
         }
-        // console.log('socket connected');
+        console.log('socket connected');
         return this.socket;
     }
 
     disconnect(): void {
         this.socket?.disconnect();
         this.socket = null;
-        // console.log('socket disconnected');
+        console.log('socket disconnected');
     }
 
     getSocket(): Socket | null {

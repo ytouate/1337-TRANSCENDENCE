@@ -27,6 +27,7 @@ import TwoFactor from './pages/TwoFactor/TwoFactor.js';
 import { useState } from 'react';
 import AgainstAi from './pages/AgainstAi/AgainstAi.js';
 import Queue from './pages/Queue/Queue.js';
+import Challenge from './pages/Challenge/Challenge.js';
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -44,6 +45,12 @@ const router = createBrowserRouter(
                 <Route path='chat' loader={homeLoader} element={<Chat />} />
                 <Route loader={navLoader} path='ai' element={<AgainstAi />} />
                 <Route loader={navLoader} path='queue' element={<Queue />} />
+
+                <Route
+                    loader={navLoader}
+                    path='challenge/:hostId'
+                    element={<Challenge />}
+                />
 
                 <Route
                     path='settings'

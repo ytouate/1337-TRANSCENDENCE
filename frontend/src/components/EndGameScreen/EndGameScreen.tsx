@@ -24,8 +24,7 @@ const EndGameScreen = ({
     const navigate = useNavigate();
 
     const onHomeClick = () => {
-        if (resetState) navigate('/');
-        else window.location.reload();
+        navigate('/');
     };
 
     return (

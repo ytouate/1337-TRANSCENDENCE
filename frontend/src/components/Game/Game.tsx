@@ -30,7 +30,7 @@ interface Props {
     player2: Player;
     gameId: any;
     userId: number;
-    resetState: () => void;
+    resetState: (() => void) | null;
 }
 
 const Game = ({ userId, player1, player2, gameId, resetState }: Props) => {
@@ -268,7 +268,7 @@ const Game = ({ userId, player1, player2, gameId, resetState }: Props) => {
                         score1={getLeftPlayer().score}
                         score2={getRightPlayer().score}
                         username2={getRightPlayer().username}
-                        resetState={() => resetState()}
+                        resetState={resetState}
                         urlImage1={getLeftPlayer().urlImg}
                         urlImage2={getRightPlayer().urlImg}
                     />

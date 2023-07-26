@@ -7,6 +7,11 @@ export interface UserData {
     id: number;
 }
 
+export interface Lobby {
+    inviteeId: number
+    users: UserData[];
+}
+
 export interface PlayerPosition {
     id: number;
     username: string;

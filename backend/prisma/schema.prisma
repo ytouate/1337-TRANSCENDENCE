@@ -55,6 +55,7 @@ model chatRoom {
   admins     String[]
   muteUsers  String[]
   banUsers   String[]
+  isDms      Boolean   @default(false)
   status     String    @default("public")
   password   String?
 }
@@ -62,7 +63,7 @@ model chatRoom {
 model Message {
   id       Int      @id @default(autoincrement())
   data     String
-  time     DateTime @default(now())
+  time     String
   roomId   Int
   userId   Int
   user     User     @relation(fields: [userId], references: [id])

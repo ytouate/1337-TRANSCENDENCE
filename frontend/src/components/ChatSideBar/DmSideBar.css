@@ -1,0 +1,29 @@
+.chat-users {
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.chat-users-header {
+    height: 70px;
+    background-color: #f6f3eb;
+    font-weight: 500;
+    font-size: 22px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    
+}
+
+.chat-users-content {
+    height: 100%;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 20px;
+    overflow: scroll;
+    background-color: #f6f3eb;
+}
