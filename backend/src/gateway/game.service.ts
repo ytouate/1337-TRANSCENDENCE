@@ -89,8 +89,8 @@ export class GameGateWay implements OnGatewayConnection {
     }
 
     // add client to the userSockets
-    async addClient(client: Socket, username: string) {
-        const user = await this.userService.getUserByUsername(username);
+    async addClient(client: Socket, email: string) {
+        const user = await this.userService.getUserByEmail(email);
 
         if (!user) return null;
 
@@ -102,7 +102,8 @@ export class GameGateWay implements OnGatewayConnection {
         };
 
         //means player exists
-        console.log(`Client with username ${username} connected`);
+        // console.log(`Client with username ${user.username} connected`);
+        console.log({ connected_client: userData });
 
         this.userSockets.set(user.id, userData);
         return user;
@@ -433,6 +434,7 @@ export class GameGateWay implements OnGatewayConnection {
             console.log('u are not allowed here');
             this.server.to(myData.socket.id).emit('unauthorized_lobby', {});
             // throw new UnauthorizedException();
+            //
             return;
         }
         if (hostId === userId) lobby.users[0] = myData;
