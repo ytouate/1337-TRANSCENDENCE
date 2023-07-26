@@ -13,6 +13,7 @@
 }
 .match-card {
   background-color: var(--cards-color);
+  width: max-content;
   flex-shrink: 0;
   padding: 20px;
   height: 95%;
