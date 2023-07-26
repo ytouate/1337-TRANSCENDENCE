@@ -55,7 +55,7 @@ export class GameGateWay implements OnGatewayConnection {
         const payload = await this.jwtSerive.verifyAsync(
             client.handshake.headers.authorization.slice(7),
         );
-        this.addClient(client, payload.username);
+        this.addClient(client, payload.email);
     }
 
     getUserIdBySocket(socket: Socket): number | undefined {
