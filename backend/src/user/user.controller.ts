@@ -14,8 +14,8 @@ export class UserController {
         ){}
 
     @Post('addAdmin')
-    async setAdmin(@Query() Param) {
-        return await this.userService.setAdmin(Param)
+    async setAdmin(@Body() Body) {
+        return await this.userService.setAdmin(Body)
     }
 
     @Post('mute')

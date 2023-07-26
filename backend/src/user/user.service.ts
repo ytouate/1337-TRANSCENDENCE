@@ -8,8 +8,8 @@ export class UserService {
 
     
     // create room {2 users => n users}
-    async creatRoom(Param , user, isDm) {
-        let {roomName  , status, password} = Param
+    async creatRoom(user, Body) {
+        let {roomName  , status, password} = Body
         if (!password)
             password = ''
         const room = await this.prismaService.chatRoom.findFirst({ where : {roomName : roomName}})
@@ -27,11 +27,11 @@ export class UserService {
                             },
                             status : status,
                             password : hash,
-                            isDms : isDm,
+                            isDms : Body.isDms,
                         }, include : {users : true ,messages : true}
                     }
                     )
-                await this.setAdmin({'username' : user.username , 'roomName' : roomName})
+                await this.setAdmin({email : [user.email] , roomName : Body.roomName})
                 return {'found': false, room};
             }
             catch(error) {
@@ -202,20 +202,20 @@ export class UserService {
 
     // set admin to other users in my room
     async   setAdmin(param) {
-        const member = await this.getUserWithUsername(param.username)
+        // const member = await this.getUserWithUsername(param.username)
         const room = await this.prismaService.chatRoom.findFirst({where : {roomName : param.roomName}})
-        if (room?.admins.indexOf(member.email) < 0)
-        {
+        // if (room?.admins.indexOf(member.email) < 0)
+        // {
             return await this.prismaService.chatRoom.update(
             {
                 where : {id : room.id} , 
                 data : {
-                    admins : {push : member.email}
-                }
+                    admins : {push : param.email}
+                }, include : {users : true , messages : true}
             }    
             )
-        }
-        return room
+        // }
+        // return room
     }
 
 
