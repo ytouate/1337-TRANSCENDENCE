@@ -55,6 +55,7 @@ export interface Message {
     userId: number;
     user: User;
     roomData: chatRoom;
+    roomName: string;
 }
 
 export interface Preference {

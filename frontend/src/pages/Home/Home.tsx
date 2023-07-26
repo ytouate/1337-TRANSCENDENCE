@@ -28,7 +28,7 @@ export async function loader() {
 }
 
 function Home() {
-    const [isSignedIn] = useContext(authContext);
+    const [isSignedIn] : any = useContext(authContext);
     if (isSignedIn == false) return <Navigate to={"/signin"} />;
 
     const user: any = useLoaderData();

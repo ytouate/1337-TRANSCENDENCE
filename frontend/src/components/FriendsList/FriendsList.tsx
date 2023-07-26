@@ -92,7 +92,7 @@ export default function FriendsList(props: friendListType) {
     const friendList = useFriendList(user);
     const blockedUsers = useBlockedUsers(user);
 
-    function handleSearch(e) {
+    function handleSearch(e : any) {
         searchForUsers(e, searchPattern).then((data) => {
             setSearchFriends(
                 data.map((friend: any) => {

@@ -17,13 +17,13 @@ function acceptInvitation(socket: any, id: number) {
     });
 }
 
-// function rejectInvitation(socket: any, id: number) {
-//     socket.emit("answer_notification", {
-//         id: id,
-//         status: "reject",
-//         description: "Invitaion Rejected",
-//     });
-// }
+function rejectInvitation(socket: any, id: number) {
+    socket.emit("answer_notification", {
+        id: id,
+        status: "reject",
+        description: "Invitaion Rejected",
+    });
+}
 
 function RequestNotification(props: any) {
     return (
@@ -212,7 +212,7 @@ export default function Notification() {
                 <RequestNotification
                     key={nanoid()}
                     id={notification.id}
-                    declineInvitation={() => {}}
+                    declineInvitation={() => {rejectInvitation(socketContext, notification.id)}}
                     acceptInvitation={() => {
                         acceptInvitation(socketContext, notification.id);
                     }}
