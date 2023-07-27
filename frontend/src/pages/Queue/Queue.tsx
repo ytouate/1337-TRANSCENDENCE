@@ -4,7 +4,7 @@ import * as Constant from '../../constants/constants.ts';
 import { useLoaderData } from 'react-router-dom';
 
 // import webSocketService from '../service/WebSocketService.ts';
-import { useNavigate  } from 'react-router';
+import { useNavigate } from 'react-router';
 import { Paddle, Player } from '../../interface/game.ts';
 // import { PacmanLoader } from 'react-spinners';
 import galaxy_black from '../../assets/space_black.jpeg';
@@ -73,7 +73,7 @@ const Queue = () => {
         // setScoket(webSocketService.getSocket());
 
         return () => {
-            webSocketService.disconnect();
+            // webSocketService.disconnect();
             setScoket(null);
         };
     }, []);
@@ -81,6 +81,10 @@ const Queue = () => {
     useEffect(() => {
         // const socket = webSocketService.getSocket();
         console.log('connected');
+
+        if (!socket) {
+            setScoket(webSocketService.connect());
+        }
 
         socket?.emit('queueUp', { userId: id });
 
@@ -167,8 +171,9 @@ const Queue = () => {
                         userId={id}
                         player1={player1}
                         player2={player2}
-                        gameId={gameId}
+                        gameId={Number(gameId)}
                         resetState={resetState}
+                        isSpectate={false}
                     />
                 </div>
             )}
