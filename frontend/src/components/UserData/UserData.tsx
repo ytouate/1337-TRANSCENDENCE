@@ -11,7 +11,10 @@ async function takeAction(socket: any, action: string, username: string) {
         method: "GET",
         headers: { Authorization: `Bearer ${Cookies.get("Token")}` },
     };
-    const data = await fetch("http://localhost:3000/user", options);
+    const data = await fetch(
+        `http://${import.meta.env.VITE_API_URL}/user`,
+        options
+    );
     const res = await data.json();
     if (action == "add") {
         socket.emit("send_notification", {
@@ -28,7 +31,10 @@ async function takeAction(socket: any, action: string, username: string) {
             },
             body: JSON.stringify({ username: username }),
         };
-        const res = await fetch("http://localhost:3000/users/block", options);
+        const res = await fetch(
+            `http://${import.meta.env.VITE_API_URL}/users/block`,
+            options
+        );
         if (!res.ok) throw new Error("Could not block ");
     } else if (action == "unfriend") {
         const options = {
@@ -40,7 +46,7 @@ async function takeAction(socket: any, action: string, username: string) {
             body: JSON.stringify({ username: username }),
         };
         const res = await fetch(
-            "http://localhost:3000/users/unfriend",
+            `http://${import.meta.env.VITE_API_URL}/users/unfriend`,
             options
         );
         if (!res.ok) throw new Error("Could not unfriend");

@@ -17,7 +17,10 @@ export async function loader() {
             Authorization: `Bearer ${Token}`,
         },
     };
-    const res = await fetch("http://localhost:3000/user", options);
+    const res = await fetch(
+        `http://${import.meta.env.VITE_API_URL}/user`,
+        options
+    );
     if (res.ok) return await res.json();
     else {
         if (res.status == 401)
@@ -26,10 +29,10 @@ export async function loader() {
 }
 
 export default function Settings() {
-    const [isSignedIn, setIsSignedIn] : any = useContext(authContext);
+    const [isSignedIn, setIsSignedIn]: any = useContext(authContext);
     if (isSignedIn == false) return <Navigate to={"/signin"} />;
     const [newName, setNewName] = useState("");
-    const [newAvatar, setNewAvatar] = useState('');
+    const [newAvatar, setNewAvatar] = useState("");
     const [clicked2fa, setClicked2fa] = useState(false);
     const [email2fa, setEmail2fa] = useState("");
     const token = Cookies.get("Token");
@@ -38,7 +41,7 @@ export default function Settings() {
         return <Navigate to={"/twofactor"} />;
 
     async function deleteAvatar() {
-        fetch("http://localhost:3000/profile/deletephoto", {
+        fetch(`http://${import.meta.env.VITE_API_URL}/profile/deletephoto`, {
             method: "DELETE",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -57,7 +60,10 @@ export default function Settings() {
             },
             body: JSON.stringify({ email: email2fa }),
         };
-        const res = await fetch("http://localhost:3000/2fa", options);
+        const res = await fetch(
+            `http://${import.meta.env.VITE_API_URL}/2fa`,
+            options
+        );
         if (!res.ok) throw new Error("could not activate 2fa");
         Cookies.remove("isSignedIn");
         Cookies.remove("Token");
@@ -73,7 +79,10 @@ export default function Settings() {
                 Authorization: `Bearer ${token}`,
             },
         };
-        const res = await fetch("http://localhost:3000/disable2fa", options);
+        const res = await fetch(
+            `http://${import.meta.env.VITE_API_URL}/disable2fa`,
+            options
+        );
         if (!res.ok) throw new Error("Could not disable 2fa");
     }
 
@@ -90,7 +99,10 @@ export default function Settings() {
             headers: { Authorization: `Bearer ${Cookies.get("Token")}` },
             body: formData,
         };
-        fetch("http://localhost:3000/profile/updatephoto", options)
+        fetch(
+            `http://${import.meta.env.VITE_API_URL}/profile/updatephoto`,
+            options
+        )
             .then((res) => res.json())
             .then(() => location.reload());
     }
@@ -106,7 +118,7 @@ export default function Settings() {
             body: JSON.stringify({ username: newName }),
         };
         const res = await fetch(
-            "http://localhost:3000/profile/updatename",
+            `http://${import.meta.env.VITE_API_URL}/profile/updatename`,
             options
         );
         if (!res.ok) throw new Error("failed to change name");

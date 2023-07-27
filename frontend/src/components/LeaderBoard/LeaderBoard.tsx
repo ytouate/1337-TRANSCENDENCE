@@ -25,10 +25,13 @@ function LeaderBoard() {
         const options = {
             method: "GET",
             headers: {
-                Authorization: `Bearer ${Cookies.get('Token')}`,
+                Authorization: `Bearer ${Cookies.get("Token")}`,
             },
         };
-        fetch("http://localhost:3000/user/leaderboard", options)
+        fetch(
+            `http://${import.meta.env.VITE_API_URL}/user/leaderboard`,
+            options
+        )
             .then((res) => res.json())
             .then((data) => setUsers(Object.values(data)));
     }, []);

@@ -13,7 +13,7 @@ export default function TwoFactor() {
         },
     };
     useEffect(() => {
-        fetch("http://localhost:3000/user", options)
+        fetch(`http://${import.meta.env.VITE_API_URL}/user`, options)
             .then((res) => {
                 if (res.ok) return res.json();
                 else navigator("/signin");
@@ -22,7 +22,7 @@ export default function TwoFactor() {
                 if (data.isSignedIn) navigator("/");
             });
     }, []);
-    
+
     let [code, setCode] = useState("");
     const [validated, setValidated] = useState(false);
     if (validated) return <Navigate to={"/"} />;
@@ -37,7 +37,7 @@ export default function TwoFactor() {
             body: JSON.stringify({ code: code }),
         };
         const res = await fetch(
-            "http://localhost:3000/2fa/validateCode",
+            `http://${import.meta.env.VITE_API_URL}/2fa/validateCode`,
             options
         );
         if (res.ok) setValidated(true);

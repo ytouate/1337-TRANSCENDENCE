@@ -13,19 +13,19 @@ export default function GroupSideBar({
     setRoom,
     socket,
     room,
-    setIsDmsSection
+    setIsDmsSection,
 }: {
     chatRooms: chatRoom[];
     setRoom(room: chatRoom | null): void;
     socket: Socket;
     room: chatRoom;
-    setIsDmsSection(value: boolean) : void;
+    setIsDmsSection(value: boolean): void;
 }) {
     const [groups, setGroups] = useState<chatRoom[]>([]);
 
     useEffect(() => {
-        console.log('re rendered');
-        
+        console.log("re rendered");
+
         setGroups(
             chatRooms.filter(
                 (room: chatRoom) =>
@@ -38,7 +38,7 @@ export default function GroupSideBar({
                 Authorization: `Bearer ${Cookies.get("Token")}`,
             },
         };
-        fetch("http://localhost:3000/user/getRooms", options)
+        fetch(`http://${import.meta.env.VITE_API_URL}/user/getRooms`, options)
             .then((res) => res.json())
             .then((data) =>
                 setGroups((prev: chatRoom[]) => [...prev, ...data])
@@ -54,23 +54,19 @@ export default function GroupSideBar({
             password: password,
             email: [],
         });
-        shouldUpdateRef = !shouldUpdateRef.current;
     }
     const [password, setPassword] = useState("");
-    const shouldUpdateRef = useRef(false);
 
     useEffect(() => {
-        console.log('am here');
-        
+        console.log("am here");
+
         // navigator(location.pathname);
-    }, [navigator])
+    }, [navigator]);
     useEffect(() => {
         if (groups) {
             setGroupList(
                 groups.map((group: any) => {
-                    if (
-                        chatRooms.find((r: chatRoom) => r.id == group.id)
-                    ) {
+                    if (chatRooms.find((r: chatRoom) => r.id == group.id)) {
                         return (
                             <div
                                 className="sidebar-wrapper"
@@ -136,7 +132,7 @@ export default function GroupSideBar({
                                                 email: [],
                                             });
                                             setRoom(room);
-                                            setIsDmsSection(true)
+                                            setIsDmsSection(true);
                                         } else {
                                             setWantToJoinProtected(true);
                                             joinProtectedRoom(group.roomName);
