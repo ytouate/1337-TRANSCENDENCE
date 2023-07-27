@@ -1,4 +1,4 @@
-import { BadRequestException, Controller, Delete, Get, Inject, Param, Put, Req, Res, StreamableFile, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Inject, Param, Put, Req, Res, StreamableFile, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { diskStorage } from 'multer';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -6,6 +6,7 @@ import * as mimeTypes from 'mime-types';
 import { createReadStream } from 'fs';
 import { ProfileService } from './profile.service';
 import * as fs from 'fs';
+import {  UsernameUpdateDto } from 'src/DTO/username.dto';
 
 
 @Controller('profile')
@@ -46,8 +47,8 @@ export class ProfileController {
     }
     @UseGuards(AuthGuard('jwt'))
     @Put('updatename')
-    updateName(@Req() req){
-        return this.profileService.updateName(req.body.username, req);
+    updateName(@Req() req, @Body() body: UsernameUpdateDto){
+        return this.profileService.updateName(body.username, req);
     }
     @Get('getphoto/:username')
     getPhotoProfile(@Req() req, @Res({ passthrough: true }) res, @Param('username') username): Promise<StreamableFile> {

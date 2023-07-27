@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule , {cors : true});
@@ -23,6 +24,7 @@ async function bootstrap() {
     app.useStaticAssets(join(__dirname, 'Chat', 'static'));
     app.setBaseViewsDir(join(__dirname, 'Chat', 'views'));
     app.setViewEngine('ejs');
+    app.useGlobalPipes(new ValidationPipe());
     await app.listen(3000);
 }
 bootstrap();
