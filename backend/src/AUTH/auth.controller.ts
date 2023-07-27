@@ -2,7 +2,7 @@ import { Controller, Post, Res, Req , UseGuards, Body, Put, Delete, ConsoleLogge
 import { authService } from "./auth.service";
 import { Get } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
-import { ExceptionsHandler } from "@nestjs/core/exceptions/exceptions-handler";
+import { code, twoFatctor } from "src/DTO/DTO";
 
 
 @Controller()
@@ -49,12 +49,13 @@ export class authController {
 
     @Post('2fa')
     @UseGuards(AuthGuard('jwt'))
-    async siginWith2fa(@Req() request , @Body() req, @Res() res)
+    async siginWith2fa(@Req() request , @Body() body : twoFatctor, @Res() res)
     {
+        console.log('mik')
         const user = await this.authservice.validateUser(request)
         if (!user)
             return {'message' : 'unvalide user'}
-        await this.authservice.add2fa(user.email, req.email, 0)
+        await this.authservice.add2fa(user.email, body.email, 0)
         res.cookie('2fa' , '2fa')
         return res.status(200).json({'message' : 'adding 2fa success'})
     }
@@ -62,7 +63,7 @@ export class authController {
 
     @Post('2fa/validateCode')
     @UseGuards(AuthGuard('jwt'))
-    async verificationCode2fa(@Body() body, @Req() req)
+    async verificationCode2fa(@Body() body : code, @Req() req)
     {
         const user = await this.authservice.validateUser(req)
         if (user?.codeVerification  == body.code)

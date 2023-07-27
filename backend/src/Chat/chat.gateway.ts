@@ -1,4 +1,4 @@
-import { Body, OnModuleInit, UnauthorizedException, UseGuards } from "@nestjs/common";
+import {  OnModuleInit, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import {  ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Socket ,Server } from "socket.io";
@@ -7,10 +7,7 @@ import { UserService } from "src/user/user.service";
 import { Req } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { userReturnToGatway } from "src/utils/user.return";
-import { Client } from "socket.io/dist/client";
-import { use } from "passport";
-import { chownSync } from "fs";
-import { concatAll } from "rxjs";
+import { ChatDto, message } from "../DTO/DTO";
 
 @WebSocketGateway({ namespace : 'chat' , cors: {origin : '*'} })
 export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGatewayDisconnect {
@@ -28,7 +25,7 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
     // send message to current room
     @SubscribeMessage('sendMessage')
     @UseGuards(AuthGuard('websocket-jwt'))
-    async onMessage(client : Socket , @MessageBody() Body , @Req() req)
+    async onMessage(client : Socket , @MessageBody() Body : message , @Req() req)
     {
         const id = this.socketId.get(req.user.email)
         this.server.to(id).socketsJoin(Body.roomName)
@@ -52,25 +49,26 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
 
     @SubscribeMessage('createRoom')
     @UseGuards(AuthGuard('websocket-jwt'))
-    async handleCreationOfTheRoom(@ConnectedSocket() client : Socket , @Req() req, @MessageBody() Body) {
+    async handleCreationOfTheRoom(@ConnectedSocket() client : Socket , @Req() req, @MessageBody() Body : ChatDto) {
+        console.log('lkdsmcklsmcds')
         console.log(`client  ${client.id} connected and creat the room ${Body.roomName}`)
-        let userAddToRoom  : any;
         const User = await this.validateUserByEmail(req.user.email, Body.roomName, 0)
         if (User)
         {
+            console.log(Body.password)
             let {found, room} = await this.user.creatRoom( User, Body)
             let newRoom = await this.prisma.chatRoom.findUnique({where : {id : room.id} , include : {messages : true , users : true}})
-            console.log({found , room})
+            //console.log({found , room})
             if (!found)
             {
-                console.log(room)
+                //console.log(room)
                 let id = this.socketId.get(req.user.email)
                 this.server.in(id).socketsJoin(Body.roomName)
                 if (Body.email)
                 {
                     for (const email of Body.email)
                     {
-                        console.log(email)
+                        //console.log(email)
                         id = this.socketId.get(email)
                         this.server.to(id).socketsJoin(email)
                         const newUser = await this.prisma.user.findUnique({where : {email : email}})
@@ -88,7 +86,7 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
                 else
                 {
                     const id = this.socketId.get(req.user.email)
-                    this.server.to(id).socketsJoin(Body.oomName)
+                    this.server.to(id).socketsJoin(Body.roomName)
                     for (const email of Body.email)
                     {
                         const newId = this.socketId.get(email)
@@ -96,7 +94,7 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
                     }
                 }
             }
-            console.log(newRoom)
+            //console.log(newRoom)
             client.emit("get_room", {'room' : newRoom})
         }
     }
@@ -104,23 +102,26 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
     // joining the socket of user in  specific room
     @SubscribeMessage('joinRoom')
     @UseGuards(AuthGuard('websocket-jwt'))
-    async handleJoiningTheRoom(@ConnectedSocket() client : Socket , @Req() req, @MessageBody() body) {
+    async handleJoiningTheRoom(@ConnectedSocket() client : Socket , @Req() req, @MessageBody() body : ChatDto) {
         console.log(`client  ${client.id} connected and joining the room ${body.roomName}`)
-        console.log(body)
+        //console.log(body)
         const user = await this.validateUserByEmail(req.user.email, body.roomName, 1)
         if (user)
         {
             const result = await this.user.joiningTheRoom(body);
             if (result == undefined)
                 client.emit('onError' , {'message' : 'password incorrect'})
-            this.server.in(client.id).socketsJoin(body.roomName)
-            await this.user.addUserToRoom(user, body.roomName)
-            for (const email of body.email)
+            else
             {
-                const id = this.socketId.get(email)
-                this.server.in(id).socketsJoin(body.roomName)
-                const newUser = await this.prisma.user.findUnique({where : {email : email}})
-                const newUpdateChat = await this.user.addUserToRoom(newUser, body.roomName)
+                this.server.in(client.id).socketsJoin(body.roomName)
+                await this.user.addUserToRoom(user, body.roomName)
+                for (const email of body.email)
+                {
+                    const id = this.socketId.get(email)
+                    this.server.in(id).socketsJoin(body.roomName)
+                    const newUser = await this.prisma.user.findUnique({where : {email : email}})
+                    await this.user.addUserToRoom(newUser, body.roomName)
+                }
             }
         }
         else

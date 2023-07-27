@@ -27,7 +27,7 @@ export class UserService {
                             },
                             status : status,
                             password : hash,
-                            isDms : Body.isDms,
+                            isDms : Body.isDm,
                         }, include : {users : true ,messages : true}
                     }
                     )
@@ -181,6 +181,7 @@ export class UserService {
     //check user  if have order to join the rrom
     async   joiningTheRoom(param)
     {
+        console.log('password' , param.password)
         const {roomName , password} = param
         const room = await this.prismaService.chatRoom.findFirst({where : {roomName : roomName}})
         if (room.status === 'protected')
