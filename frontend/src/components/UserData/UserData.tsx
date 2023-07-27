@@ -1,5 +1,5 @@
 import "./UserData.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {} from "../../context/Context";
 import { useState } from "react";
 import Cookies from "js-cookie";
@@ -79,15 +79,22 @@ const MainUserButtons = () => {
 };
 
 const MainUserFriendsButtons = (props: any) => {
+    const navigator: any = useNavigate();
+    const [unfriend, setUnfriend] = useState(false);
     return (
         <>
             <a
                 onClick={() =>
-                    takeAction(props.socket, "unfriend", props.username)
+                    takeAction(props.socket, "unfriend", props.username).then(
+                        () => {
+                            setUnfriend(true);
+                            navigator(location.pathname);
+                        }
+                    )
                 }
             >
                 <button onClick={notfyUnfriend} className="settings-button add">
-                    Unfriend
+                    {!unfriend ? "Unfriend" : "Unfriended"}
                 </button>
             </a>
             <a
@@ -162,7 +169,10 @@ interface userDataType {
     friendStatus: boolean;
     socket: any;
 }
+
 export default function UserData(props: userDataType) {
+    console.log("props: ", props);
+
     return (
         <>
             <div className="profile--userdata">
@@ -179,11 +189,9 @@ export default function UserData(props: userDataType) {
                     {props.me ? (
                         <MainUserButtons />
                     ) : props.friendStatus ? (
-                        <MainUserFriendsButtons
-                            {...props}
-                        />
+                        <MainUserFriendsButtons {...props} />
                     ) : (
-                        <UserButtons  {...props} />
+                        <UserButtons {...props} />
                     )}
                 </div>
 

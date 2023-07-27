@@ -1,5 +1,5 @@
 import { CurrentChattingUserProps } from "../../context/Types";
-import './CurrentChattingUser.css'
+import "./CurrentChattingUser.css";
 
 export function CurrentChattingUser({
     selectedUser,
@@ -12,13 +12,11 @@ export function CurrentChattingUser({
                     <div className="chatting-user-data">
                         <p>{selectedUser.username}</p>
                         <p
-                            className={
-                                selectedUser.activitystatus
-                                    ? "chatting-user-lastmsg online"
-                                    : "chatting-user-lastmsg"
-                            }
+                            className={`chatting-user-lastmsg ${selectedUser.activitystatus
+                                .toString()
+                                .toLowerCase()}`}
                         >
-                            {selectedUser.activitystatus ? "Online" : "offline"}
+                            {selectedUser.activitystatus}
                         </p>
                     </div>
                 </div>

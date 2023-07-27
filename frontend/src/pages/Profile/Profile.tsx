@@ -11,8 +11,9 @@ import { useContext, useEffect, useState } from "react";
 import socketIO from "socket.io-client";
 import NotFound from "../../components/NotFound";
 import { Socket } from "socket.io-client/debug";
+
 export function ErrorBoundary() {
-    let error: any = useRouteError();
+    let error : any = useRouteError();
     return <NotFound message={error.message} />;
 }
 
