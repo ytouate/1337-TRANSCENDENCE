@@ -50,12 +50,12 @@ export class GameGateWay implements OnGatewayConnection {
     }
 
     // called when a client is connected
-    async handleConnection(@ConnectedSocket() client: Socket) {
+    async handleConnection(@ConnectedSocket() client: Socket, @Req() req) {
         // console.log('handleConnection');
         const payload = await this.jwtSerive.verifyAsync(
             client.handshake.headers.authorization.slice(7),
         );
-        this.addClient(client, payload.email);
+        this.addClient(client, payload.email, req);
     }
 
     getUserIdBySocket(socket: Socket): number | undefined {
@@ -89,8 +89,8 @@ export class GameGateWay implements OnGatewayConnection {
     }
 
     // add client to the userSockets
-    async addClient(client: Socket, email: string) {
-        const user = await this.userService.getUserByEmail(email);
+    async addClient(client: Socket, email: string, req: any) {
+        const user = await this.userService.getUserByEmail(email, req);
 
         if (!user) return null;
 
@@ -118,7 +118,12 @@ export class GameGateWay implements OnGatewayConnection {
     }
 
     // match two players and start the game
-    async matchPlayers(player1: number, player2: number, gameInvite: boolean) {
+    async matchPlayers(
+        player1: number,
+        player2: number,
+        gameInvite: boolean,
+        req: any,
+    ) {
         // Get the sockets for the matched players
         const userData1 = this.userSockets.get(player1);
         const userData2 = this.userSockets.get(player2);
@@ -150,8 +155,8 @@ export class GameGateWay implements OnGatewayConnection {
         // const pref1 = await this.prefService.getUserPref(userData1.id);
         // const pref2 = await this.prefService.getUserPref(userData2.id);
 
-        const user1 = await this.userService.getUserById(userData1.id);
-        const user2 = await this.userService.getUserById(userData2.id);
+        const user1 = await this.userService.getUserById(userData1.id, req);
+        const user2 = await this.userService.getUserById(userData2.id, req);
 
         userData1.socket.emit(event_name, {
             gameId: game.id,
@@ -252,14 +257,18 @@ export class GameGateWay implements OnGatewayConnection {
 
     // event handler, used when players queue up
     @SubscribeMessage('queueUp')
-    async queueUp(@MessageBody() body: any, @ConnectedSocket() client: Socket) {
+    async queueUp(
+        @MessageBody() body: any,
+        @ConnectedSocket() client: Socket,
+        @Req() req,
+    ) {
         const payload = await this.jwtSerive.verifyAsync(
             client.handshake.headers.authorization.slice(7),
         );
 
         console.log('queue up');
 
-        const user = await this.addClient(client, payload.email);
+        const user = await this.addClient(client, payload.email, req);
 
         if (this.queue.includes(user.id)) {
             console.log('User already in the queue');
@@ -290,7 +299,7 @@ export class GameGateWay implements OnGatewayConnection {
             console.log('queue already 2 ');
             const player1 = this.queue.shift();
             const player2 = this.queue.shift();
-            this.matchPlayers(player1, player2, false);
+            this.matchPlayers(player1, player2, false, req);
         } else {
             // console.log('nope');
         }
@@ -316,6 +325,7 @@ export class GameGateWay implements OnGatewayConnection {
     async gameInvite(
         @MessageBody() body: any,
         @ConnectedSocket() client: Socket,
+        @Req() req,
     ) {
         // const payload = await this.jwtSerive.verifyAsync(
         //     client.handshake.headers.authorization.slice(7),
@@ -348,6 +358,7 @@ export class GameGateWay implements OnGatewayConnection {
         );
         const opponent = await this.userService.getUserByUsername(
             opponentUsername,
+            req,
         );
         if (!opponent) {
             console.log('opponent not found');
@@ -365,7 +376,7 @@ export class GameGateWay implements OnGatewayConnection {
             return;
         }
 
-        const senderInfo = await this.userService.getUserById(userId);
+        const senderInfo = await this.userService.getUserById(userId, req);
 
         if (!senderInfo) {
             console.log('huh u dont exist');
@@ -427,7 +438,11 @@ export class GameGateWay implements OnGatewayConnection {
     }
 
     @SubscribeMessage('playerReady')
-    playerReady(@MessageBody() body: any, @ConnectedSocket() client: Socket) {
+    playerReady(
+        @MessageBody() body: any,
+        @ConnectedSocket() client: Socket,
+        @Req() req,
+    ) {
         const hostId: number = body.hostId;
         const userId: number = body.userId;
 
@@ -448,7 +463,7 @@ export class GameGateWay implements OnGatewayConnection {
 
         if (lobby.users[0] && lobby.users[1]) {
             //emit to both players to play
-            this.matchPlayers(lobby.users[0].id, lobby.users[1].id, true);
+            this.matchPlayers(lobby.users[0].id, lobby.users[1].id, true, req);
             // this.challengeLobby.delete(hostId);
         }
     }
