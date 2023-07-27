@@ -1,49 +1,57 @@
-import { Controller, Post , Get, Query, UseGuards, Put, Req, Body} from '@nestjs/common';
+import {
+    Controller,
+    Post,
+    Get,
+    UseGuards,
+    Put,
+    Req,
+    Body,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
 import { userReturn } from 'src/utils/user.return';
-import { Console } from 'console';
+import { body, password } from 'src/DTO/DTO';
 
 
 @Controller('user')
 @UseGuards(AuthGuard('jwt'))
 export class UserController {
 
-    constructor ( 
-        private userService:UserService
-        ){}
+    constructor(
+        private userService: UserService
+    ) { }
 
     @Post('addAdmin')
-    async setAdmin(@Body() Body) {
+    async setAdmin(@Body() Body: body) {
         return await this.userService.setAdmin(Body)
     }
 
     @Post('mute')
-    async   muteUser(@Body() body) {
+    async muteUser(@Body() body: body) {
         return await this.userService.muteUsers(body)
-    } 
+    }
 
     @Post('unmute')
-    async   deleteMuteUser(@Body() body) {
+    async deleteMuteUser(@Body() body: body) {
         return await this.userService.deleteUserFromMuteUsers(body);
-    } 
+    }
 
-    @Post('changePassword')
-    async   changePassword(@Query() Param) {
-        return await   this.userService.changePasswordOfProtectedRoom(Param)
+    @Put('changePassword')
+    async changePassword(@Body() body: password) {
+        return await this.userService.changePasswordOfProtectedRoom(body)
     }
 
     @Post('deletePassword')
-    async   deletePasword(@Query() Param) {
-        return await   this.userService.deletePasswordOfProtectedRoom(Param)
+    async deletePasword(@Body() body: password) {
+        return await this.userService.deletePasswordOfProtectedRoom(body)
     }
 
+
     @Get('getRoom')
-    async getRoomByName(@Query() Param, @Req() req) {
-        const room = await this.userService.getRoomByName(Param.roomName)
+    async getRoomByName(@Body() body, @Req() req) {
+        const room = await this.userService.getRoomByName(body.roomName)
         const usersToReturn = [];
-        if (room)
-        {
+        if (room) {
             for (const user of room.users) {
                 usersToReturn.push(userReturn(user, req));
             }
@@ -53,7 +61,7 @@ export class UserController {
     }
 
     @Get('getRooms')
-    async getAllRooms(@Query() Param) {
+    async getAllRooms() {
         return await this.userService.getAllRooms()
     }
 }

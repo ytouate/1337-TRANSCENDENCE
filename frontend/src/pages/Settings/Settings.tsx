@@ -67,7 +67,7 @@ export default function Settings() {
     async function disable2FA(e: any) {
         e.preventDefault();
         const token = Cookies.get("Token");
-        const options: any = {
+        const options = {
             method: "PUT",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -194,6 +194,7 @@ export default function Settings() {
                 </div>
                 <form onSubmit={changeName} className="settings--update-name">
                     <input
+                        maxLength={10}
                         value={newName}
                         onChange={(e) => setNewName(e.target.value)}
                         className="name-field"

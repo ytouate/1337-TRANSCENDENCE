@@ -14,8 +14,6 @@ body {
     /* vertical-align: center; */
 }
 
-
-
 .active {
     border-bottom: 2px solid black;
 }
@@ -26,8 +24,6 @@ body {
     color: white;
     transition: background-color 0.5s ease-in-out;
 }
-
-
 
 .not-found {
     height: 90vh;
@@ -46,9 +42,6 @@ body {
     border-bottom: 2px solid black;
     color: #28235c;
 }
-
-
-
 
 .left > p {
     width: 100%;
@@ -329,8 +322,6 @@ input[type="file"]::file-selector-button:hover {
     width: 50px;
     border-radius: 50%;
 }
-
-
 
 .history-cards {
     margin-top: 50px;
@@ -644,53 +635,6 @@ input[type="file"]::file-selector-button:hover {
     border-radius: 0px 15px 15px 15px;
 }
 
-.right-message-card {
-    height: auto;
-    width: fit-content;
-    max-width: 60%;
-    margin-left: auto;
-    display: flex;
-    flex-direction: column;
-    margin-right: 20px;
-}
-
-.right-message-card--container {
-    display: flex;
-    align-items: center;
-    font-weight: bold;
-    margin-left: auto;
-    margin-right: 0;
-}
-
-.right-message-card--sender-name {
-    font-size: 16px;
-}
-
-.right-message-card--message-time {
-    font-size: 12px;
-    text-align: right;
-}
-
-.right-message-card--sender-img {
-    margin-top: 10px;
-    margin-left: 10px;
-    margin-right: 10px;
-    width: 50px;
-    border-radius: 50%;
-    margin-bottom: 0;
-}
-
-.right-message-card > p {
-    font-weight: 600;
-    font-size: 16px;
-    padding: 15px 20px;
-    margin-right: 70px;
-    margin-top: 0;
-    border-radius: 15px 0 15px 15px;
-    background-color: var(--cards-color);
-    color: white;
-}
-
 .friends-container {
     height: 100%;
     overflow: auto;
@@ -710,16 +654,8 @@ input[type="file"]::file-selector-button:hover {
     font-size: 22px;
 }
 
-
-
 .messages {
     margin-top: 20px;
     height: 90%;
     overflow: auto;
 }
-
-
-
-
-
-

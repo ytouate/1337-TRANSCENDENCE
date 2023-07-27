@@ -1,0 +1,20 @@
+.manage-form {
+    z-index: 1;
+    position: absolute;
+    top: 25%;
+    left: 45%;
+    transform: translate(-50%, -50%);
+}
+
+.protected-options {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+}
+.protecte-change-password {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 70% 30%;
+
+}

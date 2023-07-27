@@ -19,8 +19,6 @@ import LoadingAnimation from '../../components/LoadingAnimation/LoadingAnimation
 const Queue = () => {
     const user: any = useLoaderData();
     const { id, username, preference } = user;
-    // let { preference } = user;
-    console.log(preference);
 
     const [waitState, setWaitState] = useState(true);
     const [gameId, setGameId] = useState(null);
