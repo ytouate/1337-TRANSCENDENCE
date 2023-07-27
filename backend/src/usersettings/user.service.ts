@@ -5,7 +5,7 @@ import {
     NotFoundException,
     UnauthorizedException,
 } from '@nestjs/common';
-import { Notification, User } from '@prisma/client';
+import { Notification, User, UserStatus } from '@prisma/client';
 import { stat } from 'fs';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { userReturn } from 'src/utils/user.return';
@@ -304,6 +304,21 @@ export class UserSettingsService {
                     loss: loss,
                     winRate: winRate,
                     winStreak: 0,
+                },
+            });
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async updatePlayerStatus(userId: number, status: UserStatus) {
+        try {
+            await this.prismaService.user.update({
+                where: {
+                    id: userId,
+                },
+                data: {
+                    activitystatus: status,
                 },
             });
         } catch (error) {
