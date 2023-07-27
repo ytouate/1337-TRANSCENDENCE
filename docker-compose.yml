@@ -2,32 +2,27 @@ version: '3.8'
 services:
   dev-db:
     image: postgres:13
-    ports:
-      - 5434:5432
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123
-      POSTGRES_DB: nest
+    env_file:
+    - backend/.env
     restart: always
-  # backend:
-    # build: 
-      # context: ./backend
-    # volumes:
-      # - ./backend:/app
-    # ports:
-      # - 3000:3000
-    # depends_on:
-      # - dev-db
-    # restart: always
-  # frontend:
-    # build: 
-      # context: ./frontend
-    # volumes:
-      # - ./frontend:/app
-    # ports:
-      # - 5173:5173
-    # depends_on:
-      # - dev-db
-    # restart: always
+  backend:
+    volumes:
+      - ./backend:/app
+    build: 
+      context: ./backend
+    ports:
+      - 3000:3000
+    depends_on:
+      - dev-db
+  frontend:
+    build: 
+      context: ./frontend
+    volumes:
+      - ./frontend:/app
+    ports:
+      - 5173:5173
+    depends_on:
+      - backend
+    restart: always
 networks:
   default:

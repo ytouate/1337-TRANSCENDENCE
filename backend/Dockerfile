@@ -1,17 +1,15 @@
-FROM node:14
+FROM node:18
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm i
+RUN npm install
 
-COPY . ./
+COPY . .
 
 RUN npx prisma generate
 
-RUN chmod +x scipt_nest.sh
-
-ENTRYPOINT [ "sh", "scipt_nest.sh" ]
+ENTRYPOINT [ "sh" , "script_nest.sh"]
 
 CMD ["npm", "run", "start:dev"]

@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserSettingsService } from './user.service';
+import {  UsernameSearchDto } from 'src/DTO/username.dto';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('users')
@@ -17,16 +18,12 @@ export class UserSettingsController {
     
     @Delete('unblock')
     unblockUser(@Req() req, @Body() body){
-        
         this.userService.unblockUser(req.user, body);
     }
 
     @Get('search')
-    searchUsers(@Req() req, @Query() query){
-        let queryNoSpaces = query.pattern.trim();
-        if (queryNoSpaces.length > 0)
-            return this.userService.searchUser(req, queryNoSpaces)
-        return [];
+    searchUsers(@Req() req, @Query() query: UsernameSearchDto){
+        return this.userService.searchUser(req, query.pattern);
     }
 
     @Get(':id')

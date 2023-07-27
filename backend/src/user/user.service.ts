@@ -10,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 export class UserService {
   constructor(private prismaService: PrismaService) {}
 
+
   // create room {2 users => n users}
   async creatRoom(user, Body) {
     let { roomName, status, password } = Body;
@@ -44,6 +45,7 @@ export class UserService {
     return { found: true, room };
   }
 
+
   // add user to specific room
   async addUserToRoom(user, name) {
     let newRoom: any;
@@ -65,6 +67,8 @@ export class UserService {
     }
     return newRoom;
   }
+
+
 
   // delete user from current room
   async deleteUserFromRoom(user, name) {
@@ -99,6 +103,8 @@ export class UserService {
       throw new UnauthorizedException({}, '');
     }
   }
+  
+
 
   // show all available rooms
   async getAllRooms() {
@@ -107,6 +113,8 @@ export class UserService {
       include: { users: true, messages: true },
     });
   }
+
+
 
   // get a specific room by name
   async getRoomByName(name) {
@@ -126,6 +134,8 @@ export class UserService {
     if (room?.status == 'private') throw new UnauthorizedException({}, '');
     return room;
   }
+
+
 
   // check user is has already joined
   async avoidDuplicate(user, name) {
@@ -168,6 +178,9 @@ export class UserService {
     return message;
   }
 
+
+
+
   //add data in Room { messages}
   async putDataInDatabase(name, data, req) {
     const room = await this.prismaService.chatRoom.findFirst({
@@ -195,6 +208,8 @@ export class UserService {
     return message;
   }
 
+  
+
   //check user  if have order to join the rrom
   async joiningTheRoom(param) {
     const { roomName, password } = param;
@@ -202,12 +217,13 @@ export class UserService {
       where: { roomName: roomName },
     });
     if (room.status === 'protected') {
-      if (!(await bcrypt.compare(password, room.password)))
-        return undefined;
+      if (!(await bcrypt.compare(password, room.password))) return undefined;
     }
     if (room.status === 'private') return undefined;
     return true;
   }
+
+
 
   //get user with username
   async getUserWithUsername(name) {
@@ -215,6 +231,8 @@ export class UserService {
       where: { username: name },
     });
   }
+
+
 
   // set admin to other users in my room
   async setAdmin(param) {
@@ -235,10 +253,12 @@ export class UserService {
     // return room
   }
 
+
+
   //change password of protected room
   async changePasswordOfProtectedRoom(param) {
     const { roomName, password } = param;
-    console.log(param)
+    console.log(param);
     const room = await this.prismaService.chatRoom.findFirst({
       where: { roomName: roomName },
     });
@@ -255,6 +275,8 @@ export class UserService {
     }
     throw new NotFoundException({}, 'room not found');
   }
+
+
 
   // delete pass from protected room
   async deletePasswordOfProtectedRoom(param) {
@@ -275,6 +297,8 @@ export class UserService {
     throw new NotFoundException({}, 'room not found');
   }
 
+
+
   // ban users
   async banUser(user, roomName, emails) {
     const room = await this.prismaService.chatRoom.findFirst({
@@ -293,6 +317,8 @@ export class UserService {
     console.log('ban ', room);
     return room;
   }
+
+
 
   // mute users
   async muteUsers(body) {
@@ -315,6 +341,8 @@ export class UserService {
     });
     // }
   }
+
+
 
   // delet user from mute users
   async deleteUserFromMuteUsers(body) {
@@ -342,6 +370,8 @@ export class UserService {
     // }
   }
 
+
+
   // validate user to create chat
   async validateUserToCreateChat(req) {
     return await this.prismaService.user.findUnique({
@@ -349,6 +379,7 @@ export class UserService {
     });
   }
 
+  
   // get admins of chatRoom
   async getAdminsOfUsers(roomName) {
     return await this.prismaService.chatRoom.findFirst({
