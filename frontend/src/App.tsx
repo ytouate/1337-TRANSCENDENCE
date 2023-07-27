@@ -28,6 +28,7 @@ import { useState } from 'react';
 import AgainstAi from './pages/AgainstAi/AgainstAi.js';
 import Queue from './pages/Queue/Queue.js';
 import Challenge from './pages/Challenge/Challenge.js';
+import SpectatePage from './pages/SpectatePage/SpectatePage.js';
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -45,6 +46,11 @@ const router = createBrowserRouter(
                 <Route path='chat' loader={homeLoader} element={<Chat />} />
                 <Route loader={navLoader} path='ai' element={<AgainstAi />} />
                 <Route loader={navLoader} path='queue' element={<Queue />} />
+                <Route
+                    loader={navLoader}
+                    path='spectate/:gameId'
+                    element={<SpectatePage />}
+                />
 
                 <Route
                     loader={navLoader}
