@@ -101,16 +101,12 @@ const Game = ({
         socket.on('game_over', (result: { winnerData: PlayerPosition }) => {
             // console.log(result);
             const playerPosition = result.winnerData;
-            if (!isSpectate) {
-                if (playerPosition.username === player1.username) {
-                    console.log('U won');
 
-                    player1.score = playerPosition.score;
-                } else {
-                    console.log('U lost');
-                    player2.score = playerPosition.score;
-                }
+            console.log(playerPosition.score);
+            if (playerPosition.username === player1.username) {
+                player1.score = playerPosition.score;
             } else {
+                player2.score = playerPosition.score;
             }
 
             // draw(context);
@@ -267,12 +263,12 @@ const Game = ({
     }, [draw]);
 
     const getLeftPlayer = () => {
-        if (isSpectate) return player1;
+        // if (isSpectate) return player1;
         if (player1.order === 0) return player1;
         else return player2;
     };
     const getRightPlayer = () => {
-        if (isSpectate) return player2;
+        // if (isSpectate) return player2;
 
         if (player2.order === 0) return player1;
         else return player2;
