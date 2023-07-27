@@ -2,7 +2,7 @@ import { Controller, Post , Get, Query, UseGuards, Put, Req, Body} from '@nestjs
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
 import { userReturn } from 'src/utils/user.return';
-import { Console } from 'console';
+import { body, password } from 'src/DTO/DTO';
 
 
 @Controller('user')
@@ -14,28 +14,28 @@ export class UserController {
         ){}
 
     @Post('addAdmin')
-    async setAdmin(@Body() Body) {
+    async setAdmin(@Body() Body : body) {
         return await this.userService.setAdmin(Body)
     }
 
     @Post('mute')
-    async   muteUser(@Body() body) {
+    async   muteUser(@Body() body : body) {
         return await this.userService.muteUsers(body)
     } 
 
     @Post('unmute')
-    async   deleteMuteUser(@Body() body) {
+    async   deleteMuteUser(@Body() body: body) {
         return await this.userService.deleteUserFromMuteUsers(body);
     } 
 
-    @Post('changePassword')
-    async   changePassword(@Query() Param) {
-        return await   this.userService.changePasswordOfProtectedRoom(Param)
+    @Put('changePassword')
+    async   changePassword(@Body() body : password) {
+        return await   this.userService.changePasswordOfProtectedRoom(body)
     }
 
     @Post('deletePassword')
-    async   deletePasword(@Query() Param) {
-        return await   this.userService.deletePasswordOfProtectedRoom(Param)
+    async   deletePasword(@Body() body : password) {
+        return await   this.userService.deletePasswordOfProtectedRoom(body)
     }
 
     @Get('getRoom')
@@ -53,7 +53,7 @@ export class UserController {
     }
 
     @Get('getRooms')
-    async getAllRooms(@Query() Param) {
+    async getAllRooms() {
         return await this.userService.getAllRooms()
     }
 }

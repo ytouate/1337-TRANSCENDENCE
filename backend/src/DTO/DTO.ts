@@ -1,11 +1,10 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString, Matches, MaxLength, MinLength } from "class-validator";
+import { IsBoolean, IsEmail, IsNotEmpty, IsOptional, IsString, Matches, MaxLength, MinLength } from "class-validator";
 
 export class ChatDto {
     @IsString()
     @IsNotEmpty()
     public roomName: string;
   
-    @IsString()
     @IsEmail({}, { each: true }) // Apply IsEmail validator to each element of the array
     @IsNotEmpty()
     public email: string[];
@@ -25,6 +24,14 @@ export class ChatDto {
     @IsString()
     @IsNotEmpty()
     public data: string;
+  
+    @IsOptional()
+    @IsBoolean()
+    public ban: boolean;
+  
+    @IsOptional()
+    @IsBoolean()
+    public kick: boolean;
   }
 
 export class twoFatctor {
@@ -41,6 +48,31 @@ export class code {
     @MaxLength(5)
     @MinLength(5)
     public code : string
+}
+
+export class password {
+
+    @IsString()
+    @IsNotEmpty()
+    public roomName: string;
+
+    @IsString()
+    @MinLength(4)
+    @MaxLength(10)
+    @Matches(/^(?=.*\d)(?=.*\W+)(?=.*[A-Z])(?=.*[a-z]).{10,}$/, {
+      message: 'Password too weak. It must contain at least one uppercase letter, one lowercase letter, one digit, one special character, and be at least 10 characters long.',
+    })
+    public password: string;
+}
+
+export class body {
+  @IsString()
+  @IsNotEmpty()
+  public roomName: string;
+
+  @IsEmail({}, { each: true }) // Apply IsEmail validator to each element of the array
+  @IsNotEmpty()
+  public email: string[];
 }
 
 export class message {

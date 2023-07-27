@@ -132,7 +132,7 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
     // leave the socket from room
     @SubscribeMessage('leaveRoom')
     @UseGuards(AuthGuard('websocket-jwt'))
-    async leaveRoomHandler(@Req() req, @MessageBody() body) {
+    async leaveRoomHandler(@Req() req, @MessageBody() body : ChatDto) {
         console.log('body' , body)
         if (!body.kick && !body.ban)
             body.email.push(req.user.email)
