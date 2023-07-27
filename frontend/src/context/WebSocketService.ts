@@ -7,6 +7,7 @@ class WebSocketService {
 
     connect(): any {
         if (!this.socket) {
+            console.log('socket connected');
             this.socket = socketIO('http://localhost:3000/game', {
                 autoConnect: false,
                 extraHeaders: {
@@ -15,7 +16,6 @@ class WebSocketService {
             });
             this.socket.connect();
         }
-        console.log('socket connected');
         return this.socket;
     }
 

@@ -27,7 +27,7 @@ export class UserService {
                             },
                             status : status,
                             password : hash,
-                            isDms : Body.isDms,
+                            isDms : Body.isDm,
                         }, include : {users : true ,messages : true}
                     }
                     )
