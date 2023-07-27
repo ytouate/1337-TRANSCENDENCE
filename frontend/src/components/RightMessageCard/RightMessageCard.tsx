@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import './RightMessageCard.css'
 
 export type MessageData = {
     message: string;
@@ -7,7 +8,8 @@ export type MessageData = {
     img: string;
 };
 function RightMessageCard(props: MessageData) {
-    const ref = useRef<HTMLElement>();
+    const ref : any = useRef();
+
     useEffect(() => {
         return ref.current?.scrollIntoView({ behavior: "smooth" });
     }, [props.message]);

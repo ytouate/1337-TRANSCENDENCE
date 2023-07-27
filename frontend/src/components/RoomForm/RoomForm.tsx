@@ -1,4 +1,3 @@
-
 import { User } from "../../context/Types";
 import FriendCard from "../FriendCard/FriendCard";
 import "./RoomForm.css";
@@ -8,7 +7,7 @@ import { Socket } from "socket.io-client";
 export function createGroup(
     e: any,
     socket: Socket,
-    data: { roomName: string; status: string; password: string },
+    data: { roomName: string; status: string; password: string | undefined },
     members: string[]
 ) {
     e.preventDefault();
@@ -53,14 +52,18 @@ function RoomFrom({ friends, socket, setCreateRoomClicked }: any) {
         });
     }
 
-    const ref = useRef(null);
-    function handleClickOutside(event : any) {
+    const ref: any = useRef(null);
+    function handleClickOutside(event: any) {
         if (ref.current && !ref.current.contains(event.target)) {
             setCreateRoomClicked(false);
         }
     }
     useEffect(() => {
-        document.addEventListener("mousedown", handleClickOutside);
+        // document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener("mousedown", (e: MouseEvent) => {
+            if (ref.current && !ref.current.contains(e.target))
+                setCreateRoomClicked(false);
+        });
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
@@ -76,7 +79,6 @@ function RoomFrom({ friends, socket, setCreateRoomClicked }: any) {
                 setCreateRoomClicked(false);
                 setData({ roomName: "", status: "", password: "" });
                 setMembers([]);
-                
             }}
             action=""
             className="room-form"
@@ -133,6 +135,7 @@ function RoomFrom({ friends, socket, setCreateRoomClicked }: any) {
                             maxLength={10}
                             type="password"
                             name="password"
+                            autoComplete="on"
                             placeholder="XXXX"
                             className="twofactor-input"
                             onChange={handleChange}
@@ -142,7 +145,7 @@ function RoomFrom({ friends, socket, setCreateRoomClicked }: any) {
             </div>
             <p>Add Friends</p>
             <div className="room-form-friends-section">
-                {friends.map((friend : User) => {
+                {friends.map((friend: User) => {
                     return (
                         <div key={friend.id} className="select-field">
                             <input
@@ -155,11 +158,7 @@ function RoomFrom({ friends, socket, setCreateRoomClicked }: any) {
                                 <FriendCard
                                     name={friend.username}
                                     img={friend.urlImage}
-                                    lastmsg={
-                                        friend.activitystatus
-                                            ? "Online"
-                                            : "Offline"
-                                    }
+                                    lastmsg={friend.activitystatus}
                                     addOption={false}
                                 />
                             </label>

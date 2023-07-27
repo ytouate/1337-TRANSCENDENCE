@@ -210,7 +210,6 @@ export class UserSettingsService {
                 delete userToReturn.blockedBy;
             }
             delete userToReturn.blockedBy;
-
             return userReturn(userToReturn, req);
         }
         throw new NotFoundException({}, 'not found');
