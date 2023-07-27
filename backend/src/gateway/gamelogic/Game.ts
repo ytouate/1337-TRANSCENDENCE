@@ -129,6 +129,7 @@ export class Game {
                     clearInterval(interval); // Stop the interval
                     return;
                 }
+                this.updateGame();
                 this.resetBall(ball);
             }
         }, 1000 / 60);
@@ -201,13 +202,28 @@ export class Game {
             gameOver = true;
             winnerData = gamePosition.players[0];
             loserData = gamePosition.players[1];
-        }
-        if (gamePosition.players[1].score >= WIN_CONDITION) {
+        } else if (gamePosition.players[1].score >= WIN_CONDITION) {
             gameOver = true;
             winnerData = gamePosition.players[1];
             loserData = gamePosition.players[0];
         }
         return { gameOver, winnerData, loserData };
+    }
+
+    private async updateGame() {
+        const durationInSeconds = Math.floor(
+            (new Date().getTime() - new Date(this.timeStart).getTime()) / 1000,
+        );
+        try {
+            const updatedGame = await this.gameService.updateGameState(
+                this.roomId,
+                this.gamePosition.players[0].score,
+                this.gamePosition.players[1].score,
+                durationInSeconds,
+            );
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     // update game and data and user statistics
