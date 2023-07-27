@@ -14,7 +14,7 @@ function useFriendList(props: any) {
             return (
                 <Link to={`/profile/${friend.id}`} key={friend.id}>
                     <FriendCard
-                        lastmsg={friend.activitystatus ? "online" : "offline"}
+                        lastmsg={friend.activitystatus}
                         img={friend.urlImage}
                         name={friend.username}
                         addOption={false}
@@ -33,7 +33,7 @@ function useBlockedUsers(props: any) {
             return (
                 <Fragment key={user.id}>
                     <FriendCard
-                        lastmsg={user.activitystatus ? "Online" : "Offline"}
+                        lastmsg={user.activitystatus}
                         img={user.urlImage}
                         name={user.username}
                         addOption={true}
@@ -92,7 +92,7 @@ export default function FriendsList(props: friendListType) {
     const friendList = useFriendList(user);
     const blockedUsers = useBlockedUsers(user);
 
-    function handleSearch(e : any) {
+    function handleSearch(e: any) {
         searchForUsers(e, searchPattern).then((data) => {
             setSearchFriends(
                 data.map((friend: any) => {
@@ -100,9 +100,7 @@ export default function FriendsList(props: friendListType) {
                     return (
                         <Link to={`/profile/${friend.id}`} key={friend.id}>
                             <FriendCard
-                                lastmsg={
-                                    friend.activitystatus ? "online" : "offline"
-                                }
+                                lastmsg={friend.activitystatus}
                                 addOption={false}
                                 img={friend.urlImage}
                                 name={friend.username}

@@ -33,7 +33,6 @@ function Home() {
     if (isSignedIn == false) return <Navigate to={"/signin"} />;
 
     const user: any = useLoaderData();
-
     return (
         <userContext.Provider value={useState(user)}>
             <div className="home">

@@ -103,14 +103,17 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
             const result = await this.user.joiningTheRoom(body);
             if (result == undefined)
                 client.emit('onError' , {'message' : 'password incorrect'})
-            this.server.in(client.id).socketsJoin(body.roomName)
-            await this.user.addUserToRoom(user, body.roomName)
-            for (const email of body.email)
+            else
             {
-                const id = this.socketId.get(email)
-                this.server.in(id).socketsJoin(body.roomName)
-                const newUser = await this.prisma.user.findUnique({where : {email : email}})
-                const newUpdateChat = await this.user.addUserToRoom(newUser, body.roomName)
+                this.server.in(client.id).socketsJoin(body.roomName)
+                await this.user.addUserToRoom(user, body.roomName)
+                for (const email of body.email)
+                {
+                    const id = this.socketId.get(email)
+                    this.server.in(id).socketsJoin(body.roomName)
+                    const newUser = await this.prisma.user.findUnique({where : {email : email}})
+                    const newUpdateChat = await this.user.addUserToRoom(newUser, body.roomName)
+                }
             }
         }
         else
@@ -121,7 +124,7 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
     // leave the socket from room
     @SubscribeMessage('leaveRoom')
     @UseGuards(AuthGuard('websocket-jwt'))
-    async leaveRoomHandler(@Req() req, @MessageBody() body) {
+    async leaveRoomHandler(@ConnectedSocket() client : Socket , @Req() req, @MessageBody() body) {
         console.log('body' , body)
         if (!body.kick && !body.ban)
             body.email.push(req.user.email)
@@ -130,15 +133,19 @@ export class chatGateway  implements OnModuleInit ,  OnGatewayConnection , OnGat
         {
             for (const email of body.email)
             {
+                console.log(email)
                 const Id = this.socketId.get(email)
+                console.log(Id)
                 this.socketId.delete(email)
                 this.server.in(Id).socketsLeave(body.roomName)
-                const user = await this.validateUserByEmail(email, body.roomName, 0)
+                const newUser = await this.validateUserByEmail(email, body.roomName, 0)
                 if (body.ban)
-                    await this.user.banUser(user , body.roomName, body.email)
-                this.user.deleteUserFromRoom(user , body.roomName)
+                    await this.user.banUser(newUser , body.roomName, body.email)
+                await this.user.deleteUserFromRoom(newUser , body.roomName)
             }
         }
+        // const room = await this.prisma.chatRoom.findFirst({where : {roomName : body.roomName} , include : {users : true , messages : true}});
+        // client.emit("get_room", {'room' : room})
     }
 
     // if the user connect to the event

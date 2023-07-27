@@ -41,8 +41,10 @@
     background-color: #28235c;
     color: white;
 }
+
 .chat-users-header {
     display: flex;
+    min-width: 350px;
     gap: 2px;
 }
 

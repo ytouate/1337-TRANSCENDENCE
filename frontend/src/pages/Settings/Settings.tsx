@@ -67,7 +67,7 @@ export default function Settings() {
     async function disable2FA(e: any) {
         e.preventDefault();
         const token = Cookies.get("Token");
-        const options: any = {
+        const options = {
             method: "PUT",
             headers: {
                 Authorization: `Bearer ${token}`,

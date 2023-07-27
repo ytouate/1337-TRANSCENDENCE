@@ -22,7 +22,7 @@ export interface User {
     blocked: User[];
     notifications: Notification[];
     status?: string;
-    activitystatus: Boolean;
+    activitystatus: UserStatus;
     roomChat: chatRoom[];
     message: Message[];
     preference?: Preference;
@@ -91,6 +91,11 @@ export interface Props {
     setRoom?(room: chatRoom): any;
 }
 
+enum UserStatus {
+    ONLINE,
+    OFFLINE,
+    INGAME,
+}
 export interface CurrentChattingUserProps {
     selectedUser: User;
 }
