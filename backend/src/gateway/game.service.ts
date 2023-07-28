@@ -110,9 +110,8 @@ export class GameGateWay implements OnGatewayConnection {
     }
 
     clearMaps(gameInvite: boolean, roomId: number, player1: number) {
-        if (!gameInvite) {
-            this.gamePlayerPosition.delete(roomId);
-        } else {
+        this.gamePlayerPosition.delete(roomId);
+        if (gameInvite) {
             this.challengeLobby.delete(player1);
         }
     }
@@ -181,6 +180,7 @@ export class GameGateWay implements OnGatewayConnection {
         const players: PlayerPosition[] = new Array(2);
 
         players[0] = {
+            eventName: event_name,
             id: userData1.id,
             username: userData1.username,
             opponent: userData2.username,
@@ -194,6 +194,7 @@ export class GameGateWay implements OnGatewayConnection {
         };
 
         players[1] = {
+            eventName: event_name,
             id: userData2.id,
             username: userData2.username,
             opponent: userData1.username,
@@ -228,7 +229,7 @@ export class GameGateWay implements OnGatewayConnection {
             this.clearMaps(gameInvite, game.id, player1);
             this.userService.updatePlayerStatus(player1, 'ONLINE');
             this.userService.updatePlayerStatus(player2, 'ONLINE');
-        });
+        }, event_name);
     }
 
     // event handler so each player ..
@@ -246,10 +247,11 @@ export class GameGateWay implements OnGatewayConnection {
     // Check if a player is already in a game
     checkifPlayerInGame(
         userId: number,
+        eventName?: String
     ): { gameId: number; p: PlayerPosition } | undefined {
         for (const [gameId, gamePosition] of this.gamePlayerPosition) {
             for (let p of gamePosition.players) {
-                if (p.id === userId) return { gameId, p };
+                if (p.id === userId && (!eventName || p.eventName === eventName)) return { gameId, p };
             }
         }
         return undefined;
@@ -275,19 +277,28 @@ export class GameGateWay implements OnGatewayConnection {
             return;
         }
 
-        let check = this.checkifPlayerInGame(user.id);
-        if (check) {
+        let privateLobbyGame = this.checkifPlayerInGame(user.id, 'game_invite_start');
+        if (privateLobbyGame) {
+            client.emit('already_private_game');
+            return ;
+        }
+
+
+        let matchMadeGame = this.checkifPlayerInGame(user.id, 'match_found');
+        if (matchMadeGame) {
+          console.log('player already in game');
+
             client.emit('match_found', {
-                gameId: check.gameId,
-                opponent: check.p.opponent,
-                order: check.p.order,
-                pref: check.p.pref,
-                pref2: check.p.pref2,
-                urlImg1: check.p.urlImg1,
-                urlImg2: check.p.urlImg2,
+                gameId: matchMadeGame.gameId,
+                opponent: matchMadeGame.p.opponent,
+                order: matchMadeGame.p.order,
+                pref: matchMadeGame.p.pref,
+                pref2: matchMadeGame.p.pref2,
+                urlImg1: matchMadeGame.p.urlImg1,
+                urlImg2: matchMadeGame.p.urlImg2,
             });
 
-            const roomId = String(check.gameId);
+            const roomId = String(matchMadeGame.gameId);
             client.join(roomId);
 
             return;
@@ -334,11 +345,14 @@ export class GameGateWay implements OnGatewayConnection {
         // const user = await this.addClient(client, payload.username);
         const user = this.userSockets.get(userId);
 
+        const myData = this.userSockets.get(userId);
+        if (!myData) return;
+
         // the player u challenging already challenged you
         for (const [id, lobby] of this.challengeLobby) {
             if (lobby.inviteeId === userId && lobby.users[0]?.id === friendId) {
                 console.log('already challenged');
-                this.server.emit('already_challenged', {
+                myData.socket.emit('already_challenged', {
                     challengerId: lobby.users[0].id,
                 });
                 return;
@@ -346,10 +360,11 @@ export class GameGateWay implements OnGatewayConnection {
                 lobby.users[0]?.id == userId ||
                 lobby.users[1]?.id === userId
             ) {
-                console.log('u already in retratd...');
+                console.log('u already in ...');
                 return;
             }
         }
+
 
         const friendData = this.userSockets.get(friendId);
         if (!friendData) {
@@ -357,8 +372,7 @@ export class GameGateWay implements OnGatewayConnection {
             return;
         }
 
-        const myData = this.userSockets.get(userId);
-        if (!myData) return;
+   
         if (friendData.id === myData.id) {
             console.log('inviting userself ?');
             return;
@@ -371,7 +385,6 @@ export class GameGateWay implements OnGatewayConnection {
 
         // console.log('invite ' + userId);
         this.challengeLobby.set(userId, lobby);
-        console.log('current size ', this.challengeLobby.size);
 
         myData.socket.emit('invite_sent', {
             username: friendData.username,
@@ -394,11 +407,9 @@ export class GameGateWay implements OnGatewayConnection {
         const userId: number = body.userId;
         const hostId: number = body.hostId;
 
-        console.log('player declined');
         const myData = this.userSockets.get(userId);
         const opponentData = this.userSockets.get(hostId);
         this.challengeLobby.delete(hostId);
-        console.log('current size ', this.challengeLobby.size);
         if (myData && opponentData) {
             opponentData.socket.emit('invite_declined', {
                 userId: userId,
@@ -435,7 +446,7 @@ export class GameGateWay implements OnGatewayConnection {
 
         if (!lobby || (userId != lobby.inviteeId && userId != hostId)) {
             console.log('u are not allowed here');
-            if (myData) myData.socket.emit('unauthorized_lobby', {});
+            myData?.socket.emit('unauthorized_lobby', {});
             // throw new UnauthorizedException();
             //
             return;
@@ -443,22 +454,15 @@ export class GameGateWay implements OnGatewayConnection {
         // if game already started
         if (lobby.users[0]?.id === userId || lobby.users[1]?.id === userId) {
             console.log('already in game');
-            let check = this.checkifPlayerInGame(userId);
-            if (!check) return;
-            client.emit('game_invite_start', {
-                gameId: check.gameId,
-                opponent: check.p.opponent,
-                order: check.p.order,
-                pref: check.p.pref,
-                pref2: check.p.pref2,
-                urlImg1: check.p.urlImg1,
-                urlImg2: check.p.urlImg2,
-            });
-
-            const roomId = String(check.gameId);
-            client.join(roomId);
+            myData?.socket.emit('unauthorized_lobby', {});
 
             return;
+        }
+        let check = this.checkifPlayerInGame(userId, null);
+        if (check) {
+            console.log('finish ur game first');
+            myData?.socket.emit('unauthorized_lobby', {});
+            return ;
         }
         if (hostId === userId) lobby.users[0] = myData;
         else lobby.users[1] = myData;
@@ -482,7 +486,7 @@ export class GameGateWay implements OnGatewayConnection {
         if (gamePosition) {
             const roomId = String(gameId);
 
-            this.server.to(client.id).emit('spectate_ready', {
+            client.emit('spectate_ready', {
                 gameId: gameId,
                 player1: gamePosition.players[0],
                 player2: gamePosition.players[1],

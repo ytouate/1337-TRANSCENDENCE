@@ -37,7 +37,7 @@ export class authController {
 	@UseGuards(AuthGuard('jwt'))
 	async getUser(@Req() req) {
 		const user = await this.authservice.validateUser(req);
-		console.log(user);
+		// console.log(user);
 		if (user) return user;
 		throw new NotFoundException();
 	}

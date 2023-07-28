@@ -47,7 +47,7 @@ export class Game {
         this.velocity = INITIAL_VELOCITY;
     }
 
-    public startGameLoop(server: Server, clearMaps: any) {
+    public startGameLoop(server: Server, clearMaps: any, evenName: string) {
         let ball: Ball = {
             x: BOARD_WIDTH / 2,
             y: BOARD_HEIGHT / 2,
@@ -66,6 +66,7 @@ export class Game {
             const players: PlayerPosition[] = new Array(2);
 
             players[0] = {
+                eventName: evenName,
                 id: this.gamePosition.players[0].id,
                 y: this.gamePosition.players[0].y / BOARD_HEIGHT,
                 username: this.gamePosition.players[0].username,
@@ -78,6 +79,7 @@ export class Game {
                 urlImg2: this.gamePosition.players[0].urlImg2,
             };
             players[1] = {
+                eventName: evenName,
                 id: this.gamePosition.players[1].id,
                 y: this.gamePosition.players[1].y / BOARD_HEIGHT,
                 username: this.gamePosition.players[1].username,

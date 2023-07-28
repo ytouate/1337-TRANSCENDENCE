@@ -13,6 +13,7 @@ export interface Lobby {
 }
 
 export interface PlayerPosition {
+    eventName: string;
     id: number;
     username: string;
     opponent: string;
