@@ -64,7 +64,7 @@ export default function Achievements({ user }: { user: User }) {
                         description="you have more than 3 winstreak"
                     />
                 )}
-                {extrovert && (
+                {player && (
                     <AchievementCard
                         img={playerImg}
                         title="Player"
