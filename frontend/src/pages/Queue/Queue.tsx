@@ -15,6 +15,7 @@ import Game from '../../components/Game/Game.tsx';
 import webSocketService from '../../context/WebSocketService.ts';
 import './Queue.css';
 import LoadingAnimation from '../../components/LoadingAnimation/LoadingAnimation.tsx';
+import { toast } from 'react-toastify';
 
 const Queue = () => {
     const user: any = useLoaderData();
@@ -77,7 +78,6 @@ const Queue = () => {
     }, []);
 
     useEffect(() => {
-        // const socket = webSocketService.getSocket();
         console.log('connected');
 
         if (!socket) {
@@ -85,16 +85,6 @@ const Queue = () => {
         }
 
         socket?.emit('queueUp', { userId: id });
-
-        // socket.on('disconnect', (reason: string) => {
-        //     if (reason === 'io server disconnect') {
-        //         return;
-        //     }
-        //     console.log(
-        //         'Disconnected from the server. Attempting to reconnect...',
-        //     );
-        //     connectSocket();
-        // });
 
         socket?.on('match_found', (data: any) => {
             console.log('match found');
@@ -150,9 +140,16 @@ const Queue = () => {
             setWaitState(false);
         });
 
+        socket?.on('already_private_game', (data: any) => {
+            console.log('already in private game');
+            if (data?.id) navigate(`/challenge/${data?.id}`);
+            else navigate('/');
+        });
+
         return () => {
             socket?.off('connect');
             socket?.off('match_found');
+            socket?.off('already_private_game');
         };
     }, [socket]);
 

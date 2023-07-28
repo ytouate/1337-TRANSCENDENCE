@@ -88,7 +88,10 @@ const Challenge = () => {
         // private lobby, u will be redirected to the home page
         socket?.on('unauthorized_lobby', (data: any) => {
             console.log('unauthorized_lobby');
-            navigate('/');
+            if (data?.queue === true)
+                navigate('/queue');
+            else
+                navigate('/');
         });
 
         // if both players are ready (emitted 'playerReady')
