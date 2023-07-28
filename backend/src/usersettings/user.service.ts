@@ -8,7 +8,7 @@ import {
 import { Notification, User, UserStatus } from '@prisma/client';
 import { stat } from 'fs';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { userReturn, userReturnToGatway } from 'src/utils/user.return';
+import { userReturn } from 'src/utils/user.return';
 
 @Injectable()
 export class UserSettingsService {
@@ -215,7 +215,7 @@ export class UserSettingsService {
         throw new NotFoundException({}, 'not found');
     }
 
-    async getUserByEmail(email: string, req: any) {
+    async getUserByEmail(email: string) {
         const user = await this.prismaService.user.findUnique({
             where: {
                 email: email,
@@ -224,10 +224,10 @@ export class UserSettingsService {
         if (!user)
             // check if user exists
             throw new ForbiddenException('user not found');
-        return userReturnToGatway(user, req);
+        return user;
     }
 
-    async getUserByUsername(username: string, req: any) {
+    async getUserByUsername(username: string) {
         const user = await this.prismaService.user.findUnique({
             where: {
                 username: username,
@@ -236,10 +236,10 @@ export class UserSettingsService {
         if (!user)
             // check if user exists
             throw new ForbiddenException('user not found');
-        return userReturnToGatway(user, req);
+        return user;
     }
 
-    async getUserById(userId: number, req: any) {
+    async getUserById(userId: number) {
         userId = Math.floor(userId);
         const user = await this.prismaService.user.findUnique({
             where: {
@@ -265,7 +265,7 @@ export class UserSettingsService {
             // check if user exists
             throw new ForbiddenException('user not found');
         return {
-            ...userReturnToGatway(user, req),
+            ...user,
             gamesPlayed,
         };
     }
