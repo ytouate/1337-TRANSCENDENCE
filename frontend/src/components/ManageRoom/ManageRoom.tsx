@@ -32,42 +32,6 @@ function ToCards({
     });
 }
 
-{
-    /* <input
-                        onChange={(e) => {
-                            setPassword(e.target.value);
-                        }}
-                        type="text"
-                    />
-                    <button
-                        onClick={(e) => {
-                            const options = {
-                                method: "PUT",
-                                headers: {
-                                    Authorization: `Bearer ${Cookies.get(
-                                        "Token"
-                                    )}`,
-                                    "Content-Type": "application/json",
-                                },
-                                body: JSON.stringify({
-                                    roomName: currentRoom.roomName,
-                                    password: password,
-                                }),
-                            };
-                            fetch(
-                                "http://import.meta.env.VITE_API_URL/user/changePassword",
-                                options
-                            )
-                                .then((res) => res.json())
-                                .then((data) =>
-                                    console.log("succefully deleted: ", data)
-                                );
-                        }}
-                        className="button"
-                    >
-                        change
-                    </button> */
-}
 export function ManageRoom({
     setManageClicked,
     handleOptionChange,
@@ -156,7 +120,7 @@ export function ManageRoom({
             `http://${import.meta.env.VITE_API_URL}/user/deletePassword`,
             options
         )
-            .then((res) => res.json())
+            .then((res) => res.json()) // TODO: update the state from the upcaming response
             .then((data) => console.log("succefully deleted: ", data));
     };
     const [newPassword, setNewPassword] = useState("");
@@ -176,7 +140,7 @@ export function ManageRoom({
             `http://${import.meta.env.VITE_API_URL}/user/changePassword`,
             options
         )
-            .then((res) => res.json())
+            .then((res) => res.json()) // TODO: SET THE STATE WITH THE INCOMING DATA
             .then((data) => console.log("succefully deleted: ", data));
     };
     return (

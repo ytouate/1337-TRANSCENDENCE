@@ -56,7 +56,6 @@ const Queue = () => {
     };
 
     const resetState = () => {
-        // const socket = webSocketService.getSocket();
         if (!socket) {
             navigate('/');
             return;
@@ -68,17 +67,13 @@ const Queue = () => {
 
     useEffect(() => {
         setScoket(webSocketService.connect());
-        // setScoket(webSocketService.getSocket());
 
         return () => {
-            // webSocketService.disconnect();
             setScoket(null);
         };
     }, []);
 
     useEffect(() => {
-        // const socket = webSocketService.getSocket();
-        console.log('connected');
 
         if (!socket) {
             setScoket(webSocketService.connect());
@@ -86,25 +81,14 @@ const Queue = () => {
 
         socket?.emit('queueUp', { userId: id });
 
-        // socket.on('disconnect', (reason: string) => {
-        //     if (reason === 'io server disconnect') {
-        //         return;
-        //     }
-        //     console.log(
-        //         'Disconnected from the server. Attempting to reconnect...',
-        //     );
-        //     connectSocket();
-        // });
 
         socket?.on('match_found', (data: any) => {
-            console.log('match found');
-            const { opponent, gameId, order, pref, pref2, urlImg1, urlImg2 } =
+            const { opponent, gameId, order, pref, urlImg1, urlImg2 } =
                 data;
 
-            console.log({ pref, pref2 });
             if (order === 0) {
                 paddle1.color = pref.paddleColor;
-                paddle2.color = pref2.paddleColor;
+                paddle2.color = pref.paddleColor;
                 setPlayer1({
                     paddle: paddle1,
                     score: 0,
@@ -119,12 +103,12 @@ const Queue = () => {
                     score: 0,
                     username: opponent,
                     opponent: username,
-                    preferences: pref2,
+                    preferences: pref,
                     order: 1,
                     urlImg: urlImg2,
                 });
             } else {
-                paddle1.color = pref2.paddleColor;
+                paddle1.color = pref.paddleColor;
                 paddle2.color = pref.paddleColor;
                 setPlayer1({
                     paddle: paddle2,
@@ -141,7 +125,7 @@ const Queue = () => {
                     score: 0,
                     username: opponent,
                     opponent: username,
-                    preferences: pref2,
+                    preferences: pref,
                     order: 0,
                     urlImg: urlImg2,
                 });
@@ -150,14 +134,23 @@ const Queue = () => {
             setWaitState(false);
         });
 
+        socket?.on('already_private_game', () => {
+            console.log('')
+            navigate('/');
+        });
+
         return () => {
             socket?.off('connect');
             socket?.off('match_found');
+            socket?.off('already_private_game');
         };
     }, [socket]);
 
     return (
-        <div className='queue-outer-container' style={getMap()}>
+        <div className='queue-outer-container' 
+            style={waitState ? {  backgroundColor: '#28235c',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',} : getMap()}>
             {waitState ? (
                 <div className='queue-container '>
                     <LoadingAnimation />

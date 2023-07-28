@@ -6,7 +6,12 @@ import Achievements from "../../components/Achievements/Achievements";
 import Stats from "../../components/Stats/Stats";
 import { authContext } from "../../context/Context";
 import Cookies from "js-cookie";
-import { Navigate, useLoaderData, useRouteError } from "react-router-dom";
+import {
+    Navigate,
+    redirect,
+    useLoaderData,
+    useRouteError,
+} from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import socketIO from "socket.io-client";
 import NotFound from "../../components/NotFound";
@@ -19,6 +24,7 @@ export function ErrorBoundary() {
 
 export async function userLoader({ params }: any) {
     const Token = Cookies.get("Token");
+    if (!Token) return redirect("/signin");
     const options = {
         method: "GET",
         headers: {
@@ -45,17 +51,19 @@ export default function Profile() {
 
     const [socketContext, setSocketContext] = useState<Socket | any>(null);
     useEffect(() => {
-        const socketContext = socketIO(
-            `http://${import.meta.env.VITE_API_URL}/notification`,
-            {
-                extraHeaders: {
-                    Authorization: `Bearer ${Cookies.get("Token")}`,
-                },
-                autoConnect: false,
-            }
-        );
-        socketContext.connect();
-        setSocketContext(socketContext);
+        if (Cookies.get("Token")) {
+            const socketContext = socketIO(
+                `http://${import.meta.env.VITE_API_URL}/notification`,
+                {
+                    extraHeaders: {
+                        Authorization: `Bearer ${Cookies.get("Token")}`,
+                    },
+                    autoConnect: false,
+                }
+            );
+            socketContext.connect();
+            setSocketContext(socketContext);
+        }
     }, []);
     return (
         <section className="profile">

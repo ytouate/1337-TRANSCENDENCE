@@ -171,6 +171,7 @@ export const drawScores = (
     score2: number,
     player1: string,
     player2: string,
+    color: string,
 ) => {
     // const player1Width = context.measureText(player1).width;
     // const player2Width = context.measureText(player2).width;
@@ -192,7 +193,7 @@ export const drawScores = (
         context.canvas.width / 2 - 75,
         75,
         70,
-        'white',
+        color,
     );
     fillText(
         context,
@@ -200,7 +201,7 @@ export const drawScores = (
         context.canvas.width / 2 + 75,
         75,
         70,
-        'white',
+        color,
     );
 };
 

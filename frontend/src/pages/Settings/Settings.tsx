@@ -6,11 +6,12 @@ import Cookies from "js-cookie";
 import { ToastContainer, toast } from "react-toastify";
 import { useContext } from "react";
 import { authContext } from "../../context/Context";
-import { Navigate } from "react-router-dom";
+import { Navigate, redirect } from "react-router-dom";
 import { useLoaderData } from "react-router-dom";
 
 export async function loader() {
     const Token = Cookies.get("Token");
+    if (!Token) return redirect("/signin");
     const options = {
         method: "GET",
         headers: {
@@ -130,6 +131,48 @@ export default function Settings() {
     }
 
     const notify = () => toast.success("2fa enabled succefully");
+
+    let { preference } = user;
+    const [preferences, setPreferences] = useState({
+        paddle: preference.paddleColor,
+        ball: preference.ballColor,
+        background: preference.mapTheme,
+    });
+    // console.log("preferences: ", preferences);
+
+    function handlePreferenceChange(e: any) {
+        setPreferences((prev) => {
+            return {
+                ...prev,
+                [e.target.name]: e.target.value,
+            };
+        });
+    }
+
+    const updatePreference = async () => {
+        console.log({preferences});
+        const options = {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${Cookies.get("Token")}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                id: Number(user.id),
+                paddleColor: String(preferences.paddle),
+                mapTheme: String(preferences.background),
+                ballColor: String(preferences.ball),
+            })
+        };
+        const res = await fetch(
+            `http://${import.meta.env.VITE_API_URL}/pref/update`,
+            options
+        );
+        if (res.ok)
+            console.log('ok')
+
+    }
+
     return (
         <div className="settings">
             <div className="settings-top">
@@ -205,6 +248,43 @@ export default function Settings() {
             </div>
             <div className="settings-update-wrapper">
                 <div className="settings--header">
+                    <p>Game Preferences</p>
+                </div>
+                <form
+                    onSubmit={(e) => {
+                        // TODO: sent the form data to the backend
+                        e.preventDefault();
+                        updatePreference();
+                    }}
+                    className="settings--update-avatar"
+                    style={{ display: "flex", flexDirection: "column" }}
+                >
+                    <div
+                        className="inputs"
+                        style={{ display: "flex", gap: "5px", width: "100%" }}
+                    >
+                        <Customizer
+                            setValue={handlePreferenceChange}
+                            name="paddle"
+                            value={preferences.paddle}
+                        />
+                        <Customizer
+                            name="background"
+                            value={preferences.background}
+                            setValue={handlePreferenceChange}
+                        />
+                        <Customizer
+                            name="ball"
+                            value={preferences.ball}
+                            setValue={handlePreferenceChange}
+                        />
+                    </div>
+                    <button className="button">save</button>
+                </form>
+            </div>
+
+            <div className="settings-update-wrapper">
+                <div className="settings--header">
                     <img src={updateNameIcon} alt="" />
                     <p>update name</p>
                 </div>
@@ -221,6 +301,30 @@ export default function Settings() {
                     </button>
                 </form>
             </div>
+        </div>
+    );
+}
+
+function Customizer({
+    name,
+    setValue,
+    value,
+}: {
+    name: string;
+    value: string;
+    setValue(val: any): any;
+}) {
+    return (
+        <div style={{ width: "100%" }} className="customizer">
+            <p>{name} color:</p>
+            <input
+                onChange={(e: any) => setValue(e)}
+                style={{ border: "1px solid black" }}
+                type="color"
+                name={name}
+                value={value}
+                className="twofactor-input"
+            />
         </div>
     );
 }

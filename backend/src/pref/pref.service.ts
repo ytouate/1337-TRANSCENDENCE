@@ -25,7 +25,7 @@ export class PrefService {
         }
     }
 
-    async updateUserPref(dto: PrefDto) {
+    async updateUserPref(dto: any) {
         try {
             await this.prisma.preference.update({
                 data: {
@@ -34,7 +34,7 @@ export class PrefService {
                     paddleColor: dto.paddleColor,
                 },
                 where: {
-                    userId: dto.userId,
+                    id: parseInt(dto.id),
                 },
             });
         } catch (error) {

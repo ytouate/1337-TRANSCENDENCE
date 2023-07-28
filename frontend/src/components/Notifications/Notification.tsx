@@ -134,8 +134,6 @@ export default function Notification() {
         });
 
         const push_notif = (data: any) => {
-            console.log("receiving invite from ", data.username);
-
             const notif = {
                 senderUsername: data.username,
                 id: data.id,
@@ -161,34 +159,37 @@ export default function Notification() {
     };
 
     useEffect(() => {
-        const socket = webSocketService.connect();
-        setGameSocket(socket);
-        gameNotifListen(socket);
 
-        const socketContext: any = socketIO(
-            `http://${import.meta.env.VITE_API_URL}/notification`,
-            {
-                autoConnect: false,
-                extraHeaders: {
-                    Authorization: `Bearer ${Cookies.get("Token")}`,
-                },
-            }
-        );
-        socketContext.connect();
-        setSocketContext(socketContext);
-        socketContext.on("receive_notification", (notification: any) => {
-            setNotifications((prev: any) => {
-                return [...prev, notification];
+        if (Cookies.get('Token')) {
+            const socket = webSocketService.connect();
+            setGameSocket(socket);
+            gameNotifListen(socket);
+
+            const socketContext: any = socketIO(
+                `http://${import.meta.env.VITE_API_URL}/notification`,
+                {
+                    autoConnect: false,
+                    extraHeaders: {
+                        Authorization: `Bearer ${Cookies.get("Token")}`,
+                    },
+                }
+            );
+            socketContext.connect();
+            setSocketContext(socketContext);
+            socketContext.on("receive_notification", (notification: any) => {
+                setNotifications((prev: any) => {
+                    return [...prev, notification];
+                });
             });
-        });
 
-        return () => {
-            socket.off("receive_notification");
-            socket.off("receive_invite");
-            socket.off("already_challenged");
-            socket.off("invitation_canceled");
-            socket.off("notif_invite_declined");
-        };
+            return () => {
+                socket.off("receive_notification");
+                socket.off("receive_invite");
+                socket.off("already_challenged");
+                socket.off("invitation_canceled");
+                socket.off("notif_invite_declined");
+            };
+        }
     }, []);
 
     const notifList = notifications.map((notification: any) => {

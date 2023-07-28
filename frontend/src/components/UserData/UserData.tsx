@@ -177,7 +177,6 @@ interface userDataType {
 }
 
 export default function UserData(props: userDataType) {
-    console.log("props: ", props);
 
     return (
         <>

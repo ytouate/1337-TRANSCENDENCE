@@ -45,7 +45,6 @@ export function Spectate() {
 
     const onSpectateClick = (gameId: number) => {
         //redirect to spectating page using the id
-        console.log(gameId);
         navigate(`/spectate/${gameId}`);
     };
 
@@ -57,7 +56,7 @@ export function Spectate() {
             },
         };
         const id: number = user.id;
-        const url = `http://localhost:3000/game/live/${id}`;
+        const url = `http://${import.meta.env.VITE_API_URL}/game/live/${id}`;
         fetch(url, options)
             .then((res) => res.json())
             .then((data) => setGames(Object.values(data)));

@@ -77,28 +77,22 @@ const Challenge = () => {
         // if the other player declines our invitation
         // redirect him to home page and informs him that the
         // invitation has been declined
-        socket?.on('invite_declined', (data: any) => {
-            console.log('he declined lol');
-            const username = data.username;
-            console.log(`${username} has declined ur invitation`);
+        socket?.on('invite_declined', () => {
             navigate('/');
         });
 
         // if no one invited u, or if u try to acces other players
         // private lobby, u will be redirected to the home page
-        socket?.on('unauthorized_lobby', (data: any) => {
-            console.log('unauthorized_lobby');
+        socket?.on('unauthorized_lobby', () => {
             navigate('/');
         });
 
         // if both players are ready (emitted 'playerReady')
         // the server will emit this event and the game will start
         socket?.on('game_invite_start', (data: any) => {
-            console.log('game_invite_start');
             const { opponent, gameId, order, pref, pref2, urlImg1, urlImg2 } =
                 data;
 
-            console.log({ pref, pref2 });
             if (order === 0) {
                 paddle1.color = pref.paddleColor;
                 paddle2.color = pref2.paddleColor;
@@ -158,7 +152,11 @@ const Challenge = () => {
     }, []);
 
     return (
-        <div className='queue-outer-container' style={getMap()}>
+        <div className='queue-outer-container'
+        style={waitState ? {  backgroundColor: '#28235c',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',} : getMap()}>
+        
             {waitState ? (
                 <div className='queue-container '>
                     <LoadingAnimation />

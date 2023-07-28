@@ -6,6 +6,7 @@ import {
     useLocation,
 } from "react-router-dom";
 
+import { redirect } from "react-router-dom";
 import logoImg from "../../assets/logo.png";
 import DropDownMenup from "../DropDownMenu/DropDownMenu";
 import Notifications from "../Notifications/Notification";
@@ -15,6 +16,8 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { userContext } from "../../context/Context";
 
 export async function loader() {
+    const Token = Cookies.get("Token");
+    if (!Token) return redirect("/signin");
     const data = await fetch(`http://${import.meta.env.VITE_API_URL}/user`, {
         headers: {
             Authorization: `Bearer ${Cookies.get("Token")}`,
@@ -22,7 +25,6 @@ export async function loader() {
     });
     return await data.json();
 }
-
 
 function ProfileDropDown() {
     const [user]: any = useContext(userContext);
@@ -72,7 +74,7 @@ function ProfileDropDown() {
 
 function Nav() {
     const user: any = useLoaderData();
-    
+
     return (
         <userContext.Provider value={useState(user)}>
             <nav className="navbar">

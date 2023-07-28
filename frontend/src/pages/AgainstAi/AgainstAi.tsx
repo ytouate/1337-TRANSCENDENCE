@@ -68,7 +68,7 @@ const AgainstAi = () => {
     let paddle2: Paddle = {
         x: 0,
         y: 0,
-        color: PADDLE_COLOR,
+        color: preference.paddleColor,
     };
 
     let ball: Ball = {
@@ -158,11 +158,11 @@ const AgainstAi = () => {
 
     const draw = (context: CanvasRenderingContext2D) => {
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-        drawNet(context, 'white');
+        drawNet(context, paddle1.color);
         drawPaddle(context, paddle1, paddleWidth, paddleHeight);
         drawPaddle(context, paddle2, paddleWidth, paddleHeight);
         drawBall(context, ball, preference.ballColor);
-        drawScores(context, score1, score2, 'me', 'AI');
+        drawScores(context, score1, score2, 'me', 'AI', paddle1.color);
     };
 
     useEffect(() => {
@@ -206,8 +206,8 @@ const AgainstAi = () => {
                     context.canvas.width,
                     context.canvas.height,
                 );
-                drawNet(context, 'white');
-                drawScores(context, score1, score2, 'ME', 'AI');
+                drawNet(context, paddle1.color);
+                drawScores(context, score1, score2, 'ME', 'AI', paddle1.color);
                 drawGameOver(context);
                 return;
             }

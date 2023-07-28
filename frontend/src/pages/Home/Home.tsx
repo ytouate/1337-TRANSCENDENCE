@@ -10,6 +10,7 @@ import { useContext, useState } from "react";
 import { Spectate } from "../../components/Spectate/Spectate";
 export async function loader() {
     const Token = Cookies.get("Token");
+    if (!Token) return redirect("/signin");
     const options = {
         method: "GET",
         headers: {

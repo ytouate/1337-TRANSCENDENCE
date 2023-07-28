@@ -58,29 +58,16 @@ const SpectatePage = () => {
             };
     };
 
-    // const resetState = () => {
-    //     // const socket = webSocketService.getSocket();
-    //     if (!socket) {
-    //         navigate('/');
-    //         return;
-    //     }
-    //     socket.emit('queueUp');
-    //     setWaitState(true);
-    // };
 
     useEffect(() => {
         setScoket(webSocketService.connect());
-        // setScoket(webSocketService.getSocket());
 
         return () => {
-            // webSocketService.disconnect();
             setScoket(null);
         };
     }, []);
 
     useEffect(() => {
-        // const socket = webSocketService.getSocket();
-        // console.log('connected');
 
         if (!socket) {
             setScoket(webSocketService.connect());
@@ -89,22 +76,11 @@ const SpectatePage = () => {
 
         socket?.emit('spectateGame', { gameId: gameId });
 
-        // socket.on('disconnect', (reason: string) => {
-        //     if (reason === 'io server disconnect') {
-        //         return;
-        //     }
-        //     console.log(
-        //         'Disconnected from the server. Attempting to reconnect...',
-        //     );
-        //     connectSocket();
-        // });
-
         socket?.on('lobby_not_found', (data: any) => {
             navigate('/');
         });
 
         socket?.on('spectate_ready', (data: any) => {
-            console.log(data);
             paddle1.color = data.player1.pref.paddleColor;
             paddle2.color = data.player2.pref.paddleColor;
             setPlayer1({
@@ -121,7 +97,7 @@ const SpectatePage = () => {
                 score: 0,
                 username: data.player2.username,
                 opponent: data.player1.c,
-                preferences: data.player2.pref2,
+                preferences: data.player2.pref,
                 order: 1,
                 urlImg: data.player2.urlImg1,
             });
@@ -135,7 +111,10 @@ const SpectatePage = () => {
     }, [socket]);
 
     return (
-        <div className='queue-outer-container' style={getMap()}>
+        <div className='queue-outer-container' 
+        style={waitState ? {  backgroundColor: '#28235c',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',} : getMap()}>
             {waitState ? (
                 <div className='queue-container '>
                     <LoadingAnimation />

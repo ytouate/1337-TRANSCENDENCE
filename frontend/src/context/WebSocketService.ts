@@ -18,14 +18,12 @@ class WebSocketService {
             );
             this.socket.connect();
         }
-        console.log("socket connected");
         return this.socket;
     }
 
     disconnect(): void {
         this.socket?.disconnect();
         this.socket = null;
-        console.log("socket disconnected");
     }
 
     getSocket(): Socket | null {

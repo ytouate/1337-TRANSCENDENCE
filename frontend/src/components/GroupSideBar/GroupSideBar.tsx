@@ -24,8 +24,6 @@ export default function GroupSideBar({
     const [groups, setGroups] = useState<chatRoom[]>([]);
 
     useEffect(() => {
-        console.log("re rendered");
-
         setGroups(
             chatRooms.filter(
                 (room: chatRoom) =>
@@ -46,7 +44,6 @@ export default function GroupSideBar({
     }, []);
 
     const [groupList, setGroupList] = useState<any>([]);
-    const navigator = useNavigate();
     const [wantsToJoinProtected, setWantToJoinProtected] = useState(false);
     function joinProtectedRoom(roomName: string) {
         socket.emit("joinRoom", {
@@ -57,11 +54,6 @@ export default function GroupSideBar({
     }
     const [password, setPassword] = useState("");
 
-    useEffect(() => {
-        console.log("am here");
-
-        // navigator(location.pathname);
-    }, [navigator]);
     useEffect(() => {
         if (groups) {
             setGroupList(

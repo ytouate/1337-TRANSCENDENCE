@@ -14,7 +14,8 @@ export class PrefController {
     }
 
     @Post('update')
-    updateUserPref(@Body() dto: PrefDto) {
+    updateUserPref(@Body() dto: any) {
+        console.log(dto);
         return this.prefService.updateUserPref(dto);
     }
 }

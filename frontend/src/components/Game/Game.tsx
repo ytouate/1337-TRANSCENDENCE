@@ -1,11 +1,11 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState } from "react";
 import {
     PlayerPosition,
     GameState,
     Player,
     Ball,
     Paddle,
-} from '../../interface/game.ts';
+} from "../../interface/game.ts";
 import {
     drawBall,
     drawGameOver,
@@ -14,17 +14,17 @@ import {
     drawScores,
     initBall,
     initPref,
-} from '../../pages/AgainstAi/gameUtils.ts';
+} from "../../pages/AgainstAi/gameUtils.ts";
 import {
     BALL_SIZE_RATIO,
     PADDLE_HEIGHT_RATIO,
     PADDLE_MARGIN_RATIO,
     PADDLE_WIDTH_RATIO,
-} from '../../constants/constants.ts';
-import EndGameScreen from '../EndGameScreen/EndGameScreen.tsx';
-import webSocketService from '../../context/WebSocketService.ts';
-import './Game.css';
-import { Spectate } from '../Spectate/Spectate.tsx';
+} from "../../constants/constants.ts";
+import EndGameScreen from "../EndGameScreen/EndGameScreen.tsx";
+import webSocketService from "../../context/WebSocketService.ts";
+import "./Game.css";
+import { Spectate } from "../Spectate/Spectate.tsx";
 
 interface Props {
     player1: Player;
@@ -62,7 +62,7 @@ const Game = ({
 
     const draw = (context: CanvasRenderingContext2D) => {
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-        drawNet(context, 'white');
+        drawNet(context, player1.paddle.color);
         drawPaddle(context, player1.paddle, paddleWidth, paddleHeight);
         drawPaddle(context, player2.paddle, paddleWidth, paddleHeight);
         drawBall(context, ball, player1.preferences.ballColor);
@@ -73,6 +73,7 @@ const Game = ({
                 player2.score,
                 player1.username,
                 player2.username,
+                player1.preferences.paddleColor
             );
         } else {
             drawScores(
@@ -81,6 +82,7 @@ const Game = ({
                 player1.score,
                 player2.username,
                 player1.username,
+                player1.preferences.paddleColor
             );
         }
     };
@@ -94,15 +96,12 @@ const Game = ({
 
         const socket = webSocketService.getSocket();
         if (!socket) {
-            console.log('no socket');
             return;
         }
 
-        socket.on('game_over', (result: { winnerData: PlayerPosition }) => {
-            // console.log(result);
+        socket.on("game_over", (result: { winnerData: PlayerPosition }) => {
             const playerPosition = result.winnerData;
 
-            console.log(playerPosition.score);
             if (playerPosition.username === player1.username) {
                 player1.score = playerPosition.score;
             } else {
@@ -113,7 +112,7 @@ const Game = ({
             setGameOver(true);
         });
 
-        socket.on('game_update', (state: GameState) => {
+        socket.on("game_update", (state: GameState) => {
             // setGameBall(state.ball);
 
             const canvas = canvasRef.current;
@@ -150,8 +149,8 @@ const Game = ({
         });
 
         return () => {
-            socket.off('game_update');
-            socket.off('game_over');
+            socket.off("game_update");
+            socket.off("game_over");
         };
     }, []);
 
@@ -159,7 +158,7 @@ const Game = ({
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        const context = canvas.getContext('2d');
+        const context = canvas.getContext("2d");
         if (!context) return;
 
         let animationFrameId: number;
@@ -173,7 +172,7 @@ const Game = ({
             const mouseY = event.clientY - canvasRect.top;
             if (!gameOver) {
                 player1.paddle.y = mouseY - paddleHeight / 2;
-                webSocketService.getSocket()?.emit('mouseMove', {
+                webSocketService.getSocket()?.emit("mouseMove", {
                     userId: userId,
                     gameId: gameId,
                     y: player1.paddle.y / canvas.height,
@@ -188,15 +187,16 @@ const Game = ({
                     0,
                     0,
                     context.canvas.width,
-                    context.canvas.height,
+                    context.canvas.height
                 );
-                drawNet(context, 'white');
+                drawNet(context, player1.preferences.paddleColor);
                 drawScores(
                     context,
                     player1.score,
                     player2.score,
                     player1.username,
                     player2.username,
+                    player1.preferences.paddleColor
                 );
                 drawGameOver(context);
                 return;
@@ -216,7 +216,7 @@ const Game = ({
         };
         animationFrameId = window.requestAnimationFrame(render);
 
-        if (!isSpectate) canvas.addEventListener('mousemove', handleMouseMove);
+        if (!isSpectate) canvas.addEventListener("mousemove", handleMouseMove);
 
         const resizeCanvas = () => {
             const container = canvasRef.current?.parentElement;
@@ -251,14 +251,14 @@ const Game = ({
             if (gameOver) drawGameOver(context);
         };
 
-        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener("resize", resizeCanvas);
         resizeCanvas();
 
         return () => {
             window.cancelAnimationFrame(animationFrameId);
             if (!isSpectate)
-                canvas.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('resize', resizeCanvas);
+                canvas.removeEventListener("mousemove", handleMouseMove);
+            window.removeEventListener("resize", resizeCanvas);
         };
     }, [draw]);
 
@@ -275,10 +275,13 @@ const Game = ({
     };
 
     return (
-        <div className='canvas-container'>
-            <canvas ref={canvasRef} className='canvas' />
+        <div className="canvas-container">
+            <canvas ref={canvasRef} className="canvas" />
             {gameOver && (
-                <div className='endgame-overlay'>
+                <div className="endgame-overlay"
+                    style={{  backgroundColor: '#28235c',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',}}>
                     <EndGameScreen
                         username1={getLeftPlayer().username}
                         score1={getLeftPlayer().score}

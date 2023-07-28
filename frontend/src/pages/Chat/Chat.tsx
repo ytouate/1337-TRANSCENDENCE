@@ -66,42 +66,46 @@ export default function Chat() {
     }
 
     useEffect(() => {
-        const chatSocket = io(`http://${import.meta.env.VITE_API_URL}/chat`, {
-            autoConnect: false,
-            extraHeaders: {
-                Authorization: `Bearer ${Cookies.get("Token")}`,
-            },
-        });
+        if (Cookies.get('Token')) {
+            const chatSocket = io(
+                `http://${import.meta.env.VITE_API_URL}/chat`,
+                {
+                    autoConnect: false,
+                    extraHeaders: {
+                        Authorization: `Bearer ${Cookies.get("Token")}`,
+                    },
+                }
+            );
 
-        chatSocket.connect();
-        setChatSocket(chatSocket);
+            chatSocket.connect();
+            setChatSocket(chatSocket);
 
-        chatSocket.on("onError", (err) => {
-            console.log("error: ", err);
-        });
+            chatSocket.on("onError", (err) => {
+                console.log("error: ", err);
+            });
 
-        chatSocket.on("onUpdate", (miks: { message: string }) => {
-            if (miks.message != "joined") {
-                setIsDmsSection(true);
-                setRoom(null);
-            }
-        });
+            chatSocket.on("onUpdate", (miks: { message: string }) => {
+                if (miks.message != "joined") {
+                    setIsDmsSection(true);
+                    setRoom(null);
+                }
+            });
 
-        chatSocket.on("get_room", ({ room }: { room: chatRoom }) => {
-            setRoom(room);
-            setAllMessages(room.messages);
-        });
-        return () => {
-            chatSocket.off("get_room");
-            chatSocket.off("onError");
-        };
+            chatSocket.on("get_room", ({ room }: { room: chatRoom }) => {
+                setRoom(room);
+                setAllMessages(room.messages);
+            });
+            return () => {
+                chatSocket.off("get_room");
+                chatSocket.off("onError");
+            };
+        }
     }, []);
 
     useEffect(() => {
         if (chatSocket) {
             chatSocket.on("onMessage", (msg: Message) => {
                 if (msg.roomName == room?.roomName) {
-                    console.log("message received and matched");
                     setAllMessages((prev: Message[]) => {
                         return prev.length > 0 ? [...prev, msg] : [msg];
                     });
@@ -356,7 +360,10 @@ export default function Chat() {
                 <div className="chat-body">
                     <div className="chat-body-header">
                         {isDmsSection ? (
-                            <CurrentChattingUser selectedUser={selectedUser!} />
+                            <CurrentChattingUser
+                                userId={user.id}
+                                selectedUser={selectedUser!}
+                            />
                         ) : (
                             <SelectedRoom
                                 user={user}
