@@ -216,7 +216,7 @@ export class UserSettingsService {
         if (!user)
             // check if user exists
             throw new ForbiddenException('user not found');
-        return userReturnToGatway(user, req);
+        return user;
     }
 
     async getUserByUsername(username: string, req: any) {
@@ -228,7 +228,7 @@ export class UserSettingsService {
         if (!user)
             // check if user exists
             throw new ForbiddenException('user not found');
-        return userReturnToGatway(user, req);
+        return user
     }
 
     async getUserById(userId: number, req: any) {
@@ -257,7 +257,7 @@ export class UserSettingsService {
             // check if user exists
             throw new ForbiddenException('user not found');
         return {
-            ...userReturnToGatway(user, req),
+            ...user,
             gamesPlayed,
         };
     }
