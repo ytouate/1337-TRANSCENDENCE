@@ -15,6 +15,7 @@ import Game from '../../components/Game/Game.tsx';
 import webSocketService from '../../context/WebSocketService.ts';
 import './Queue.css';
 import LoadingAnimation from '../../components/LoadingAnimation/LoadingAnimation.tsx';
+import { toast } from 'react-toastify';
 
 const Queue = () => {
     const user: any = useLoaderData();
@@ -81,7 +82,6 @@ const Queue = () => {
 
         socket?.emit('queueUp', { userId: id });
 
-
         socket?.on('match_found', (data: any) => {
             const { opponent, gameId, order, pref, urlImg1, urlImg2 } =
                 data;
@@ -134,9 +134,10 @@ const Queue = () => {
             setWaitState(false);
         });
 
-        socket?.on('already_private_game', () => {
-            console.log('')
-            navigate('/');
+        socket?.on('already_private_game', (data: any) => {
+            console.log('already in private game');
+            if (data?.id) navigate(`/challenge/${data?.id}`);
+            else navigate('/');
         });
 
         return () => {

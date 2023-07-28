@@ -83,8 +83,12 @@ const Challenge = () => {
 
         // if no one invited u, or if u try to acces other players
         // private lobby, u will be redirected to the home page
-        socket?.on('unauthorized_lobby', () => {
-            navigate('/');
+        socket?.on('unauthorized_lobby', (data: any) => {
+            console.log('unauthorized_lobby');
+            if (data?.queue === true)
+                navigate('/queue');
+            else
+                navigate('/');
         });
 
         // if both players are ready (emitted 'playerReady')
