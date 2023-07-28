@@ -116,8 +116,6 @@ export class NotificationService
     //push the client socket in map
     async pushClientInMap(client: Socket) {
         try {
-            console.log( "token : ", client.handshake.headers.authorization);
-            
             const userObj: any = this.jwtService.verify(
                 client.handshake.headers.authorization.slice(7),
             );

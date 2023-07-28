@@ -66,7 +66,7 @@ export default function Chat() {
     }
 
     useEffect(() => {
-        if (Cookies.get('Token')) {
+        if (Cookies.get("Token")) {
             const chatSocket = io(
                 `http://${import.meta.env.VITE_API_URL}/chat`,
                 {
@@ -106,9 +106,11 @@ export default function Chat() {
         if (chatSocket) {
             chatSocket.on("onMessage", (msg: Message) => {
                 if (msg.roomName == room?.roomName) {
-                    setAllMessages((prev: Message[]) => {
-                        return prev.length > 0 ? [...prev, msg] : [msg];
-                    });
+                    if (!user.blocked.find((u: User) => u.id == msg.userId)) {
+                        setAllMessages((prev: Message[]) => {
+                            return prev.length > 0 ? [...prev, msg] : [msg];
+                        });
+                    }
                 }
                 navigator("/chat");
             });
@@ -123,9 +125,13 @@ export default function Chat() {
         navigator("/chat");
     }, [isDmsSection]);
 
+    const misajat = allMessages.filter((msg) => {
+        if (user.blocked.find((u: User) => u.id == msg.userId)) return false;
+        return true;
+    });
     const privateMessages =
         room &&
-        allMessages?.map((msg: Message) => {
+        misajat?.map((msg: Message) => {
             if (msg.userId == user.id) {
                 return (
                     <RightMessageCard

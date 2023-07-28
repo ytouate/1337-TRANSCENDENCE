@@ -13,7 +13,6 @@ export function CurrentChattingUser({
     const navigate = useNavigate();
 
     const emitInvite = (friendId: number) => {
-        // maybe some checks on socket
         const socket = webSocketService.getSocket();
 
         socket?.emit("gameInvite", {

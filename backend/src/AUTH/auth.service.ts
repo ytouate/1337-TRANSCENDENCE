@@ -64,7 +64,8 @@ export class authService{
                 friends: true,
                 preference : true,
                 notifications : true,
-                roomChat : {include  : { users : true , messages : true}}
+                roomChat : {include  : { users : true , messages : true }},
+                blocked: true,
             },
         })
         if (user)

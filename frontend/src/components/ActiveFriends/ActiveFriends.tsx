@@ -12,9 +12,8 @@ export default function ActiveFriends() {
     const navigate = useNavigate();
 
     const emitInvite = (friendId: number) => {
-        // maybe some checks on socket
+
         const socket = webSocketService.getSocket();
-        if (!socket) console.log('socket not connected cant emit');
         socket?.emit('gameInvite', {
             userId: user.id,
             friendId: friendId,
