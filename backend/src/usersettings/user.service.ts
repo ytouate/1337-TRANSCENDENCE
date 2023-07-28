@@ -8,10 +8,6 @@ import {
 import { Notification, User, UserStatus } from '@prisma/client';
 import { stat } from 'fs';
 import { PrismaService } from 'src/prisma/prisma.service';
-<<<<<<< HEAD
-import { userReturn } from 'src/utils/user.return';
-=======
->>>>>>> 70c1ff813bd6af476fc88c30094649f3a5c2733f
 
 @Injectable()
 export class UserSettingsService {
