@@ -11,18 +11,19 @@ export default function ActiveFriends() {
     const activeFriends = useActiveFriends(user);
     const navigate = useNavigate();
 
-    const emitInvite = (username: string) => {
+    const emitInvite = (friendId: number) => {
         // maybe some checks on socket
         const socket = webSocketService.getSocket();
         if (!socket) console.log('socket not connected cant emit');
         socket?.emit('gameInvite', {
             userId: user.id,
-            opponentUsername: username,
+            friendId: friendId,
         });
-        console.log('emitted');
 
         socket?.on('invite_sent', (data: any) => {
-            navigate(`/challenge/${data.id}`, { state: { username } });
+            navigate(`/challenge/${data.id}`, {
+                state: { username: data.username },
+            });
         });
     };
 
@@ -34,7 +35,7 @@ export default function ActiveFriends() {
                     <Fragment key={friend.id}>
                         <div
                             onClick={() => {
-                                emitInvite(friend.username);
+                                emitInvite(friend.id);
                             }}
                         >
                             <ChallengeCard
