@@ -4,7 +4,7 @@ import { GameDto } from './dto';
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller('game')
-// @UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'))
 export class GameController {
     constructor(private gameService: GameService) {}
 
