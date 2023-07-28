@@ -16,7 +16,10 @@ export async function loader() {
             Authorization: `Bearer ${Token}`,
         },
     };
-    const res = await fetch("http://localhost:3000/user", options);
+    const res = await fetch(
+        `http://${import.meta.env.VITE_API_URL}/user`,
+        options
+    );
     if (res.ok) {
         const data = await res.json();
         if (data.optionalMail && !data.isSignedIn) {
@@ -26,7 +29,6 @@ export async function loader() {
     }
     return redirect("/signin");
 }
-
 
 function Home() {
     const [isSignedIn]: any = useContext(authContext);

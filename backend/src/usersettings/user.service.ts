@@ -8,7 +8,10 @@ import {
 import { Notification, User, UserStatus } from '@prisma/client';
 import { stat } from 'fs';
 import { PrismaService } from 'src/prisma/prisma.service';
+<<<<<<< HEAD
 import { userReturn } from 'src/utils/user.return';
+=======
+>>>>>>> 70c1ff813bd6af476fc88c30094649f3a5c2733f
 
 @Injectable()
 export class UserSettingsService {
@@ -126,7 +129,6 @@ export class UserSettingsService {
         );
         if (index != -1) usersSearch = usersSearch.splice(index, index);
         usersSearch.map((obj: any) => {
-            obj = userReturn(obj, req);
 
             obj.friendStatus = false;
             obj.me = false;
@@ -197,12 +199,6 @@ export class UserSettingsService {
             else if (status == 'blocked')
                 throw new UnauthorizedException({}, '');
             else if (status == 'me') {
-                userToReturn.friends = userToReturn.friends.map((friend) =>
-                    userReturn(friend, req),
-                );
-                userToReturn.blocked = userToReturn.blocked.map((friend) =>
-                    userReturn(friend, req),
-                );
                 userToReturn.me = true;
             }
             if (userToReturn.me == false) {
@@ -210,7 +206,7 @@ export class UserSettingsService {
                 delete userToReturn.blockedBy;
             }
             delete userToReturn.blockedBy;
-            return userReturn(userToReturn, req);
+            return userToReturn;
         }
         throw new NotFoundException({}, 'not found');
     }
@@ -236,7 +232,7 @@ export class UserSettingsService {
         if (!user)
             // check if user exists
             throw new ForbiddenException('user not found');
-        return user;
+        return user
     }
 
     async getUserById(userId: number) {

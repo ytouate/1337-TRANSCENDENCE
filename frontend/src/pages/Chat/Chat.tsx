@@ -66,7 +66,7 @@ export default function Chat() {
     }
 
     useEffect(() => {
-        const chatSocket = io("http://localhost:3000/chat", {
+        const chatSocket = io(`http://${import.meta.env.VITE_API_URL}/chat`, {
             autoConnect: false,
             extraHeaders: {
                 Authorization: `Bearer ${Cookies.get("Token")}`,
@@ -79,6 +79,14 @@ export default function Chat() {
         chatSocket.on("onError", (err) => {
             console.log("error: ", err);
         });
+
+        chatSocket.on("onUpdate", (miks: { message: string }) => {
+            if (miks.message != "joined") {
+                setIsDmsSection(true);
+                setRoom(null);
+            }
+        });
+
         chatSocket.on("get_room", ({ room }: { room: chatRoom }) => {
             setRoom(room);
             setAllMessages(room.messages);
@@ -209,9 +217,15 @@ export default function Chat() {
                     email: members,
                 }),
             };
-            fetch("http://localhost:3000/user/" + option, options)
+            fetch(
+                `http://${import.meta.env.VITE_API_URL}/user/` + option,
+                options
+            )
                 .then((res) => res.json())
-                .then((data) => setRoom(data)); // ! added it may cause an error
+                .then((data) => {
+                    setRoom(data);
+                    location.reload();
+                }); // ! added it may cause an error
             setManageClicked(false);
             setMembers([]);
         }
@@ -227,9 +241,15 @@ export default function Chat() {
                     email: members,
                 }),
             };
-            fetch("http://localhost:3000/user/addAdmin", options)
+            fetch(
+                `http://${import.meta.env.VITE_API_URL}/user/addAdmin`,
+                options
+            )
                 .then((res) => res.json())
-                .then((data) => setRoom(data)); // ! added it may cause an error
+                .then((data) => {
+                    setRoom(data);
+                    location.reload();
+                }); // ! added it may cause an error
             setManageClicked(false);
             setMembers([]);
         }
@@ -241,6 +261,7 @@ export default function Chat() {
             setRoom(room); // ! added it may cause an error
             setManageClicked(false);
             setMembers([]);
+            location.reload();
         }
     }
 

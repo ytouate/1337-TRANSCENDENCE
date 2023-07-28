@@ -62,7 +62,7 @@ export async function searchForUsers(e: any, searchPattern: string) {
         },
     };
     const res = await fetch(
-        `http://localhost:3000/users/search?` +
+        `http://${import.meta.env.VITE_API_URL}/users/search?` +
             new URLSearchParams({
                 pattern: searchPattern,
             }),
@@ -85,7 +85,10 @@ export default function FriendsList(props: friendListType) {
         },
     };
     useEffect(() => {
-        fetch("http://localhost:3000/users/" + props.id, options)
+        fetch(
+            `http://${import.meta.env.VITE_API_URL}/users/` + props.id,
+            options
+        )
             .then((res) => res.json())
             .then((data) => setUser(data));
     }, [isSearching]);

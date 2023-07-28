@@ -13,7 +13,7 @@ import NotFound from "../../components/NotFound";
 import { Socket } from "socket.io-client/debug";
 
 export function ErrorBoundary() {
-    let error : any = useRouteError();
+    let error: any = useRouteError();
     return <NotFound message={error.message} />;
 }
 
@@ -26,7 +26,7 @@ export async function userLoader({ params }: any) {
         },
     };
     const res = await fetch(
-        "http://localhost:3000/users/" + params.id,
+        `http://${import.meta.env.VITE_API_URL}/users/` + params.id,
         options
     );
     if (res.ok) return await res.json();
@@ -45,12 +45,15 @@ export default function Profile() {
 
     const [socketContext, setSocketContext] = useState<Socket | any>(null);
     useEffect(() => {
-        const socketContext = socketIO("http://localhost:3000/notification", {
-            extraHeaders: {
-                Authorization: `Bearer ${Cookies.get("Token")}`,
-            },
-            autoConnect: false,
-        });
+        const socketContext = socketIO(
+            `http://${import.meta.env.VITE_API_URL}/notification`,
+            {
+                extraHeaders: {
+                    Authorization: `Bearer ${Cookies.get("Token")}`,
+                },
+                autoConnect: false,
+            }
+        );
         socketContext.connect();
         setSocketContext(socketContext);
     }, []);
@@ -78,7 +81,7 @@ export default function Profile() {
                 )}
             </div>
             <div className="profile--right">
-                <Achievements />
+                <Achievements user={user} />
                 <Stats
                     winRate={user.winRate}
                     wins={user.win}

@@ -29,7 +29,7 @@ export default function DropDownMenup({ dropdownRef }: any) {
             <li>
                 <a
                     onClick={() => {
-                        fetch("http://localhost:3000/logout", {
+                        fetch(`http://${import.meta.env.VITE_API_URL}/logout`, {
                             method: "POST",
                             headers: {
                                 Authorization: `Bearer ${Cookies.get("Token")}`,

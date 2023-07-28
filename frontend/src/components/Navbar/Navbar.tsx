@@ -15,7 +15,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { userContext } from "../../context/Context";
 
 export async function loader() {
-    const data = await fetch("http://localhost:3000/user", {
+    const data = await fetch(`http://${import.meta.env.VITE_API_URL}/user`, {
         headers: {
             Authorization: `Bearer ${Cookies.get("Token")}`,
         },

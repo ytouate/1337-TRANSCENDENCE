@@ -55,7 +55,7 @@ function ToCards({
                                 }),
                             };
                             fetch(
-                                "http://localhost:3000/user/changePassword",
+                                "http://import.meta.env.VITE_API_URL/user/changePassword",
                                 options
                             )
                                 .then((res) => res.json())
@@ -152,7 +152,10 @@ export function ManageRoom({
                 roomName: room.roomName,
             }),
         };
-        fetch("http://localhost:3000/user/deletePassword", options)
+        fetch(
+            `http://${import.meta.env.VITE_API_URL}/user/deletePassword`,
+            options
+        )
             .then((res) => res.json())
             .then((data) => console.log("succefully deleted: ", data));
     };
@@ -169,7 +172,10 @@ export function ManageRoom({
                 password: newPassword,
             }),
         };
-        fetch("http://localhost:3000/user/changePassword", options)
+        fetch(
+            `http://${import.meta.env.VITE_API_URL}/user/changePassword`,
+            options
+        )
             .then((res) => res.json())
             .then((data) => console.log("succefully deleted: ", data));
     };

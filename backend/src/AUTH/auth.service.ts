@@ -3,8 +3,8 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { imageLink } from "./auth.strategy42";
 import { JwtService } from "@nestjs/jwt";
 import { MailerService } from "@nestjs-modules/mailer";
-import { userReturn } from "src/utils/user.return";
 import { use } from "passport";
+import { User } from "@prisma/client";
 
 @Injectable()
 export class authService{
@@ -59,7 +59,7 @@ export class authService{
 
     //validate user
     async validateUser(req) : Promise<any>{
-        const user =  await this.prisma.user.findUnique({where : {email : req.user.email} ,
+        const user :  any =  await this.prisma.user.findUnique({where : {email : req.user.email} ,
             include: {
                 friends: true,
                 preference : true,
@@ -69,8 +69,7 @@ export class authService{
         })
         if (user)
         {
-            user.friends = user.friends.map(friend => userReturn(friend, req));
-            return userReturn(user, req)
+            return user;
         }
         throw new UnauthorizedException()
     }
@@ -80,11 +79,8 @@ export class authService{
             const users =  await this.prisma.user.findMany({
              orderBy : { winRate: 'desc'}
             })
-            const usersToReturn = [];
-            for (const user of users) {
-                usersToReturn.push(userReturn(user, req));
-            }
-            return usersToReturn; 
+
+            return users; 
         }
 
 

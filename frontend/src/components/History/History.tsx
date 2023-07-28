@@ -1,9 +1,9 @@
-import MatchCard from '../HistoryCard/HistoryCard';
-import historyIcon from '../../assets/history-icon.svg';
-import './History.css';
-import { Fragment, useEffect, useState } from 'react';
-import Cookies from 'js-cookie';
-import { useParams } from 'react-router-dom';
+import MatchCard from "../HistoryCard/HistoryCard";
+import historyIcon from "../../assets/history-icon.svg";
+import "./History.css";
+import { Fragment, useEffect, useState } from "react";
+import Cookies from "js-cookie";
+import { useParams } from "react-router-dom";
 
 export default function History() {
     const [matches, setMatches] = useState([]);
@@ -11,12 +11,12 @@ export default function History() {
 
     useEffect(() => {
         const options = {
-            method: 'GET',
+            method: "GET",
             headers: {
-                Authorization: `Bearer ${Cookies.get('Token')}`,
+                Authorization: `Bearer ${Cookies.get("Token")}`,
             },
         };
-        const url = `http://localhost:3000/game/user/${id}`;
+        const url = `http://${import.meta.env.VITE_API_URL}/game/user/${id}`;
         fetch(url, options)
             .then((res) => {
                 return res.json();
@@ -47,12 +47,12 @@ export default function History() {
         );
     });
     return (
-        <div className='profile--histroy'>
-            <div className='profile--history-header'>
-                <img src={historyIcon} alt='' />
+        <div className="profile--histroy">
+            <div className="profile--history-header">
+                <img src={historyIcon} alt="" />
                 <p>Match History</p>
             </div>
-            <div className='profile--history-matches'>{MatchHistory}</div>
+            <div className="profile--history-matches">{MatchHistory}</div>
         </div>
     );
 }

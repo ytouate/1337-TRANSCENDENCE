@@ -107,11 +107,12 @@ export class UserService {
 
 
   // show all available rooms
-  async getAllRooms() {
-    return await this.prismaService.chatRoom.findMany({
+  async getAllRooms(req: any) {
+    let rooms: any = await this.prismaService.chatRoom.findMany({
       where: { status: { in: ['public', 'protected'] } },
       include: { users: true, messages: true },
     });
+   return rooms;
   }
 
 

@@ -13,7 +13,7 @@ export async function unblock(username: string) {
         body: JSON.stringify({ username: username }),
     };
 
-    const res = await fetch("http://localhost:3000/users/unblock", options);
+    const res = await fetch(`http://${import.meta.env.VITE_API_URL}/users/unblock`, options);
     if (!res.ok) throw new Error("failed to unblock");
 }
 export const notifyUnblocked = () => toast("unblocked succefully");

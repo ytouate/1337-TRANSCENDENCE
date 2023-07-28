@@ -26,9 +26,10 @@ export function DmSideBar({ user, setSelectedUser, createRoom }: Props) {
                                                 img={member.urlImage}
                                                 name={member.username}
                                                 lastmsg={
+                                                    
                                                     room.messages[
                                                         room.messages.length - 1
-                                                    ]?.data
+                                                    ]?.data.slice(0, 10)
                                                 }
                                                 addOption={false}
                                             />

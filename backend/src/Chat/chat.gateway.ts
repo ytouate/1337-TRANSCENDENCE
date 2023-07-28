@@ -14,7 +14,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { Req } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { userReturnToGatway } from 'src/utils/user.return';
 import { ChatDto, message } from '../DTO/DTO';
 
 @WebSocketGateway({ namespace: 'chat', cors: { origin: '*' } })
@@ -47,7 +46,7 @@ export class chatGateway
       Body.data,
       req,
     );
-    message.sender = userReturnToGatway(message.sender, req);
+
     message.roomName = Body.roomName;
     this.server.to(Body.roomName).emit('onMessage', message);
   }
@@ -65,7 +64,6 @@ export class chatGateway
     @Req() req,
     @MessageBody() Body: ChatDto,
   ) {
-    console.log('lkdsmcklsmcds');
     console.log(
       `client  ${client.id} connected and creat the room ${Body.roomName}`,
     );
@@ -91,6 +89,7 @@ export class chatGateway
             //console.log(email)
             id = this.socketId.get(email);
             this.server.to(id).socketsJoin(email);
+            this.server.to(id).emit('onUpdate' , {'message' : 'create'})
             const newUser = await this.prisma.user.findUnique({
               where: { email: email },
             });
@@ -116,6 +115,7 @@ export class chatGateway
         }
       }
       //console.log(newRoom)
+      
       client.emit('get_room', { room: newRoom });
     }
   }
@@ -147,6 +147,7 @@ export class chatGateway
         for (const email of body.email) {
           const id = this.socketId.get(email);
           this.server.in(id).socketsJoin(body.roomName);
+          this.server.to(id).emit('onUpdate' , {'message' : 'joined'})
           const newUser = await this.prisma.user.findUnique({
             where: { email: email },
           });
@@ -173,6 +174,7 @@ export class chatGateway
         console.log(Id);
         this.socketId.delete(email);
         this.server.in(Id).socketsLeave(body.roomName);
+        this.server.to(Id).emit('onUpdate' , {'message' : 'leaved'})
         const newUser = await this.validateUserByEmail(email, body.roomName, 0);
         if (body.ban)
           await this.user.banUser(newUser, body.roomName, body.email);
