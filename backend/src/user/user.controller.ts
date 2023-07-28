@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
-import { userReturn } from 'src/utils/user.return';
 import { body, password } from 'src/DTO/DTO';
 
 
@@ -50,18 +49,13 @@ export class UserController {
     @Get('getRoom')
     async getRoomByName(@Body() body, @Req() req) {
         const room = await this.userService.getRoomByName(body.roomName)
-        const usersToReturn = [];
         if (room) {
-            for (const user of room.users) {
-                usersToReturn.push(userReturn(user, req));
-            }
-            room.users = usersToReturn;
             return room
         }
     }
 
     @Get('getRooms')
-    async getAllRooms() {
-        return await this.userService.getAllRooms()
+    async getAllRooms(@Req() req) {
+        return await this.userService.getAllRooms(req)
     }
 }

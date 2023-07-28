@@ -103,7 +103,7 @@ export class GameGateWay implements OnGatewayConnection {
 
         //means player exists
         // console.log(`Client with username ${user.username} connected`);
-        console.log({ connected_client: userData });
+        // console.log({ connected_client: userData });
 
         this.userSockets.set(user.id, userData);
         return user;
@@ -205,6 +205,9 @@ export class GameGateWay implements OnGatewayConnection {
 
         const gamePosition = this.gamePlayerPosition.get(game.id);
 
+        this.userService.updatePlayerStatus(player1, 'INGAME');
+        this.userService.updatePlayerStatus(player2, 'INGAME');
+
         // Create a new Game instance and start the game loop
         const gameInstance = new Game(
             game.id,
@@ -218,6 +221,8 @@ export class GameGateWay implements OnGatewayConnection {
 
         gameInstance.startGameLoop(this.server, () => {
             this.clearMaps(gameInvite, game.id, player1);
+            this.userService.updatePlayerStatus(player1, 'ONLINE');
+            this.userService.updatePlayerStatus(player2, 'ONLINE');
         });
     }
 
@@ -432,7 +437,8 @@ export class GameGateWay implements OnGatewayConnection {
 
         if (!lobby || (userId != lobby.inviteeId && userId != hostId)) {
             console.log('u are not allowed here');
-            this.server.to(myData.socket.id).emit('unauthorized_lobby', {});
+            if (myData)
+                this.server.to(myData.socket.id).emit('unauthorized_lobby', {});
             // throw new UnauthorizedException();
             //
             return;
@@ -447,24 +453,27 @@ export class GameGateWay implements OnGatewayConnection {
         }
     }
 
-    // @SubscribeMessage('spectateGame')
-    // async spectateGame(
-    //     @MessageBody() body: any,
-    //     @ConnectedSocket() client: Socket,
-    // ) {
-    //     const gameId: number = body.gameId;
+    @SubscribeMessage('spectateGame')
+    async spectateGame(
+        @MessageBody() body: any,
+        @ConnectedSocket() client: Socket,
+    ) {
+        const gameId: number = body.gameId;
+        const gamePosition = this.gamePlayerPosition.get(Number(gameId));
+        // console.log(gamePosition);
+        // console.log(gameId);
+        if (gamePosition) {
+            const roomId = String(gameId);
 
-    //     const gamePosition = this.gamePlayerPosition.get(gameId);
-    //     if (gamePosition) {
-    //         const roomId = String(gameId);
+            this.server.to(client.id).emit('spectate_ready', {
+                gameId: gameId,
+                player1: gamePosition.players[0],
+                player2: gamePosition.players[1],
+            });
 
-    //         this.server.to(client.id).emit('spectate_ready', {
-    //             gameId: gameId,
-    //             player1: gamePosition.players[0],
-    //             player2: gamePosition.players[1],
-    //         });
-
-    //         client.join(roomId);
-    //     }
-    // }
+            client.join(roomId);
+        } else {
+            client.emit('lobby_not_found');
+        }
+    }
 }

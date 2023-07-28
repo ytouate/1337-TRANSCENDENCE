@@ -1,4 +1,4 @@
-export const WIN_CONDITION = 5;
+export const WIN_CONDITION = 3;
 
 export const BOARD_HEIGHT = 1200;
 export const BOARD_WIDTH = 1600;

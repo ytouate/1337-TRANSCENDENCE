@@ -6,7 +6,7 @@ import FriendCard from "../FriendCard/FriendCard";
 import { createGroup } from "../RoomForm/RoomForm";
 import roomImg from "../../assets/against_friends_img.jpg";
 import "./GroupSideBar.css";
-import { Navigate, redirect, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function GroupSideBar({
     chatRooms,

@@ -5,7 +5,7 @@ import { createReadStream } from 'fs';
 import { Response } from 'express';
 import { MIMEType } from 'util';
 import { lookup } from 'mime-types';
-import { userReturn } from 'src/utils/user.return';
+import path from 'path';
 
 
 @Injectable()
@@ -20,7 +20,7 @@ export class ProfileService{
           notifications: true,
         }})
         if (user){
-          return userReturn(user, req)
+          return user;
         }
     }
     async updatePhoto(req, filePath) {
@@ -29,12 +29,16 @@ export class ProfileService{
           email: req.user.email,
         },
         data: {
-          urlImage: filePath,
-          imageIsUpdate: true,
+          urlImage: req.protocol + '://' +
+          req.get('host') +
+          '/profile/getphoto/' +
+          req.user.username,
+          imageIsUpdate: false,
+          filepath: filePath
         },
       })
       if (updateUser){
-        return userReturn(updateUser, req)
+        return updateUser;
       }
     }
     async deletePhoto(req) {
@@ -43,12 +47,15 @@ export class ProfileService{
               email: req.user.email,
             },
             data: {
-              urlImage: "./gorilaavatar/Gorilla-Avatar-icon.png",
+              urlImage: req.protocol + '://' +
+              req.get('host') +
+              '/profile/getphoto/' +
+              req.user.username,
               imageIsUpdate: true,
             },
           })
           if (updateUser){
-            return userReturn(updateUser, req)
+            return updateUser;
         }
     }
     async updateName(newUserame, req) {
@@ -70,7 +77,7 @@ export class ProfileService{
             },
           })
         if (updateUser){
-          return userReturn(updateUser, req);
+          return updateUser;
         }
     }
     async getPhotoProfile(req, res, username): Promise<StreamableFile>{
@@ -78,12 +85,17 @@ export class ProfileService{
         username: username,
     }})
     if (user){
-        const file = createReadStream(user.urlImage);
-        const mimetype = lookup(user.urlImage)
-        res.set({
-          'content-type': mimetype
-        })
-        return new StreamableFile(file);
+      let path;
+      if (!user.imageIsUpdate)
+        path = user.filepath
+      else
+        path = 'gorilaavatar/Gorilla-Avatar-icon.png';
+      const file = createReadStream(path)
+      const mimetype = lookup(path)
+      res.set({
+        'content-type': mimetype
+      })
+      return new StreamableFile(file);
     }
     }
     async deleteNotification(user, notifications){

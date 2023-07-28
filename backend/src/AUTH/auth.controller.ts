@@ -30,13 +30,14 @@ export class authController {
 		await this.authservice.checkUserhave2fa(user);
 		res.cookie('Token', token);
 		res.cookie('isSignedIn', true);
-		res.redirect('http://localhost:5173/');
+		res.redirect(`http://${process.env.API_URL}:5173/`);
 	}
 
 	@Get('user')
 	@UseGuards(AuthGuard('jwt'))
 	async getUser(@Req() req) {
 		const user = await this.authservice.validateUser(req);
+		console.log(user);
 		if (user) return user;
 		throw new NotFoundException();
 	}

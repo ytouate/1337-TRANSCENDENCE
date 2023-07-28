@@ -81,7 +81,7 @@ export default function Profile() {
                 )}
             </div>
             <div className="profile--right">
-                <Achievements />
+                <Achievements user={user} />
                 <Stats
                     winRate={user.winRate}
                     wins={user.win}

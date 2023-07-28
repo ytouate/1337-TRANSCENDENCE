@@ -5,10 +5,9 @@ import {
     NotFoundException,
     UnauthorizedException,
 } from '@nestjs/common';
-import { Notification, User } from '@prisma/client';
+import { Notification, User, UserStatus } from '@prisma/client';
 import { stat } from 'fs';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { userReturn } from 'src/utils/user.return';
 
 @Injectable()
 export class UserSettingsService {
@@ -126,7 +125,6 @@ export class UserSettingsService {
         );
         if (index != -1) usersSearch = usersSearch.splice(index, index);
         usersSearch.map((obj: any) => {
-            obj = userReturn(obj, req);
 
             obj.friendStatus = false;
             obj.me = false;
@@ -197,12 +195,6 @@ export class UserSettingsService {
             else if (status == 'blocked')
                 throw new UnauthorizedException({}, '');
             else if (status == 'me') {
-                userToReturn.friends = userToReturn.friends.map((friend) =>
-                    userReturn(friend, req),
-                );
-                userToReturn.blocked = userToReturn.blocked.map((friend) =>
-                    userReturn(friend, req),
-                );
                 userToReturn.me = true;
             }
             if (userToReturn.me == false) {
@@ -210,7 +202,7 @@ export class UserSettingsService {
                 delete userToReturn.blockedBy;
             }
             delete userToReturn.blockedBy;
-            return userReturn(userToReturn, req);
+            return userToReturn;
         }
         throw new NotFoundException({}, 'not found');
     }
@@ -303,6 +295,21 @@ export class UserSettingsService {
                     loss: loss,
                     winRate: winRate,
                     winStreak: 0,
+                },
+            });
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async updatePlayerStatus(userId: number, status: UserStatus) {
+        try {
+            await this.prismaService.user.update({
+                where: {
+                    id: userId,
+                },
+                data: {
+                    activitystatus: status,
                 },
             });
         } catch (error) {

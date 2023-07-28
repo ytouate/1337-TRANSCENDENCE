@@ -13,9 +13,9 @@ export class GameController {
         return this.gameService.getAll();
     }
 
-    @Get('live')
-    getLiveGame() {
-        return this.gameService.getLiveGame();
+    @Get('live/:userId')
+    getLiveGame(@Param('userId') userId: number) {
+        return this.gameService.getLiveGame(Number(userId));
     }
 
     @Get('user/:userId')

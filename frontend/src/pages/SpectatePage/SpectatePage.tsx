@@ -13,15 +13,18 @@ import jungle from '../../assets/jungle.jpeg';
 import arcade from '../../assets/arcade.jpg';
 import Game from '../../components/Game/Game.tsx';
 import webSocketService from '../../context/WebSocketService.ts';
-import './Queue.css';
+import './SpectatePage.css';
 import LoadingAnimation from '../../components/LoadingAnimation/LoadingAnimation.tsx';
+import { useParams } from 'react-router-dom';
 
-const Queue = () => {
+const SpectatePage = () => {
     const user: any = useLoaderData();
     const { id, username, preference } = user;
+    // let { preference } = user;
+    const { gameId } = useParams();
 
     const [waitState, setWaitState] = useState(true);
-    const [gameId, setGameId] = useState(null);
+    // const [gameId, setGameId] = useState(null);
     const [player1, setPlayer1] = useState<Player>({} as Player);
     const [player2, setPlayer2] = useState<Player>({} as Player);
     const navigate = useNavigate();
@@ -55,16 +58,15 @@ const Queue = () => {
             };
     };
 
-    const resetState = () => {
-        // const socket = webSocketService.getSocket();
-        if (!socket) {
-            navigate('/');
-            return;
-        }
-        socket.emit('queueUp');
-        setGameId(null);
-        setWaitState(true);
-    };
+    // const resetState = () => {
+    //     // const socket = webSocketService.getSocket();
+    //     if (!socket) {
+    //         navigate('/');
+    //         return;
+    //     }
+    //     socket.emit('queueUp');
+    //     setWaitState(true);
+    // };
 
     useEffect(() => {
         setScoket(webSocketService.connect());
@@ -78,13 +80,14 @@ const Queue = () => {
 
     useEffect(() => {
         // const socket = webSocketService.getSocket();
-        console.log('connected');
+        // console.log('connected');
 
         if (!socket) {
             setScoket(webSocketService.connect());
+        } else {
         }
 
-        socket?.emit('queueUp', { userId: id });
+        socket?.emit('spectateGame', { gameId: gameId });
 
         // socket.on('disconnect', (reason: string) => {
         //     if (reason === 'io server disconnect') {
@@ -96,63 +99,38 @@ const Queue = () => {
         //     connectSocket();
         // });
 
-        socket?.on('match_found', (data: any) => {
-            console.log('match found');
-            const { opponent, gameId, order, pref, pref2, urlImg1, urlImg2 } =
-                data;
+        socket?.on('lobby_not_found', (data: any) => {
+            navigate('/');
+        });
 
-            console.log({ pref, pref2 });
-            if (order === 0) {
-                paddle1.color = pref.paddleColor;
-                paddle2.color = pref2.paddleColor;
-                setPlayer1({
-                    paddle: paddle1,
-                    score: 0,
-                    username: username,
-                    opponent: opponent,
-                    preferences: pref,
-                    order: 0,
-                    urlImg: urlImg1,
-                });
-                setPlayer2({
-                    paddle: paddle2,
-                    score: 0,
-                    username: opponent,
-                    opponent: username,
-                    preferences: pref2,
-                    order: 1,
-                    urlImg: urlImg2,
-                });
-            } else {
-                paddle1.color = pref2.paddleColor;
-                paddle2.color = pref.paddleColor;
-                setPlayer1({
-                    paddle: paddle2,
-                    score: 0,
-                    username: username,
-                    opponent: opponent,
-                    preferences: pref,
-                    order: 1,
-                    urlImg: urlImg1,
-                });
-
-                setPlayer2({
-                    paddle: paddle1,
-                    score: 0,
-                    username: opponent,
-                    opponent: username,
-                    preferences: pref2,
-                    order: 0,
-                    urlImg: urlImg2,
-                });
-            }
-            setGameId(gameId);
+        socket?.on('spectate_ready', (data: any) => {
+            console.log(data);
+            paddle1.color = data.player1.pref.paddleColor;
+            paddle2.color = data.player2.pref.paddleColor;
+            setPlayer1({
+                paddle: paddle1,
+                score: 0,
+                username: data.player1.username,
+                opponent: data.player2.username2,
+                preferences: data.player1.pref,
+                order: 0,
+                urlImg: data.player1.urlImg1,
+            });
+            setPlayer2({
+                paddle: paddle2,
+                score: 0,
+                username: data.player2.username,
+                opponent: data.player1.c,
+                preferences: data.player2.pref2,
+                order: 1,
+                urlImg: data.player2.urlImg1,
+            });
             setWaitState(false);
         });
 
         return () => {
             socket?.off('connect');
-            socket?.off('match_found');
+            socket?.off('spectate_ready');
         };
     }, [socket]);
 
@@ -161,7 +139,7 @@ const Queue = () => {
             {waitState ? (
                 <div className='queue-container '>
                     <LoadingAnimation />
-                    <h1 className='queue-h1'>Waiting for players...</h1>
+                    <h1 className='queue-h1'>Loading...</h1>
                 </div>
             ) : (
                 <div className='game-container'>
@@ -170,8 +148,8 @@ const Queue = () => {
                         player1={player1}
                         player2={player2}
                         gameId={Number(gameId)}
-                        resetState={resetState}
-                        isSpectate={false}
+                        resetState={null}
+                        isSpectate={true}
                     />
                 </div>
             )}
@@ -179,4 +157,4 @@ const Queue = () => {
     );
 };
 
-export default Queue;
+export default SpectatePage;

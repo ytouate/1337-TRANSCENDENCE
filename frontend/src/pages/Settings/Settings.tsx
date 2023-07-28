@@ -195,7 +195,11 @@ export default function Settings() {
                             <p>{user.username}</p>
                         </div>
                     )}
-                    <input type="file" onChange={updateAvatar} />
+                    <input
+                        type="file"
+                        accept=".png, .jpg, .jpeg"
+                        onChange={updateAvatar}
+                    />
                     <button className="upload-btn">Upload</button>
                 </form>
             </div>

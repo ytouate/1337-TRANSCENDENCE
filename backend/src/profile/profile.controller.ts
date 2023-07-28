@@ -3,7 +3,6 @@ import { diskStorage } from 'multer';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as mimeTypes from 'mime-types';
-import { createReadStream } from 'fs';
 import { ProfileService } from './profile.service';
 import * as fs from 'fs';
 import {  UsernameUpdateDto } from 'src/DTO/username.dto';
@@ -28,7 +27,7 @@ export class ProfileController {
             }
         }),
         fileFilter: (req, file, callback) => {
-            if (file.mimetype != 'image/jpeg' && file.mimetype != 'image/jpg')
+            if (file.mimetype != 'image/jpeg' && file.mimetype != 'image/jpg' && file.mimetype != 'image/png')
                 callback(new Error('file type not allowed'),false);
             if (file.size > 700000)
                 callback(new Error('size not allowed'), false);

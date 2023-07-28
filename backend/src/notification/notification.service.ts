@@ -19,7 +19,6 @@ import {
 import { Notification, User } from '@prisma/client';
 import { Server, Socket } from 'socket.io';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { userReturn, userReturnToGatway } from 'src/utils/user.return';
 
 @WebSocketGateway({ namespace: 'notification', cors: { origin: '*' } })
 export class NotificationService
@@ -78,7 +77,6 @@ export class NotificationService
                 id: notif.senderId,
             },
         });
-        notif.sender = userReturnToGatway(sender, req);
         if (this.socketById.has(notif.reiceverId)) {
             for (
                 let i = 0;

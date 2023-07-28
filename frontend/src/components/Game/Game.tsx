@@ -24,16 +24,25 @@ import {
 import EndGameScreen from '../EndGameScreen/EndGameScreen.tsx';
 import webSocketService from '../../context/WebSocketService.ts';
 import './Game.css';
+import { Spectate } from '../Spectate/Spectate.tsx';
 
 interface Props {
     player1: Player;
     player2: Player;
-    gameId: any;
+    gameId: number;
     userId: number;
     resetState: (() => void) | null;
+    isSpectate: boolean;
 }
 
-const Game = ({ userId, player1, player2, gameId, resetState }: Props) => {
+const Game = ({
+    userId,
+    player1,
+    player2,
+    gameId,
+    resetState,
+    isSpectate,
+}: Props) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const [gameOver, setGameOver] = useState(false);
 
@@ -92,14 +101,14 @@ const Game = ({ userId, player1, player2, gameId, resetState }: Props) => {
         socket.on('game_over', (result: { winnerData: PlayerPosition }) => {
             // console.log(result);
             const playerPosition = result.winnerData;
-            if (playerPosition.id === userId) {
-                console.log('U won');
 
+            console.log(playerPosition.score);
+            if (playerPosition.username === player1.username) {
                 player1.score = playerPosition.score;
             } else {
-                console.log('U lost');
                 player2.score = playerPosition.score;
             }
+
             // draw(context);
             setGameOver(true);
         });
@@ -122,7 +131,7 @@ const Game = ({ userId, player1, player2, gameId, resetState }: Props) => {
             let playerPos1: PlayerPosition;
             let playerPos2: PlayerPosition;
 
-            if (state.gamePosition.player1.id == userId) {
+            if (isSpectate || state.gamePosition.player1.id == userId) {
                 playerPos1 = state.gamePosition.player1;
                 playerPos2 = state.gamePosition.player2;
             } else {
@@ -133,8 +142,11 @@ const Game = ({ userId, player1, player2, gameId, resetState }: Props) => {
             player1.score = playerPos1.score;
             player2.score = playerPos2.score;
 
-            const actualPosition = playerPos2.y * canvas.height;
-            player2.paddle.y = actualPosition;
+            const actualPosition1 = playerPos1.y * canvas.height;
+            const actualPosition2 = playerPos2.y * canvas.height;
+
+            if (isSpectate) player1.paddle.y = actualPosition1;
+            player2.paddle.y = actualPosition2;
         });
 
         return () => {
@@ -155,7 +167,7 @@ const Game = ({ userId, player1, player2, gameId, resetState }: Props) => {
         let prevCanvasWidth = canvas.width;
         let prevCanvasHeight = canvas.height;
 
-        const handleMouseOver = (event: MouseEvent) => {
+        const handleMouseMove = (event: MouseEvent) => {
             const canvasRect = canvas.getBoundingClientRect();
             const mouseX = event.clientX - canvasRect.left;
             const mouseY = event.clientY - canvasRect.top;
@@ -204,7 +216,7 @@ const Game = ({ userId, player1, player2, gameId, resetState }: Props) => {
         };
         animationFrameId = window.requestAnimationFrame(render);
 
-        canvas.addEventListener('mousemove', handleMouseOver);
+        if (!isSpectate) canvas.addEventListener('mousemove', handleMouseMove);
 
         const resizeCanvas = () => {
             const container = canvasRef.current?.parentElement;
@@ -244,16 +256,20 @@ const Game = ({ userId, player1, player2, gameId, resetState }: Props) => {
 
         return () => {
             window.cancelAnimationFrame(animationFrameId);
-            canvas.removeEventListener('mousemove', handleMouseOver);
+            if (!isSpectate)
+                canvas.removeEventListener('mousemove', handleMouseMove);
             window.removeEventListener('resize', resizeCanvas);
         };
     }, [draw]);
 
     const getLeftPlayer = () => {
+        // if (isSpectate) return player1;
         if (player1.order === 0) return player1;
         else return player2;
     };
     const getRightPlayer = () => {
+        // if (isSpectate) return player2;
+
         if (player2.order === 0) return player1;
         else return player2;
     };

@@ -170,8 +170,9 @@ const Challenge = () => {
                         userId={id}
                         player1={player1}
                         player2={player2}
-                        gameId={gameId}
+                        gameId={Number(gameId)}
                         resetState={null}
+                        isSpectate={false}
                     />
                 </div>
             )}
