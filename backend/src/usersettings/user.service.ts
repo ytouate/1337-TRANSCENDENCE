@@ -207,7 +207,7 @@ export class UserSettingsService {
         throw new NotFoundException({}, 'not found');
     }
 
-    async getUserByEmail(email: string) {
+    async getUserByEmail(email: string, req: any) {
         const user = await this.prismaService.user.findUnique({
             where: {
                 email: email,
@@ -216,10 +216,10 @@ export class UserSettingsService {
         if (!user)
             // check if user exists
             throw new ForbiddenException('user not found');
-        return user;
+        return userReturnToGatway(user, req);
     }
 
-    async getUserByUsername(username: string) {
+    async getUserByUsername(username: string, req: any) {
         const user = await this.prismaService.user.findUnique({
             where: {
                 username: username,
@@ -228,10 +228,10 @@ export class UserSettingsService {
         if (!user)
             // check if user exists
             throw new ForbiddenException('user not found');
-        return user;
+        return userReturnToGatway(user, req);
     }
 
-    async getUserById(userId: number) {
+    async getUserById(userId: number, req: any) {
         userId = Math.floor(userId);
         const user = await this.prismaService.user.findUnique({
             where: {
@@ -257,7 +257,7 @@ export class UserSettingsService {
             // check if user exists
             throw new ForbiddenException('user not found');
         return {
-            ...user,
+            ...userReturnToGatway(user, req),
             gamesPlayed,
         };
     }
