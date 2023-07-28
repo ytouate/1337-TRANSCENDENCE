@@ -207,7 +207,7 @@ export class UserSettingsService {
         throw new NotFoundException({}, 'not found');
     }
 
-    async getUserByEmail(email: string, req: any) {
+    async getUserByEmail(email: string) {
         const user = await this.prismaService.user.findUnique({
             where: {
                 email: email,
@@ -219,7 +219,7 @@ export class UserSettingsService {
         return user;
     }
 
-    async getUserByUsername(username: string, req: any) {
+    async getUserByUsername(username: string) {
         const user = await this.prismaService.user.findUnique({
             where: {
                 username: username,
@@ -231,7 +231,7 @@ export class UserSettingsService {
         return user
     }
 
-    async getUserById(userId: number, req: any) {
+    async getUserById(userId: number) {
         userId = Math.floor(userId);
         const user = await this.prismaService.user.findUnique({
             where: {
